@@ -1,0 +1,5606 @@
+/*! © Ama Yarın Pazardır · ama-yarin-pazardir.peekdock.com · Tüm hakları saklıdır. İzinsiz kopyalanamaz. */
+(function () {
+  "use strict";
+  var z = window.Cekirdek,
+    lt = {},
+    s = function (a) {
+      return document.getElementById(a) || lt[a] || (lt[a] = document.createElement("div"));
+    },
+    y = function (a) {
+      return String(a).replace(/[&<>"']/g, function (e) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[e];
+      });
+    },
+    v = function (a, e) {
+      return Number(a).toLocaleString("tr-TR", { maximumFractionDigits: e === void 0 ? 2 : e });
+    },
+    M = function (a) {
+      var e = s(a).value;
+      return e === "" ? NaN : parseFloat(e);
+    },
+    st = function (a) {
+      var e = M(a);
+      return isNaN(e) ? void 0 : e;
+    },
+    de = function (a) {
+      return getComputedStyle(document.documentElement).getPropertyValue(a).trim();
+    },
+    Fa =
+      '<p class="dl-not"><b>Bilgi:</b> \xC7\u0131kt\u0131lar hesaplama yard\u0131m\u0131d\u0131r, tahmini de\u011Ferler i\xE7erir. \xDCretime ge\xE7meden \xF6nce \xF6l\xE7\xFCleri kontrol edin ve m\xFCmk\xFCnse deneme par\xE7as\u0131/kesimi yap\u0131n.</p>',
+    ot;
+  function q(a) {
+    var e = s("durum");
+    ((e.textContent = a),
+      (e.hidden = !a),
+      clearTimeout(ot),
+      a &&
+        (ot = setTimeout(function () {
+          e.hidden = !0;
+        }, 4500)));
+  }
+  function pa(a, e) {
+    s(a).innerHTML = '<div class="kart"><p class="hata">' + y(e) + "</p></div>";
+  }
+  function Sa(a) {
+    return a
+      .map(function (e) {
+        return '<p class="uyari">\u26A0 ' + y(e) + "</p>";
+      })
+      .join("");
+  }
+  function pn(a, e) {
+    var t;
+    return function () {
+      (clearTimeout(t), (t = setTimeout(a, e)));
+    };
+  }
+  var Wt =
+    '<h3>\u0130ndirmeden \xF6nce l\xFCtfen okuyun</h3><div class="onay-met"><p>Bu site \xFCcretsiz bir <b>hesaplama yard\u0131mc\u0131s\u0131d\u0131r</b>. \u0130ndirece\u011Finiz dosya (DXF, PDF, PNG, CSV/TXT) tahmini ve teorik de\u011Ferler i\xE7erir; malzeme, kal\u0131nl\u0131k, b\xFCk\xFCm y\xF6ntemi, tak\u0131m ve tezg\xE2h farklar\u0131 ger\xE7ek \xF6l\xE7\xFCleri de\u011Fi\u015Ftirebilir.</p><ul><li><b>\xDCretime ge\xE7meden \xF6nce</b> t\xFCm \xF6l\xE7\xFCleri, a\xE7\u0131lar\u0131 ve adetleri kendiniz kontrol edin.</li><li><b>Mutlaka deneme yap\u0131n:</b> \xF6nce ucuz/art\u0131k malzemede deneme kesimi ve deneme b\xFCk\xFCm\xFC yap\u0131n, sonra as\u0131l malzemeye ge\xE7in.</li><li>Dosyay\u0131 kesim/b\xFCk\xFCm makinesine vermeden \xF6nce kendi CAD/CAM yaz\u0131l\u0131m\u0131n\u0131zda a\xE7\u0131p inceleyin.</li><li>K-fakt\xF6r\xFC, b\xFCk\xFCm pay\u0131, testere pay\u0131, fire ve a\u011F\u0131rl\u0131k gibi sonu\xE7lar yakla\u015F\u0131kt\u0131r; standart de\u011Ferleri ilgili standarttan do\u011Frulay\u0131n.</li></ul><p>Sonu\xE7lar <b>hatas\u0131z olaca\u011F\u0131 garanti edilmez</b> ve \u201Coldu\u011Fu gibi\u201D sunulur. Sonu\xE7lar\u0131n kullan\u0131m\u0131ndan do\u011Fabilecek malzeme, i\u015F g\xFCc\xFC, zaman, makine, k\xE2r kayb\u0131 veya ba\u015Fka her t\xFCrl\xFC zarardan <b>\u0130malat Masas\u0131 ve site sahibi sorumlu tutulamaz</b>; sonucu kullanman\u0131n t\xFCm sorumlulu\u011Fu kullan\u0131c\u0131ya aittir.</p><p>Hesaplamalar taray\u0131c\u0131n\u0131zda yap\u0131l\u0131r, girdi\u011Finiz veriler sunucuya g\xF6nderilmez.  Ayr\u0131nt\u0131lar: <a href="/kullanim-sartlari" target="_blank" rel="noopener">Kullan\u0131m \u015Eartlar\u0131</a>.</p></div><label class="onay-sec"><input type="checkbox" id="onayCk"> <span>Okudum, anlad\u0131m; sonu\xE7lar\u0131 kontrol edip deneme yapmadan \xFCretime ge\xE7meyece\u011Fimi ve sorumlulu\u011Fun bana ait oldu\u011Funu onayl\u0131yorum.</span></label><div class="onay-btn"><button type="button" class="btn ikincil" id="onayIptal">Vazge\xE7</button> <button type="button" class="btn ana" id="onayTamam" disabled>Okudum, onayl\u0131yorum \xB7 \u0130ndir</button></div>';
+  function ze(a, e) {
+    Le(Wt);
+    var t = document.getElementById("ortModal"),
+      i = t.querySelector("#onayCk"),
+      n = t.querySelector("#onayTamam");
+    (i.focus(),
+      (i.onchange = function () {
+        n.disabled = !i.checked;
+      }),
+      (t.querySelector("#onayIptal").onclick = Ya),
+      (n.onclick = function () {
+        i.checked && (Ya(), e());
+      }));
+  }
+  function Da(a, e) {
+    ze(a, function () {
+      Vt(a, e);
+    });
+  }
+  async function Vt(a, e) {
+    var t = null;
+    try {
+      window.claude && window.claude.use && (t = await window.claude.use("downloads"));
+    } catch (l) {
+      t = null;
+    }
+    var i = /\.dxf$/i.test(a);
+    if (t) {
+      try {
+        (await t.save({ filename: i ? a.replace(/\.dxf$/i, ".zip") : a, data: i ? z.zipYap(a, e) : e }),
+          q("Kaydedildi" + (i ? " (zip i\xE7inde " + a + ")" : "") + "."));
+      } catch (l) {
+        (!l || l.code !== "declined") && q("Dosya kaydedilemedi.");
+      }
+      return;
+    }
+    var n = new Blob([e], { type: i ? "application/dxf" : "text/plain;charset=utf-8" }),
+      r = document.createElement("a");
+    ((r.href = URL.createObjectURL(n)),
+      (r.download = a),
+      document.body.appendChild(r),
+      r.click(),
+      r.remove(),
+      setTimeout(function () {
+        URL.revokeObjectURL(r.href);
+      }, 4e3),
+      q(a + " indirildi."));
+  }
+  function Me(a) {
+    var e = a.getContext("2d"),
+      t = document.createElement("canvas"),
+      i = t.getContext("2d"),
+      n = null,
+      r = null,
+      l = null,
+      d = null,
+      c = Math.PI / 4,
+      o = Math.atan(1 / Math.SQRT2),
+      u = c,
+      p = o,
+      m = 1,
+      h = 1,
+      f = [0, 0, 0],
+      k = { 0: [176, 190, 202], 1: [112, 128, 140], 2: [206, 216, 224], 3: [214, 84, 14] },
+      b = 0;
+    function x() {
+      var B = a.getBoundingClientRect(),
+        C = Math.min(window.devicePixelRatio || 1, 2),
+        L = Math.max(10, Math.round(B.width)),
+        R = Math.max(10, Math.round(B.height));
+      (a.width !== Math.round(L * C) || a.height !== Math.round(R * C)) &&
+        ((a.width = Math.round(L * C)), (a.height = Math.round(R * C)));
+      var A = L * 2,
+        F = R * 2;
+      return (
+        (t.width !== A || t.height !== F) &&
+          ((t.width = A), (t.height = F), (n = i.createImageData(A, F)), (r = new Float32Array(A * F))),
+        [L, R]
+      );
+    }
+    function E(B, C, L, R, A, F, K) {
+      var I = L,
+        P = B,
+        H = C,
+        X = I * F - P * K,
+        V = I * K + P * F;
+      return [X, H * R + V * A, V * R - H * A];
+    }
+    function w() {
+      ((u = c), (p = o), (m = 1), S(), D());
+    }
+    function S() {
+      if (l) {
+        var B = Math.cos(o),
+          C = Math.sin(o),
+          L = Math.cos(c),
+          R = Math.sin(c),
+          A = l.min,
+          F = l.max,
+          K = 1e18,
+          I = -1e18,
+          P = 1e18,
+          H = -1e18;
+        f = [(A[0] + F[0]) / 2, (A[1] + F[1]) / 2, (A[2] + F[2]) / 2];
+        for (var X = 0; X < 8; X++) {
+          var V = E(
+            (X & 1 ? F[0] : A[0]) - f[0],
+            (X & 2 ? F[1] : A[1]) - f[1],
+            (X & 4 ? F[2] : A[2]) - f[2],
+            B,
+            C,
+            L,
+            R,
+          );
+          ((K = Math.min(K, V[0])),
+            (I = Math.max(I, V[0])),
+            (P = Math.min(P, V[1])),
+            (H = Math.max(H, V[1])));
+        }
+        var Z = x();
+        h = Math.min((Z[0] * 2 * 0.74) / Math.max(1e-6, I - K), (Z[1] * 2 * 0.66) / Math.max(1e-6, H - P));
+      }
+    }
+    function D() {
+      if (l) {
+        var B = x(),
+          C = B[0],
+          L = B[1],
+          R = t.width,
+          A = t.height,
+          F = Math.cos(p),
+          K = Math.sin(p),
+          I = Math.cos(u),
+          P = Math.sin(u),
+          H = h * m,
+          X = R / 2,
+          V = A / 2 + A * 0.02,
+          Z = l.pos.length / 3,
+          ma = new Float32Array(Z),
+          ca = new Float32Array(Z),
+          na = new Float32Array(Z),
+          ra = new Float32Array(Z),
+          ea = -0.45,
+          J = 0.62,
+          $ = 0.64,
+          ya = Math.hypot(ea, J, $);
+        ((ea /= ya), (J /= ya), ($ /= ya));
+        for (var U = 0; U < Z; U++) {
+          var ta = E(l.pos[3 * U] - f[0], l.pos[3 * U + 1] - f[1], l.pos[3 * U + 2] - f[2], F, K, I, P);
+          ((ma[U] = X + ta[0] * H), (ca[U] = V - ta[1] * H), (na[U] = ta[2]));
+          var Q = E(l.nor[3 * U + 0], l.nor[3 * U + 1], l.nor[3 * U + 2], F, K, I, P),
+            La = -Q[2],
+            le = Math.max(0, Q[0] * ea + Q[1] * J + La * $),
+            $a = ea,
+            fa = J,
+            la = $ + 1,
+            Qa = Math.hypot($a, fa, la),
+            he = Math.pow(Math.max(0, (Q[0] * $a + Q[1] * fa + La * la) / Qa), 28);
+          ((ra[U] = La),
+            (na[U] = ta[2]),
+            (l._I = l._I || new Float32Array(Z)),
+            (l._S = l._S || new Float32Array(Z)),
+            (l._I[U] = (0.34 + 0.66 * le) * (0.7 + 0.3 * Math.sqrt(Math.max(0, La)))),
+            (l._S[U] = 0.32 * he));
+        }
+        var ye = new Uint32Array(n.data.buffer);
+        (ye.fill(0), r.fill(1 / 0));
+        for (var sa = 0; sa < l.tri.length; sa += 3) {
+          var oa = l.tri[sa],
+            Ta = l.tri[sa + 1],
+            Aa = l.tri[sa + 2];
+          if (!(ra[oa] + ra[Ta] + ra[Aa] <= 0)) {
+            var ba = ma[oa],
+              Pa = ca[oa],
+              ja = ma[Ta],
+              Oa = ca[Ta],
+              va = ma[Aa],
+              ga = ca[Aa],
+              Gt = (ja - ba) * (ga - Pa) - (va - ba) * (Oa - Pa);
+            if (!(Math.abs(Gt) < 1e-6))
+              for (
+                var Xt = 1 / Gt,
+                  it = k[l.tip[sa / 3]],
+                  Ji = Math.max(0, Math.floor(Math.min(ba, ja, va))),
+                  qi = Math.min(R - 1, Math.ceil(Math.max(ba, ja, va))),
+                  an = Math.max(0, Math.floor(Math.min(Pa, Oa, ga))),
+                  en = Math.min(A - 1, Math.ceil(Math.max(Pa, Oa, ga))),
+                  tn = na[oa],
+                  nn = na[Ta],
+                  rn = na[Aa],
+                  ln = l._I[oa],
+                  sn = l._I[Ta],
+                  on = l._I[Aa],
+                  dn = l._S[oa],
+                  un = l._S[Ta],
+                  cn = l._S[Aa],
+                  be = an;
+                be <= en;
+                be++
+              )
+                for (var ge = be + 0.5, xe = Ji; xe <= qi; xe++) {
+                  var Se = xe + 0.5,
+                    se = ((ja - Se) * (ga - ge) - (va - Se) * (Oa - ge)) * Xt,
+                    oe = ((va - Se) * (Pa - ge) - (ba - Se) * (ga - ge)) * Xt,
+                    Ee = 1 - se - oe;
+                  if (!(se < -1e-4 || oe < -1e-4 || Ee < -1e-4)) {
+                    var Ut = se * tn + oe * nn + Ee * rn,
+                      Ja = be * R + xe;
+                    if (!(Ut >= r[Ja])) {
+                      r[Ja] = Ut;
+                      var nt = se * ln + oe * sn + Ee * on,
+                        rt = (se * dn + oe * un + Ee * cn) * 255,
+                        fn = Math.min(255, it[0] * nt + rt),
+                        mn = Math.min(255, it[1] * nt + rt),
+                        vn = Math.min(255, it[2] * nt + rt);
+                      ye[Ja] = (255 << 24) | (vn << 16) | (mn << 8) | fn;
+                    }
+                  }
+                }
+          }
+        }
+        (i.putImageData(n, 0, 0),
+          e.setTransform(1, 0, 0, 1, 0, 0),
+          e.clearRect(0, 0, a.width, a.height),
+          (e.imageSmoothingEnabled = !0),
+          (e.imageSmoothingQuality = "high"),
+          e.drawImage(t, 0, 0, a.width, a.height));
+        var Ja = a.width / C;
+        (e.setTransform(Ja, 0, 0, Ja, 0, 0), l.L && _(F, K, I, P, H / 2, C, L));
+      }
+    }
+    function _(B, C, L, R, A, F, K) {
+      for (var I = l.min, P = l.max, H = null, X = 0; X < 4; X++) {
+        var V = X & 1 ? P[0] : I[0],
+          Z = X & 2 ? P[1] : I[1],
+          ma = E(V - f[0], Z - f[1], I[2] - f[2], B, C, L, R),
+          ca = E(V - f[0], Z - f[1], P[2] - f[2], B, C, L, R),
+          na = (ma[1] + ca[1]) / 2;
+        (H === null || na < H.alt) && (H = { alt: na, a: ma, b: ca });
+      }
+      var ra = F / 2,
+        ea = K / 2 + K * 0.01,
+        J = ra + H.a[0] * A,
+        $ = ea - H.a[1] * A,
+        ya = ra + H.b[0] * A,
+        U = ea - H.b[1] * A,
+        ta = ya - J,
+        Q = U - $,
+        La = Math.hypot(ta, Q);
+      if (!(La < 40)) {
+        var le = ta / La,
+          $a = Q / La,
+          fa = -$a,
+          la = le;
+        la < 0 && ((fa = -fa), (la = -la));
+        var Qa = 22,
+          he = de("--mut"),
+          ye = de("--ink"),
+          sa = [J + fa * Qa, $ + la * Qa],
+          oa = [ya + fa * Qa, U + la * Qa];
+        ((e.strokeStyle = he),
+          (e.fillStyle = he),
+          (e.lineWidth = 1),
+          e.beginPath(),
+          e.moveTo(J + fa * 6, $ + la * 6),
+          e.lineTo(sa[0] + fa * 5, sa[1] + la * 5),
+          e.moveTo(ya + fa * 6, U + la * 6),
+          e.lineTo(oa[0] + fa * 5, oa[1] + la * 5),
+          e.moveTo(sa[0], sa[1]),
+          e.lineTo(oa[0], oa[1]),
+          e.stroke(),
+          [
+            [sa, 1],
+            [oa, -1],
+          ].forEach(function (Oa) {
+            var va = Oa[0],
+              ga = Oa[1];
+            (e.beginPath(),
+              e.moveTo(va[0], va[1]),
+              e.lineTo(va[0] + ga * le * 9 + fa * 3.5, va[1] + ga * $a * 9 + la * 3.5),
+              e.lineTo(va[0] + ga * le * 9 - fa * 3.5, va[1] + ga * $a * 9 - la * 3.5),
+              e.closePath(),
+              e.fill());
+          }));
+        var Ta = (sa[0] + oa[0]) / 2,
+          Aa = (sa[1] + oa[1]) / 2,
+          ba = Math.atan2(Q, ta);
+        ((ba > Math.PI / 2 || ba < -Math.PI / 2) && (ba += Math.PI),
+          e.save(),
+          e.translate(Ta, Aa),
+          e.rotate(ba));
+        var Pa = v(l.L, 0) + " mm";
+        e.font = "500 12px " + de("--font-mono");
+        var ja = e.measureText(Pa).width;
+        ((e.fillStyle = de("--panel")),
+          e.fillRect(-ja / 2 - 5, -9, ja + 10, 18),
+          (e.fillStyle = ye),
+          (e.textAlign = "center"),
+          (e.textBaseline = "middle"),
+          e.fillText(Pa, 0, 1),
+          e.restore());
+      }
+    }
+    var W = function () {
+        (cancelAnimationFrame(b), (b = requestAnimationFrame(D)));
+      },
+      G = null;
+    (a.addEventListener("pointerdown", function (B) {
+      ((G = [B.clientX, B.clientY]), a.setPointerCapture(B.pointerId));
+    }),
+      a.addEventListener("pointermove", function (B) {
+        G &&
+          ((u += (B.clientX - G[0]) * 0.008),
+          (p = Math.max(-1.45, Math.min(1.45, p + (B.clientY - G[1]) * 0.008))),
+          (G = [B.clientX, B.clientY]),
+          W());
+      }));
+    var wa = function () {
+      G = null;
+    };
+    return (
+      a.addEventListener("pointerup", wa),
+      a.addEventListener("pointercancel", wa),
+      a.addEventListener(
+        "wheel",
+        function (B) {
+          (B.preventDefault(), (m = Math.max(0.4, Math.min(4, m * (B.deltaY < 0 ? 1.1 : 0.9)))), W());
+        },
+        { passive: !1 },
+      ),
+      a.addEventListener("dblclick", w),
+      window.ResizeObserver &&
+        new ResizeObserver(function () {
+          l && a.getBoundingClientRect().width > 0 && (S(), W());
+        }).observe(a),
+      {
+        ayarla: function (B, C) {
+          ((l = C), (d = B), a.getBoundingClientRect().width > 0 && (S(), D()));
+        },
+        ciz: function () {
+          l && a.getBoundingClientRect().width > 0 && (S(), D());
+        },
+        sifirla: w,
+        ciz2: W,
+        goruntu: function () {
+          return a;
+        },
+      }
+    );
+  }
+  var Na = window.AYARLAR || {},
+    dt = null;
+  function ut() {
+    try {
+      var a = localStorage.getItem("im-sayac");
+      if (a) return JSON.parse(a);
+    } catch (e) {}
+    return dt || {};
+  }
+  function Zt(a) {
+    dt = a;
+    try {
+      localStorage.setItem("im-sayac", JSON.stringify(a));
+    } catch (e) {}
+  }
+  function ue() {
+    var a = new Date();
+    return a.getFullYear() + "-" + (a.getMonth() + 1) + "-" + a.getDate();
+  }
+  var we = null;
+  function Le(a) {
+    var e = document.getElementById("ortModal");
+    (e ||
+      ((e = document.createElement("div")),
+      (e.id = "ortModal"),
+      (e.className = "ort"),
+      e.setAttribute("role", "dialog"),
+      e.setAttribute("aria-modal", "true"),
+      document.body.appendChild(e)),
+      (e.hidden = !1),
+      (e.innerHTML = '<div class="kutu">' + a + "</div>"));
+    var t = e.querySelector("button");
+    t && t.focus();
+  }
+  function Ya() {
+    clearInterval(we);
+    var a = document.getElementById("ortModal");
+    a && ((a.hidden = !0), (a.innerHTML = ""));
+  }
+  function Ba(a, e) {
+    var t = Na.gecisReklam && Na.adsense && Na.adsense.client && Na.adsense.aktif;
+    if (!t) {
+      e();
+      return;
+    }
+    var i = ut();
+    i.gun !== ue() && (i = { gun: ue(), sayac: {} });
+    var n = i.sayac[a] || 0,
+      r = Na.gecisHer || 2,
+      l = Na.gecisSn || 5,
+      d = function () {
+        var c = ut();
+        (c.gun !== ue() && (c = { gun: ue(), sayac: {} }), (c.sayac[a] = (c.sayac[a] || 0) + 1), Zt(c), e());
+      };
+    n > 0 && n % r === 0 ? $t(l, d) : d();
+  }
+  function $t(a, e) {
+    (Le(
+      '<h2>Reklam</h2><p class="alt-yazi">K\u0131sa bir reklam aras\u0131. \u0130\u015Fleminiz hemen ard\u0131ndan devam edecek.</p><div class="reklam" id="gecisReklam" data-yuva="gecis" style="display:grid"></div><div class="satir"><span class="sayac" id="rSay"></span><div class="iki"><button class="btn" type="button" id="rVazgec">Vazge\xE7</button><button class="btn ana" type="button" id="rDevam" disabled>Devam et</button></div></div>',
+    ),
+      window.IM && window.IM.slotDoldur && window.IM.slotDoldur(document.getElementById("gecisReklam")));
+    var t = a,
+      i = function () {
+        ((s("rSay").textContent = t > 0 ? "Devam i\xE7in " + t + " sn" : "Haz\u0131r"),
+          (s("rDevam").disabled = t > 0));
+      };
+    (i(),
+      (we = setInterval(function () {
+        document.hidden || (t > 0 && t--, i(), t <= 0 && clearInterval(we));
+      }, 1e3)),
+      s("rVazgec").addEventListener("click", Ya),
+      s("rDevam").addEventListener("click", function () {
+        (Ya(), e());
+      }));
+  }
+  var ka = null,
+    Qt = {
+      yuvarlak:
+        "Rulo makinesi: a\xE7\u0131l\u0131m geni\u015Fli\u011Fi = \u03C0 \xD7 n\xF6tr \xE7ap. K genelde 0,5; kal\u0131n sacda 0,33 - 0,5 aras\u0131nda denenebilir.",
+      kare: "Abkant: a\xE7\u0131l\u0131m, d\u0131\u015F \xF6l\xE7\xFClerden her b\xFCk\xFCm i\xE7in b\xFCk\xFCm pay\u0131 d\xFC\u015F\xFClerek bulunur. B\xFCk\xFCm \xE7izgileri b\xFCk\xFCm b\xF6lgesinin ortas\u0131ndad\u0131r.",
+      cokgen:
+        "Abkant: her k\xF6\u015Fe 360\xB0 / kenar say\u0131s\u0131 kadar b\xFCk\xFCl\xFCr. D\u0131\u015F \xF6l\xE7\xFC, kar\u015F\u0131l\u0131kl\u0131 iki kenar aras\u0131ndaki uzakl\u0131kt\u0131r.",
+      konik:
+        "Rulo makinesi: a\xE7\u0131l\u0131m bir halka dilimidir (sekt\xF6r). Y\xFCkseklik, iki u\xE7 aras\u0131ndaki eksen boyunca mesafedir.",
+    };
+  function ct() {
+    var a = document.querySelector('input[name="b-tip"]:checked');
+    return a ? a.value : "yuvarlak";
+  }
+  function ft() {
+    var a = ct();
+    ([].forEach.call(s("boruF").querySelectorAll(".f"), function (e) {
+      e.hidden = e.dataset.t.split(" ").indexOf(a) < 0;
+    }),
+      (s("bIpucu").textContent = Qt[a]));
+  }
+  function mt() {
+    return {
+      tip: ct(),
+      et: M("b-et"),
+      k: M("b-k"),
+      kaynak: M("b-kay") || 0,
+      malzeme: s("b-mal").value,
+      dis: M("b-dis"),
+      boy: M("b-boy"),
+      dilim: st("b-dilim"),
+      onBukum: M("b-on") || 0,
+      a: M("b-a"),
+      b: M("b-b"),
+      ri: st("b-ri"),
+      n: M("b-n"),
+      af: M("b-af"),
+      d1: M("b-d1"),
+      d2: M("b-d2"),
+      h: M("b-h"),
+    };
+  }
+  function Jt(a) {
+    var e = a.genislik,
+      t = a.uzunluk,
+      i = Math.max(e, t),
+      n = i * 0.16,
+      r = i / 34,
+      l = i / 480,
+      d = -n + " " + -n * 0.9 + " " + (e + 2 * n) + " " + (t + 2 * n * 0.9 + (a.tip === "konik", 0)),
+      c = function (S) {
+        return t - S;
+      },
+      o =
+        '<defs><marker id="ok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1l9 4-9 4z" fill="var(--mut)"/></marker></defs>';
+    function u(S, D, _, W, G, wa) {
+      var B =
+          '<line class="kota" x1="' +
+          S +
+          '" y1="' +
+          D +
+          '" x2="' +
+          _ +
+          '" y2="' +
+          W +
+          '" marker-start="url(#ok)" marker-end="url(#ok)"/>',
+        C = (S + _) / 2,
+        L = (D + W) / 2;
+      return (
+        wa
+          ? (B +=
+              '<text transform="translate(' +
+              (C + r * 0.35) +
+              " " +
+              L +
+              ') rotate(90)" font-size="' +
+              r +
+              '" text-anchor="middle" dominant-baseline="hanging">' +
+              G +
+              "</text>")
+          : (B +=
+              '<text x="' +
+              C +
+              '" y="' +
+              (L + r * 1.15) +
+              '" font-size="' +
+              r +
+              '" text-anchor="middle">' +
+              G +
+              "</text>"),
+        B
+      );
+    }
+    if (a.tip === "konik") {
+      let S = function (D) {
+        for (var _ = [], W = 0; W <= m; W++) {
+          var G = a.a0 + ((a.a1 - a.a0) * W) / m;
+          _.push([h + D * Math.cos(G), c(f + D * Math.sin(G))]);
+        }
+        return _;
+      };
+      var p = [],
+        m = 90,
+        h = a.ox,
+        f = a.oy,
+        k = S(a.R1),
+        b = S(a.R2).reverse(),
+        x =
+          "M" +
+          k
+            .map(function (D) {
+              return D[0].toFixed(2) + "," + D[1].toFixed(2);
+            })
+            .join("L") +
+          "L" +
+          b
+            .map(function (D) {
+              return D[0].toFixed(2) + "," + D[1].toFixed(2);
+            })
+            .join("L") +
+          "Z";
+      ((o +=
+        '<rect x="0" y="0" width="' +
+        e +
+        '" height="' +
+        t +
+        '" fill="none" stroke="var(--mut)" stroke-width="' +
+        l +
+        '" stroke-dasharray="' +
+        l * 6 +
+        " " +
+        l * 4 +
+        '" opacity=".6"/>'),
+        (o +=
+          '<path d="' +
+          x +
+          '" fill="var(--panel)" stroke="var(--ink)" stroke-width="' +
+          l * 2.2 +
+          '" stroke-linejoin="round"/>'));
+      var E = -Math.PI / 2;
+      ((o +=
+        '<line x1="' +
+        (h + a.R1 * Math.cos(E)) +
+        '" y1="' +
+        c(f + a.R1 * Math.sin(E)) +
+        '" x2="' +
+        (h + a.R2 * Math.cos(E)) +
+        '" y2="' +
+        c(f + a.R2 * Math.sin(E)) +
+        '" stroke="var(--err)" stroke-width="' +
+        l * 1.4 +
+        '" stroke-dasharray="' +
+        l * 7 +
+        " " +
+        l * 5 +
+        '"/>'),
+        (o += '<circle cx="' + h + '" cy="' + c(f) + '" r="' + l * 3.5 + '" fill="var(--mut)"/>'),
+        (o +=
+          '<text x="' +
+          (h + r * 0.6) +
+          '" y="' +
+          (c(f) + r * 1.1) +
+          '" font-size="' +
+          r * 0.9 +
+          '">tepe noktas\u0131</text>'),
+        (o +=
+          '<text x="' +
+          e / 2 +
+          '" y="' +
+          t / 2 +
+          '" font-size="' +
+          r * 0.95 +
+          '" text-anchor="middle">R1 ' +
+          v(a.R1, 1) +
+          " \xB7 R2 " +
+          v(a.R2, 1) +
+          "</text>"),
+        (o +=
+          '<text x="' +
+          e / 2 +
+          '" y="' +
+          (t / 2 + r * 1.3) +
+          '" font-size="' +
+          r * 0.95 +
+          '" text-anchor="middle">a\xE7\u0131 ' +
+          v((a.faz * 180) / Math.PI, 1) +
+          "\xB0</text>"));
+    } else {
+      var w = 0;
+      (a.segs.forEach(function (S) {
+        (S.tur === "bukum" &&
+          (o +=
+            '<rect x="' +
+            w +
+            '" y="0" width="' +
+            S.len +
+            '" height="' +
+            t +
+            '" fill="var(--accent)" opacity=".13"/>'),
+          (w += S.len));
+      }),
+        (o +=
+          '<rect x="0" y="0" width="' +
+          e +
+          '" height="' +
+          t +
+          '" fill="none" stroke="var(--ink)" stroke-width="' +
+          l * 2.2 +
+          '"/>'),
+        a.cizgiler.forEach(function (S, D) {
+          var _ = S.tur === "bukum";
+          ((o +=
+            '<line x1="' +
+            S.x +
+            '" y1="0" x2="' +
+            S.x +
+            '" y2="' +
+            t +
+            '" stroke="var(--err)" stroke-width="' +
+            l * 1.4 +
+            '" stroke-dasharray="' +
+            l * 7 +
+            " " +
+            l * 5 +
+            '"/>'),
+            _ &&
+              (o +=
+                '<text x="' +
+                S.x +
+                '" y="' +
+                -r * (0.45 + (D % 2) * 1.1) +
+                '" font-size="' +
+                r * 0.85 +
+                '" text-anchor="middle">B' +
+                (D + 1) +
+                " " +
+                v(S.aci, 0) +
+                "\xB0</text>"));
+        }),
+        a.onCizgiler.forEach(function (S) {
+          o +=
+            '<line x1="' +
+            S +
+            '" y1="0" x2="' +
+            S +
+            '" y2="' +
+            t +
+            '" stroke="var(--ok)" stroke-width="' +
+            l * 1.4 +
+            '" stroke-dasharray="' +
+            l * 7 +
+            " " +
+            l * 5 +
+            '"/>';
+        }));
+    }
+    return (
+      (o += u(0, t + n * 0.45, e, t + n * 0.45, v(a.genislik) + " mm", !1)),
+      (o += u(e + n * 0.5, 0, e + n * 0.5, t, v(a.uzunluk) + " mm", !0)),
+      '<svg class="sema" viewBox="' +
+        d +
+        '" role="img" aria-label="A\xE7\u0131l\u0131m \u015Femas\u0131">' +
+        o +
+        "</svg>"
+    );
+  }
+  var qt = { yuvarlak: "Yuvarlak", kare: "Kare / dikd\xF6rtgen", cokgen: "\xC7okgen", konik: "Konik" };
+  function ai(a) {
+    return a.tip === "yuvarlak"
+      ? ["\xD8 " + v(a.dis) + " \xD7 " + v(a.et), "i\xE7 \xD8 " + v(a.ic)]
+      : a.tip === "kare"
+        ? [v(a.a) + " \xD7 " + v(a.b) + " \xD7 " + v(a.et), "R i\xE7 " + v(a.ri)]
+        : a.tip === "cokgen"
+          ? [a.n + " kenar \xB7 " + v(a.af) + " \xD7 " + v(a.et), "R i\xE7 " + v(a.ri)]
+          : ["\xD8 " + v(a.dis1) + " \u2192 \xD8 " + v(a.dis2), "h " + v(a.h) + " \xD7 " + v(a.et)];
+  }
+  var vt = null;
+  function ei() {
+    s("boruS").dataset.kuruldu ||
+      ((s("boruS").dataset.kuruldu = "1"),
+      (s("boruS").innerHTML =
+        '<div class="fayans" id="bFayans"></div><div class="gorunum"><div class="kart"><h2>B\xFCk\xFClm\xFC\u015F h\xE2l <small>izometrik, s\xFCr\xFCkleyerek d\xF6nd\xFCr\xFCn</small></h2><div class="masa uc"><canvas id="bTuval" aria-label="Boru 3 boyutlu g\xF6r\xFCn\xFCm"></canvas><div class="etiket" id="bEtiket"></div><div class="araclar"><button type="button" id="bSifirla">\u0130zometrik</button></div><div class="ipucu">s\xFCr\xFCkle: d\xF6nd\xFCr \xB7 tekerlek: yak\u0131nla\u015Ft\u0131r</div></div></div><div class="kart"><h2>A\xE7\u0131l\u0131m <small>sac \xFCzerinde</small></h2><div class="masa" id="bSema"></div><div class="lejant" id="bLejant"></div></div></div><div class="kart" id="bDetay"></div>'),
+      (ka = Me(s("bTuval"))),
+      s("bSifirla").addEventListener("click", function () {
+        ka.sifirla();
+      }));
+  }
+  function Te(a) {
+    (ei(), s("boruS").classList.remove("bayat"), (s("bBn").hidden = !0));
+    var e,
+      t = mt();
+    try {
+      e = z.boruModel(t);
+    } catch (d) {
+      if (!d.kullanici) throw d;
+      ((s("bDetay").innerHTML = '<p class="hata">' + y(d.message) + "</p>"), (vt = null));
+      return;
+    }
+    vt = e;
+    var i = z.boruMesh(e),
+      n = e.cizgiler.filter(function (d) {
+        return d.tur === "bukum";
+      }).length;
+    s("bFayans").innerHTML =
+      '<div class="vurgu"><b>' +
+      v(e.genislik) +
+      "<i>mm</i></b><span>A\xE7\u0131l\u0131m " +
+      (e.tip === "konik" ? "geni\u015Fli\u011Fi (kutu)" : "geni\u015Fli\u011Fi") +
+      '</span></div><div class="vurgu"><b>' +
+      v(e.uzunluk) +
+      "<i>mm</i></b><span>A\xE7\u0131l\u0131m boyu</span></div><div><b>" +
+      v(e.alan / 1e6, 3) +
+      "<i>m\xB2</i></b><span>Sac alan\u0131</span></div><div><b>" +
+      v(e.agirlik, 1) +
+      "<i>kg</i></b><span>A\u011F\u0131rl\u0131k</span></div><div><b>" +
+      (e.cikis === "abkant" ? n + "<i>b\xFCk\xFCm</i>" : "Rulo") +
+      "</b><span>\u0130\u015Flem</span></div>";
+    var r = ai(e);
+    ((s("bEtiket").innerHTML =
+      '<span class="chip">' +
+      y(qt[e.tip]) +
+      '</span><span class="chip">' +
+      y(r[0]) +
+      '</span><span class="chip">' +
+      y(r[1]) +
+      "</span>"),
+      (s("bSema").innerHTML = Jt(e)),
+      (s("bLejant").innerHTML =
+        '<span class="kes">Kesim hatt\u0131</span><span class="bk">' +
+        (e.cikis === "abkant" ? "B\xFCk\xFCm \xE7izgisi" : "Referans \xE7izgisi") +
+        "</span>" +
+        (e.onCizgiler.length ? '<span class="ref">\xD6n b\xFCk\xFCm</span>' : "")));
+    var l = "<h2>Ayr\u0131nt\u0131lar</h2>";
+    (e.cikis === "abkant"
+      ? (l +=
+          '<div class="tablo"><table><tr><th>B\xFCk\xFCm</th><th class="s">A\xE7\u0131</th><th class="s">Soldan konum (mm)</th></tr>' +
+          e.cizgiler
+            .map(function (d, c) {
+              return (
+                "<tr><td>B" +
+                (c + 1) +
+                '</td><td class="s m">' +
+                v(d.aci, 1) +
+                '\xB0</td><td class="s m">' +
+                v(d.x) +
+                "</td></tr>"
+              );
+            })
+            .join("") +
+          '</table></div><p class="not" style="margin-top:10px">B\xFCk\xFCm pay\u0131 (her k\xF6\u015Fe): ' +
+          v(e.bukumPayi, 2) +
+          " mm. A\xE7\u0131l\u0131m geni\u015Fli\u011Fi = t\xFCm d\xFCz k\u0131s\u0131mlar + b\xFCk\xFCm paylar\u0131" +
+          (e.kaynak ? " \u2212 kaynak aral\u0131\u011F\u0131" : "") +
+          ".</p>")
+      : e.tip === "yuvarlak"
+        ? (l +=
+            '<p class="not">\u0130\xE7 \xE7ap ' +
+            v(e.ic) +
+            " mm, n\xF6tr \xE7ap " +
+            v(e.notr) +
+            " mm. A\xE7\u0131l\u0131m geni\u015Fli\u011Fi = \u03C0 \xD7 n\xF6tr \xE7ap" +
+            (e.kaynak ? " \u2212 kaynak aral\u0131\u011F\u0131" : "") +
+            ".</p>")
+        : (l +=
+            '<p class="not">Tarafs\u0131z yar\u0131\xE7aplar: b\xFCy\xFCk u\xE7 ' +
+            v(e.rn1) +
+            " mm, k\xFC\xE7\xFCk u\xE7 " +
+            v(e.rn2) +
+            " mm. E\u011Fik y\xFCkseklik " +
+            v(e.egimUzunlugu) +
+            " mm, a\xE7\u0131l\u0131m yaylar\u0131 R1 " +
+            v(e.R1) +
+            " ve R2 " +
+            v(e.R2) +
+            " mm, a\xE7\u0131 " +
+            v((e.faz * 180) / Math.PI, 1) +
+            "\xB0.</p>"),
+      (l +=
+        Sa(e.uyarilar) +
+        '<div class="eylem"><button class="btn ana" type="button" id="boruIndir"' +
+        (a ? "" : " disabled") +
+        ">DXF indir</button>" +
+        (a
+          ? ""
+          : `<span class="not" style="margin:0;align-self:center">DXF i\xE7in Hesapla'ya bas\u0131n.</span>`) +
+        "</div>" +
+        (a ? Fa : "")),
+      (s("bDetay").innerHTML = l),
+      s("boruIndir").addEventListener("click", function () {
+        try {
+          Da("boru_acilim.dxf", z.boruDxf(t));
+        } catch (d) {
+          q(d.message);
+        }
+      }),
+      ka.ayarla(e, i));
+  }
+  function pt() {
+    s("boruS").dataset.kuruldu && (s("boruS").classList.add("bayat"), (s("bBn").hidden = !1));
+  }
+  (s("boruF").addEventListener("input", pt),
+    s("boruF").addEventListener("change", function (a) {
+      (a.target.name === "b-tip" && ft(), pt());
+    }),
+    s("boruF").addEventListener("submit", function (a) {
+      a.preventDefault();
+      try {
+        z.boruModel(mt());
+      } catch (e) {
+        if (!e.kullanici) throw e;
+        Te(!1);
+        return;
+      }
+      Ba("boru", function () {
+        Te(!0);
+      });
+    }),
+    new MutationObserver(function () {
+      (ka && ka.ciz2(), xa && xa.ciz2());
+    }).observe(document.documentElement, { attributes: !0, attributeFilter: ["data-theme"] }),
+    matchMedia("(prefers-color-scheme: dark)").addEventListener &&
+      matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
+        ka && ka.ciz2();
+      }));
+  var xa = null,
+    Ra = "koni",
+    _a = {},
+    kt = !1,
+    Ae = null;
+  function ti() {
+    if (!kt) {
+      ((kt = !0),
+        (s("kKat").innerHTML = z.sekil.katalog
+          .map(function (e) {
+            return (
+              '<button type="button" data-id="' +
+              e.id +
+              '" aria-pressed="false"><b>' +
+              y(e.ad) +
+              "</b><small>" +
+              y(e.alt) +
+              "</small></button>"
+            );
+          })
+          .join("")),
+        s("kKat").addEventListener("click", function (e) {
+          var t = e.target.closest("button");
+          t && ht(t.dataset.id);
+        }),
+        (s("kS").innerHTML =
+          '<div class="fayans" id="kFayans"></div><div class="gorunum"><div class="kart" id="kUcKart"><h2>3B g\xF6r\xFCn\xFCm <small>s\xFCr\xFCkleyerek d\xF6nd\xFCr\xFCn</small></h2><div class="masa uc"><canvas id="kTuval" aria-label="\u015Eekil 3 boyutlu g\xF6r\xFCn\xFCm"></canvas><div class="araclar"><button type="button" id="kSifirla">\u0130zometrik</button></div><div class="ipucu">s\xFCr\xFCkle: d\xF6nd\xFCr \xB7 tekerlek: yak\u0131nla\u015Ft\u0131r</div></div></div><div class="kart"><h2>A\xE7\u0131l\u0131m <small>d\xFCz sac \xFCzerinde</small></h2><div class="masa" id="kSema"></div><div class="lejant"><span class="kes">Kesim hatt\u0131</span><span class="bk">B\xFCk\xFCm / g\xF6nye \xE7izgisi</span><span class="ref">Referans</span></div></div></div><div class="kart" id="kDetay"></div>'),
+        (xa = Me(s("kTuval"))),
+        s("kSifirla").addEventListener("click", function () {
+          xa.sifirla();
+        }),
+        s("kF").addEventListener("input", bt),
+        s("kF").addEventListener("change", function (e) {
+          (e.target.dataset.a && (Fe(), yt()), bt());
+        }),
+        s("kF").addEventListener("submit", function (e) {
+          (e.preventDefault(), Fe());
+          try {
+            z.sekil.hesapla(Ra, _a[Ra]);
+          } catch (t) {
+            if (!t.kullanici) throw t;
+            De(!1);
+            return;
+          }
+          Ba("katalog", function () {
+            De(!0);
+          });
+        }));
+      var a = s("katalog").dataset.sekil;
+      (a &&
+        z.sekil.katalog.some(function (e) {
+          return e.id === a;
+        }) &&
+        (Ra = a),
+        ht(Ra));
+    }
+  }
+  function Pe() {
+    return z.sekil.katalog.filter(function (a) {
+      return a.id === Ra;
+    })[0];
+  }
+  function ht(a) {
+    ((Ra = a),
+      [].forEach.call(s("kKat").children, function (e) {
+        e.setAttribute("aria-pressed", String(e.dataset.id === a));
+      }),
+      _a[a] || (_a[a] = z.sekil.varsayilan(Pe())),
+      yt(),
+      De());
+  }
+  function yt() {
+    var a = Pe(),
+      e = _a[a.id];
+    ((s("kBaslik").textContent = a.ad), (s("kAlt").textContent = a.alt));
+    var t = e.arac,
+      i = a.grup && t ? a.grup[t] : null,
+      n = "";
+    (a.alan.forEach(function (r) {
+      if (a.grup && r.id !== "arac") {
+        var l = [].concat.apply(
+          [],
+          Object.keys(a.grup).map(function (c) {
+            return a.grup[c];
+          }),
+        );
+        if (l.indexOf(r.id) >= 0 && i.indexOf(r.id) < 0) return;
+      }
+      var d = "k-" + r.id;
+      r.sec
+        ? (n +=
+            '<div style="grid-column:1/-1"><label for="' +
+            d +
+            '">' +
+            y(r.ad) +
+            '</label><select id="' +
+            d +
+            '" data-id="' +
+            r.id +
+            '"' +
+            (r.id === "arac" ? ' data-a="1"' : "") +
+            ">" +
+            r.sec
+              .map(function (c) {
+                return (
+                  '<option value="' +
+                  c[0] +
+                  '"' +
+                  (String(e[r.id]) === c[0] ? " selected" : "") +
+                  ">" +
+                  y(c[1]) +
+                  "</option>"
+                );
+              })
+              .join("") +
+            "</select></div>")
+        : (n +=
+            '<div><label for="' +
+            d +
+            '">' +
+            y(r.ad) +
+            (r.birim ? " <small>" + y(r.birim) + "</small>" : "") +
+            '</label><input id="' +
+            d +
+            '" data-id="' +
+            r.id +
+            '" type="number" step="' +
+            (r.adim === "any" ? "any" : r.adim) +
+            '" inputmode="decimal" value="' +
+            e[r.id] +
+            '"></div>');
+    }),
+      (s("kAlanlar").innerHTML = n));
+  }
+  function ii(a) {
+    var e = Math.max(a.w, a.h) * 0.05,
+      t = function (d) {
+        return a.h - d;
+      },
+      i = "";
+    a.kesim.forEach(function (d) {
+      i +=
+        d
+          .map(function (c, o) {
+            return (o ? "L" : "M") + c[0].toFixed(2) + "," + t(c[1]).toFixed(2);
+          })
+          .join("") + "Z";
+    });
+    var n = Math.max(a.w, a.h) / 520,
+      r =
+        '<path d="' +
+        i +
+        '" fill="var(--panel)" fill-opacity=".75" fill-rule="evenodd" stroke="var(--ink)" stroke-width="' +
+        n * 2 +
+        '" stroke-linejoin="round"/>',
+      l = function (d, c) {
+        return (
+          '<line x1="' +
+          d[0][0].toFixed(2) +
+          '" y1="' +
+          t(d[0][1]).toFixed(2) +
+          '" x2="' +
+          d[1][0].toFixed(2) +
+          '" y2="' +
+          t(d[1][1]).toFixed(2) +
+          '" stroke="' +
+          c +
+          '" stroke-width="' +
+          n * 1.4 +
+          '" stroke-dasharray="' +
+          n * 7 +
+          " " +
+          n * 5 +
+          '"/>'
+        );
+      };
+    return (
+      a.bukum.forEach(function (d) {
+        r += l(d, "var(--err)");
+      }),
+      a.ref.forEach(function (d) {
+        r += l(d, "var(--ok)");
+      }),
+      a.etiket.forEach(function (d) {
+        r +=
+          '<text x="' +
+          d.x.toFixed(2) +
+          '" y="' +
+          t(d.y).toFixed(2) +
+          '" font-size="' +
+          (d.h * 1.1).toFixed(2) +
+          '">' +
+          y(d.t) +
+          "</text>";
+      }),
+      '<svg class="sema" viewBox="' +
+        -e +
+        " " +
+        -e +
+        " " +
+        (a.w + 2 * e) +
+        " " +
+        (a.h + 2 * e) +
+        '" role="img" aria-label="A\xE7\u0131l\u0131m \u015Femas\u0131">' +
+        r +
+        "</svg>"
+    );
+  }
+  function Fe() {
+    var a = _a[Ra];
+    [].forEach.call(s("kAlanlar").querySelectorAll("[data-id]"), function (e) {
+      a[e.dataset.id] = e.value;
+    });
+  }
+  function bt() {
+    Ae && (s("kS").classList.add("bayat"), (s("kBn").hidden = !1));
+  }
+  function De(a) {
+    (Fe(), s("kS").classList.remove("bayat"), (s("kBn").hidden = !0));
+    var e = Pe(),
+      t = _a[e.id],
+      i;
+    try {
+      i = z.sekil.hesapla(e.id, t);
+    } catch (l) {
+      if (!l.kullanici) throw l;
+      ((s("kFayans").innerHTML = ""),
+        (Ae = null),
+        (s("kDetay").innerHTML = '<p class="hata">' + y(l.message) + "</p>"));
+      return;
+    }
+    Ae = i;
+    var n = i.parcalar.reduce(function (l, d) {
+      return l + d.adet;
+    }, 0);
+    ((s("kFayans").innerHTML =
+      '<div class="vurgu"><b>' +
+      n +
+      "<i>par\xE7a</i></b><span>" +
+      i.parcalar.length +
+      " farkl\u0131 kesim</span></div><div><b>" +
+      v(i.alan / 1e6, 3) +
+      "<i>m\xB2</i></b><span>Toplam sac alan\u0131</span></div><div><b>" +
+      v(i.cizim.w, 0) +
+      " \xD7 " +
+      v(i.cizim.h, 0) +
+      "<i>mm</i></b><span>\xC7izim kutusu</span></div>"),
+      (s("kUcKart").hidden = !i.mesh),
+      (s("kSema").innerHTML = ii(i.cizim)));
+    var r =
+      '<h2>Par\xE7alar ve \xF6l\xE7\xFCler</h2><div class="tablo"><table><tr><th>Par\xE7a</th><th class="s">Adet</th><th class="s">Sac kutusu (mm)</th></tr>' +
+      i.parcalar
+        .map(function (l) {
+          return (
+            "<tr><td>" +
+            y(l.ad) +
+            '</td><td class="s m">' +
+            l.adet +
+            '</td><td class="s m">' +
+            v(l.w, 1) +
+            " \xD7 " +
+            v(l.h, 1) +
+            "</td></tr>"
+          );
+        })
+        .join("") +
+      '</table></div><div class="tablo" style="margin-top:12px"><table class="bilgi">' +
+      i.bilgi
+        .map(function (l) {
+          return "<tr><td>" + y(l[0]) + '</td><td class="m">' + y(l[1]) + "</td></tr>";
+        })
+        .join("") +
+      "</table></div>" +
+      (i.parcalar.length > 1
+        ? '<p class="not" style="margin-top:10px"><b>' +
+          i.parcalar.length +
+          " ayr\u0131 par\xE7a:</b> DXF\u2019te par\xE7alar yan yana, ayr\u0131 konturlar olarak verilir; her birini ayr\u0131 kesip b\xFCk\xFCp birbirine kaynat\u0131rs\u0131n\u0131z. Tabloda yazan adet kadar kesin (DXF\u2019te par\xE7a \xFCzerinde \u201Cx N\u201D yazar).</p>"
+        : "") +
+      Sa(i.uyarilar) +
+      '<div class="eylem"><button class="btn ana" type="button" id="kIndir"' +
+      (a ? "" : " disabled") +
+      ">DXF indir</button>" +
+      (a
+        ? ""
+        : `<span class="not" style="margin:0;align-self:center">DXF i\xE7in Hesapla'ya bas\u0131n.</span>`) +
+      "</div>" +
+      (a ? Fa : "");
+    ((s("kDetay").innerHTML = r),
+      s("kIndir").addEventListener("click", function () {
+        Da("acilim_" + e.id + ".dxf", z.sekil.dxf(i));
+      }),
+      i.mesh && xa.ayarla(null, i.mesh));
+  }
+  function gt(a, e) {
+    var t = document.createElement("div");
+    ((t.className = "sira"),
+      (t.innerHTML =
+        '<input type="number" step="any" min="0" inputmode="decimal" class="pb" aria-label="Par\xE7a boyu mm" value="' +
+        (a === void 0 ? "" : a) +
+        '"><input type="number" step="1" min="1" class="pa" aria-label="Adet" value="' +
+        (e === void 0 ? 1 : e) +
+        '"><button type="button" class="btn sil" aria-label="Sat\u0131r\u0131 sil">\u2715</button>'),
+      t.querySelector("button").addEventListener("click", function () {
+        (t.remove(), si());
+      }),
+      s("pSatir").appendChild(t));
+  }
+  var Be = null;
+  function xt() {
+    var a = [].map
+      .call(s("pSatir").children, function (l) {
+        return {
+          boy: parseFloat(l.querySelector(".pb").value),
+          adet: parseInt(l.querySelector(".pa").value, 10),
+        };
+      })
+      .filter(function (l) {
+        return !isNaN(l.boy);
+      });
+    try {
+      var e = z.profilOptimize(M("p-ana"), M("p-kerf"), a, 1200);
+      Be = e;
+      var t = Mt(),
+        i =
+          (t ? li(t) : "") +
+          '<h2>Kesim plan\u0131</h2><div class="fayans"><div class="vurgu"><b>' +
+          e.cubukSayisi +
+          "<i>\xE7ubuk</i></b><span>" +
+          v(e.anaBoy, 0) +
+          " mm boyunda</span></div><div><b>%" +
+          v(e.firePct, 1) +
+          "</b><span>Fire</span></div><div><b>" +
+          v(e.fire, 0) +
+          "<i>mm</i></b><span>Toplam fire</span></div><div><b>" +
+          e.altSinir +
+          "</b><span>Teorik alt s\u0131n\u0131r</span></div></div>";
+      e.gruplar.forEach(function (l) {
+        var d = "";
+        (l.parcalar.forEach(function (c, o) {
+          (o > 0 &&
+            e.kerf > 0 &&
+            (d +=
+              '<i class="kerf" style="width:' +
+              Math.max(1, (e.kerf / e.anaBoy) * 100) +
+              '%;min-width:2px" title="Testere pay\u0131 ' +
+              v(e.kerf) +
+              ' mm"></i>'),
+            (d +=
+              '<i class="k' +
+              (o % 2) +
+              '" style="flex:0 0 ' +
+              (c / e.anaBoy) * 100 +
+              '%" title="' +
+              v(c) +
+              ' mm">' +
+              (c / e.anaBoy > 0.07 ? v(c, 0) : "") +
+              "</i>"));
+        }),
+          (d += '<i class="artik" title="Art\u0131k ' + v(l.artik, 1) + ' mm"></i>'),
+          (i +=
+            '<div class="cubuk"><span class="n">' +
+            l.adet +
+            ' \xD7</span><div class="bar">' +
+            d +
+            '</div><span class="a">art\u0131k ' +
+            v(l.artik, 0) +
+            "</span></div>"));
+      });
+      var n = {};
+      if (
+        (e.gruplar.forEach(function (l) {
+          l.parcalar.forEach(function (d) {
+            n[d] = (n[d] || 0) + l.adet;
+          });
+        }),
+        (i +=
+          '<h2 style="margin-top:18px">Kesim listesi <small>kesimi yapacak ki\u015Fi i\xE7in</small></h2><div class="tablo"><table><tr><th>Kesilecek boy</th><th class="s">Adet</th></tr>' +
+          Object.keys(n)
+            .map(Number)
+            .sort(function (l, d) {
+              return d - l;
+            })
+            .map(function (l) {
+              return '<tr><td class="m">' + v(l, 1) + ' mm</td><td class="s m"><b>' + n[l] + "</b></td></tr>";
+            })
+            .join("") +
+          "</table></div>"),
+        t && t.kgm > 0)
+      ) {
+        var r = t.kgm * ((e.cubukSayisi * e.anaBoy) / 1e3);
+        i +=
+          '<p class="not" style="margin-top:8px">A\u011F\u0131rl\u0131k (' +
+          y(t.malAd) +
+          "): " +
+          v(t.kgm, 3) +
+          " kg/m \xB7 " +
+          e.cubukSayisi +
+          " \xE7ubuk toplam \u2248 " +
+          v(r, 1) +
+          " kg.</p>";
+      }
+      ((i +=
+        '<p class="not" style="margin-top:12px">Bir \xE7ubu\u011Fa s\u0131\u011Fma \u015Fart\u0131: par\xE7alar\u0131n toplam\u0131 + (par\xE7a say\u0131s\u0131 \u2212 1) \xD7 testere pay\u0131 \u2264 ana boy. Taral\u0131 alan \xE7ubukta kalan art\u0131kt\u0131r, siyah \xE7izgiler testere pay\u0131d\u0131r.</p>' +
+        Sa(e.uyarilar) +
+        '<div class="eylem"><button class="btn ana" type="button" id="profilPdf">PDF al (profil ve \xF6l\xE7\xFCleriyle)</button><button class="btn" type="button" id="profilIndir">Metin olarak kaydet</button><button class="btn" type="button" id="profilYazdir">Yazd\u0131r</button></div>' +
+        Fa),
+        (s("profilS").innerHTML = i),
+        s("profilS").classList.remove("bayat"),
+        s("profilIndir").addEventListener("click", function () {
+          var l =
+            `KES\u0130M PLANI
+` +
+            (t
+              ? "Profil: " +
+                t.ad +
+                `
+` +
+                t.liste.map(function (d) {
+                  return "  " + (d[0] ? d[0] + " - " : "") + d[1] + ": " + d[2];
+                }).join(`
+`) +
+                `
+`
+              : "") +
+            "Ana boy: " +
+            e.anaBoy +
+            " mm | Testere pay\u0131: " +
+            e.kerf +
+            ` mm
+\xC7ubuk: ` +
+            e.cubukSayisi +
+            " | Fire: %" +
+            e.firePct.toFixed(2) +
+            `
+
+`;
+          (e.gruplar.forEach(function (d) {
+            l +=
+              d.adet +
+              " x  " +
+              d.parcalar.join(" + ") +
+              "  (art\u0131k " +
+              d.artik.toFixed(1) +
+              `)
+`;
+          }),
+            Da("kesim_plani.txt", l));
+        }),
+        s("profilPdf").addEventListener("click", function () {
+          Di().catch(function () {
+            q("PDF olu\u015Fturulamad\u0131.");
+          });
+        }),
+        s("profilYazdir").addEventListener("click", function () {
+          (document.body.classList.add("pf-yazdir"),
+            setTimeout(function () {
+              window.print();
+            }, 50));
+        }));
+    } catch (l) {
+      if (l.kullanici) pa("profilS", l.message);
+      else throw l;
+    }
+  }
+  var Ga = {},
+    ia = "",
+    ni = ["kutu", "boru", "mil", "karedolu", "lama", "alti", "kose", "ibeam", "ukanal", "tprofil", "std"],
+    qa = "ABCDEFGH";
+  function Re() {
+    return z.agirlik.SEKIL.filter(function (a) {
+      return a.id === ia;
+    })[0];
+  }
+  function kn(a) {
+    return a.alan.filter(function (e) {
+      return e.id !== "bo" && !e.harfsiz;
+    });
+  }
+  function ce() {
+    if (ia) {
+      var a = (Ga[ia] = Ga[ia] || {});
+      [].forEach.call(s("pfAlanlar").querySelectorAll("[data-id]"), function (e) {
+        a[e.dataset.id] = e.value;
+      });
+    }
+  }
+  function Ie(a) {
+    return { seri: (a && a.seri) || "IPE", olcu: a && a.olcu };
+  }
+  function St() {
+    ia && (ce(), (s("pfCizim").innerHTML = z.agirlik.cizim(ia, Ie(Ga[ia]))));
+  }
+  function Et() {
+    var a = Re(),
+      e = (Ga[ia] = Ga[ia] || {}),
+      t = "",
+      i = 0;
+    (a.alan.forEach(function (r) {
+      if (!(r.id === "bo" || r.harfsiz)) {
+        var l = e[r.id] !== void 0 ? e[r.id] : r.v;
+        if (r.sec) {
+          var d = r.sec;
+          if (a.id === "std" && r.id === "olcu") {
+            var c = e.seri || "IPE";
+            ((d = Object.keys(z.agirlik.STANDART[c]).map(function (o) {
+              return [o, o + " (" + String(z.agirlik.STANDART[c][o]).replace(".", ",") + " kg/m)"];
+            })),
+              z.agirlik.STANDART[c][l] || (l = d[0][0]));
+          }
+          t +=
+            '<div style="grid-column:1/-1"><label for="pff-' +
+            r.id +
+            '">' +
+            y(r.ad) +
+            '</label><select id="pff-' +
+            r.id +
+            '" data-id="' +
+            r.id +
+            '">' +
+            d
+              .map(function (o) {
+                return (
+                  '<option value="' +
+                  o[0] +
+                  '"' +
+                  (String(l) === o[0] ? " selected" : "") +
+                  ">" +
+                  y(o[1]) +
+                  "</option>"
+                );
+              })
+              .join("") +
+            "</select></div>";
+        } else
+          t +=
+            '<div><label for="pff-' +
+            r.id +
+            '"><b class="hrf">' +
+            qa[i++] +
+            "</b>" +
+            y(r.ad) +
+            (r.birim ? " <small>" + y(r.birim) + "</small>" : "") +
+            '</label><input id="pff-' +
+            r.id +
+            '" data-id="' +
+            r.id +
+            '" type="number" step="any" min="0" inputmode="decimal" value="' +
+            l +
+            '"></div>';
+      }
+    }),
+      (s("pfAlanlar").innerHTML = t));
+    var n = s("pfBoyHrf");
+    ((n.textContent = qa[i] || ""), (n.hidden = !(a.id !== "std" && qa[i])));
+  }
+  function zt(a) {
+    if (
+      (ce(),
+      (ia = a),
+      [].forEach.call(s("pfSecici").querySelectorAll("[data-sid]"), function (n) {
+        var r = n.dataset.sid === a;
+        (n.setAttribute("aria-checked", String(r)), n.classList.toggle("on", r));
+      }),
+      (s("pfKutu").hidden = !a),
+      a)
+    ) {
+      var e = Re();
+      ((s("pfSecili").textContent = e.ad),
+        (s("pfBaslik").textContent = e.ad + " \u2013 \xF6l\xE7\xFCler"),
+        Et(),
+        St());
+    } else ((s("pfSecili").textContent = "Se\xE7ilmedi"), (s("pfBoyHrf").hidden = !0));
+    var t = s("pfSecici").querySelector(".on");
+    if (t) {
+      var i = s("pfSecici");
+      i.scrollLeft = Math.max(0, t.offsetLeft - (i.clientWidth - t.offsetWidth) / 2);
+    }
+    Ke();
+  }
+  function Ke() {
+    Be && s("profilS").classList.add("bayat");
+  }
+  function ri() {
+    var a = z.agirlik,
+      e =
+        '<button type="button" class="skare" role="radio" aria-checked="true" data-sid=""><svg viewBox="0 0 120 80" aria-hidden="true"><path d="M14 40h92M14 28v24M106 28v24" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg><span>Yaln\u0131zca boy</span></button>';
+    (ni.forEach(function (t) {
+      var i = a.SEKIL.filter(function (n) {
+        return n.id === t;
+      })[0];
+      i &&
+        (e +=
+          '<button type="button" class="skare" role="radio" aria-checked="false" data-sid="' +
+          t +
+          '">' +
+          a.cizim(t, { mini: !0, seri: "IPE" }) +
+          "<span>" +
+          y(i.ad) +
+          "</span></button>");
+    }),
+      (s("pfSecici").innerHTML = e),
+      (s("p-mal").innerHTML = a.MALZEME.filter(function (t) {
+        return t[0] !== "ozel";
+      })
+        .map(function (t) {
+          return '<option value="' + t[0] + '">' + y(t[1]) + "</option>";
+        })
+        .join("")),
+      [].forEach.call(s("pfSecici").querySelectorAll("[data-sid]"), function (t) {
+        t.addEventListener("click", function () {
+          zt(t.dataset.sid);
+        });
+      }),
+      s("pfAlanlar").addEventListener("change", function (t) {
+        (t.target.dataset.id === "seri" && (ce(), Et(), St()), Ke());
+      }),
+      s("pfAlanlar").addEventListener("input", Ke),
+      zt(document.getElementById("profil").dataset.tip || ""));
+  }
+  function Mt() {
+    if (!ia) return null;
+    ce();
+    var a = Re(),
+      e = Ga[ia],
+      t = Object.assign({}, e, { bo: M("p-ana"), mal: s("p-mal").value, adet: 1 }),
+      i = z.agirlik.hesapla(ia, t),
+      n = 0,
+      r = [];
+    return (
+      a.alan.forEach(function (l) {
+        if (!(l.id === "bo" || l.harfsiz)) {
+          if (l.sec) {
+            a.id === "std" && l.id === "seri" && r.push(["", "Profil", t.seri + " " + t.olcu]);
+            return;
+          }
+          r.push([qa[n++], l.ad, t[l.id] + (l.birim ? " " + l.birim : "")]);
+        }
+      }),
+      r.push([a.id === "std" ? "" : qa[n] || "", "Ana profil boyu", v(t.bo, 0) + " mm"]),
+      { sid: ia, ad: a.ad, v: t, liste: r, kgm: i.kgm || 0, malAd: i.malAd }
+    );
+  }
+  function li(a) {
+    return (
+      '<div class="kart" style="margin-bottom:14px;padding:14px"><h2>' +
+      y(a.ad) +
+      '</h2><div class="agkart-ic"><div class="agkart-cz">' +
+      z.agirlik.cizim(a.sid, Ie(a.v)) +
+      '</div><ul class="olculer">' +
+      a.liste
+        .map(function (e) {
+          return (
+            "<li>" +
+            (e[0] ? '<b class="hrf">' + e[0] + "</b>" : "") +
+            "<span>" +
+            y(e[1]) +
+            "</span><strong>" +
+            y(e[2]) +
+            "</strong></li>"
+          );
+        })
+        .join("") +
+      "</ul></div></div>"
+    );
+  }
+  window.addEventListener("afterprint", function () {
+    document.body.classList.remove("pf-yazdir");
+  });
+  var si = function () {};
+  ([
+    [1200, 5],
+    [800, 4],
+    [450, 6],
+    [2500, 2],
+  ].forEach(function (a) {
+    gt(a[0], a[1]);
+  }),
+    s("pEkle").addEventListener("click", function () {
+      gt();
+      var a = s("pSatir").querySelectorAll(".pb");
+      a[a.length - 1].focus();
+    }),
+    s("profilF").addEventListener("submit", function (a) {
+      (a.preventDefault(), Ba("profil", xt));
+    }));
+  var da = [],
+    Ea = [{ w: 3e3, h: 1500, adet: 5 }],
+    za = null,
+    oi = 0;
+  function di(a) {
+    if (!a) return "";
+    var e = a.w,
+      t = a.h,
+      i = Math.max(e, t) * 0.06,
+      n = "";
+    return (
+      [a.dis].concat(a.delikler).forEach(function (r) {
+        (r.forEach(function (l, d) {
+          n += (d ? "L" : "M") + l[0].toFixed(1) + "," + (t - l[1]).toFixed(1);
+        }),
+          (n += "Z"));
+      }),
+      '<svg viewBox="' +
+        -i +
+        " " +
+        -i +
+        " " +
+        (e + 2 * i) +
+        " " +
+        (t + 2 * i) +
+        '"><path d="' +
+        n +
+        '" fill="var(--p0)" fill-opacity=".5" stroke="var(--p0)" stroke-width="1.3" vector-effect="non-scaling-stroke" fill-rule="evenodd"/></svg>'
+    );
+  }
+  function wt(a) {
+    try {
+      var e = z.dxfOku(a.metin, a.ad, {
+        katmanlar: a.secili ? Array.from(a.secili) : void 0,
+        enBuyuk: a.enBuyuk,
+      });
+      ((a.sonuc = e),
+        (a.hata = null),
+        a.secili ||
+          (a.varsayilanKatman = e.katmanlar
+            .filter(function (t) {
+              return t.secili;
+            })
+            .map(function (t) {
+              return t.ad;
+            })));
+    } catch (t) {
+      if (!t.kullanici) {
+        ((a.hata = "Dosya okunamad\u0131 (beklenmeyen bi\xE7im)."), (a.sonuc = null));
+        return;
+      }
+      ((a.hata = t.message), (a.sonuc = null));
+    }
+  }
+  function ae() {
+    var a = s("sDosyalar");
+    ((a.innerHTML = ""),
+      da.length || (a.innerHTML = '<p class="not">Hen\xFCz par\xE7a eklenmedi.</p>'),
+      da.forEach(function (e) {
+        var t = document.createElement("div");
+        t.className = "dosya" + (e.hata ? " hatali" : "");
+        var i = e.sonuc,
+          n = "";
+        if (e.okunuyor) n = "<small>okunuyor...</small>";
+        else if (e.hata) n = '<small class="h">' + y(e.hata.replace(e.ad + ": ", "")) + "</small>";
+        else if (i) {
+          var r = i.parcalar[0],
+            l = i.parcalar.reduce(function (o, u) {
+              return o + u.delikler.length;
+            }, 0);
+          n =
+            "<small>" +
+            (i.parcalar.length > 1
+              ? i.parcalar.length + " kontur"
+              : v(r.w, 1) + " \xD7 " + v(r.h, 1) + " mm") +
+            " \xB7 " +
+            l +
+            " delik \xB7 " +
+            v(
+              i.parcalar.reduce(function (o, u) {
+                return o + u.alan;
+              }, 0) / 100,
+              1,
+            ) +
+            " cm\xB2</small>" +
+            (i.uyarilar.length
+              ? '<small class="u">\u26A0 ' +
+                y(
+                  i.uyarilar
+                    .map(function (o) {
+                      return o.replace(e.ad + ": ", "");
+                    })
+                    .join(" "),
+                ) +
+                "</small>"
+              : "");
+        }
+        if (
+          ((t.innerHTML =
+            '<div class="ust2"><div class="kucuk-resim">' +
+            (i ? di(i.parcalar[0]) : "") +
+            '</div><div class="ad">' +
+            y(e.ad) +
+            n +
+            '</div><input type="number" step="1" min="1" value="' +
+            e.adet +
+            '" aria-label="' +
+            y(e.ad) +
+            ' adedi"><button type="button" class="btn sil" aria-label="Dosyay\u0131 kald\u0131r">\u2715</button></div>'),
+          i && (i.katmanlar.length > 1 || i.parcalar.length > 1))
+        ) {
+          var d = document.createElement("details"),
+            c = "<summary>Katmanlar ve kontur se\xE7imi (" + i.katmanlar.length + " katman)</summary>";
+          (i.katmanlar.forEach(function (o) {
+            c +=
+              '<label class="katman"><input type="checkbox" data-k="' +
+              y(o.ad) +
+              '"' +
+              (o.secili ? " checked" : "") +
+              "> " +
+              y(o.ad) +
+              ' <span style="color:var(--mut)">(' +
+              o.sayi +
+              ")</span></label>";
+          }),
+            (i.parcalar.length > 1 || e.enBuyuk) &&
+              (c +=
+                '<label class="katman"><input type="checkbox" data-eb="1"' +
+                (e.enBuyuk ? " checked" : "") +
+                "> Yaln\u0131zca en b\xFCy\xFCk konturu par\xE7a say</label>"),
+            (d.innerHTML = c),
+            d.addEventListener("change", function (o) {
+              (o.target.dataset.eb
+                ? (e.enBuyuk = o.target.checked)
+                : (e.secili = new Set(
+                    [].filter
+                      .call(d.querySelectorAll("input[data-k]"), function (u) {
+                        return u.checked;
+                      })
+                      .map(function (u) {
+                        return u.dataset.k;
+                      }),
+                  )),
+                wt(e),
+                ae());
+            }),
+            e.acik && (d.open = !0),
+            d.addEventListener("toggle", function () {
+              e.acik = d.open;
+            }),
+            t.appendChild(d));
+        }
+        (t.querySelector("input[type=number]").addEventListener("input", function (o) {
+          e.adet = parseInt(o.target.value, 10);
+        }),
+          t.querySelector("button").addEventListener("click", function () {
+            (da.splice(da.indexOf(e), 1), ae());
+          }),
+          a.appendChild(t));
+      }));
+  }
+  function He() {
+    var a = s("sPlakalar");
+    ((a.innerHTML = ""),
+      Ea.forEach(function (e) {
+        var t = document.createElement("div");
+        ((t.className = "sira plaka"),
+          (t.innerHTML =
+            '<input type="number" step="any" min="0" inputmode="decimal" value="' +
+            e.w +
+            '" aria-label="Sac X mm"><input type="number" step="any" min="0" inputmode="decimal" value="' +
+            e.h +
+            '" aria-label="Sac Y mm"><input type="number" step="1" min="1" value="' +
+            e.adet +
+            '" aria-label="Sac adedi"><button type="button" class="btn sil" aria-label="Sac tipini sil">\u2715</button>'));
+        var i = t.querySelectorAll("input");
+        (i[0].addEventListener("input", function (n) {
+          e.w = parseFloat(n.target.value);
+        }),
+          i[1].addEventListener("input", function (n) {
+            e.h = parseFloat(n.target.value);
+          }),
+          i[2].addEventListener("input", function (n) {
+            e.adet = parseInt(n.target.value, 10);
+          }),
+          t.querySelector("button").addEventListener("click", function () {
+            (Ea.splice(Ea.indexOf(e), 1), He());
+          }),
+          a.appendChild(t));
+      }));
+  }
+  s("sPlakaEkle").addEventListener("click", function () {
+    (Ea.push({ w: 2e3, h: 1e3, adet: 1 }), He());
+  });
+  function Lt(a) {
+    [].forEach.call(a, function (e) {
+      if (!/\.dxf$/i.test(e.name)) {
+        q(e.name + ": yaln\u0131zca .dxf dosyalar\u0131 eklenir.");
+        return;
+      }
+      var t = { id: ++oi, ad: e.name, adet: 1, okunuyor: !0 };
+      (da.push(t),
+        ae(),
+        e
+          .text()
+          .then(function (i) {
+            ((t.metin = i), (t.okunuyor = !1), wt(t), ae());
+          })
+          .catch(function () {
+            ((t.okunuyor = !1), (t.hata = "Dosya okunamad\u0131."), ae());
+          }));
+    });
+  }
+  s("sDosya").addEventListener("change", function (a) {
+    (Lt(a.target.files), (a.target.value = ""));
+  });
+  var ee = s("surukle");
+  (["dragenter", "dragover"].forEach(function (a) {
+    ee.addEventListener(a, function (e) {
+      (e.preventDefault(), ee.classList.add("uzerinde"));
+    });
+  }),
+    ["dragleave", "drop"].forEach(function (a) {
+      ee.addEventListener(a, function (e) {
+        (e.preventDefault(), ee.classList.remove("uzerinde"));
+      });
+    }),
+    ee.addEventListener("drop", function (a) {
+      Lt(a.dataTransfer.files);
+    }));
+  var Ce = null;
+  function ui() {
+    ((s("s-mal").innerHTML = z.agirlik.MALZEME.map(function (a) {
+      return '<option value="' + a[0] + '">' + y(a[1]) + "</option>";
+    }).join("")),
+      s("s-mal").addEventListener("change", function () {
+        s("s-rhoK").hidden = s("s-mal").value !== "ozel";
+      }));
+  }
+  function Tt() {
+    var a = z.agirlik.MALZEME.filter(function (i) {
+        return i[0] === s("s-mal").value;
+      })[0],
+      e = M("s-t"),
+      t = a[0] === "ozel" ? M("s-rho") : a[2];
+    return e > 0
+      ? t > 0
+        ? { mal: a[1], t: e, rho: t, fiyat: Math.max(0, M("s-fiyat") || 0) }
+        : { hata: "Yo\u011Funluk 0'dan b\xFCy\xFCk olmal\u0131." }
+      : { hata: "Sac kal\u0131nl\u0131\u011F\u0131 0'dan b\xFCy\xFCk olmal\u0131." };
+  }
+  var Ia = null;
+  function ci() {
+    return new Worker("isci.js?v=" + encodeURIComponent((window.AYARLAR && window.AYARLAR.surum) || ""));
+  }
+  function je() {
+    ((s("sGonder").disabled = !1), (s("sIptal").hidden = !0), Ia && (Ia.terminate(), (Ia = null)));
+  }
+  (s("sIptal").addEventListener("click", function () {
+    (je(), (s("sacS").innerHTML = '<p class="bos">Yerle\u015Fim iptal edildi.</p>'));
+  }),
+    s("sacF").addEventListener("submit", function (a) {
+      if ((a.preventDefault(), At === "elle")) {
+        (gi(), Ue("elle", !0));
+        return;
+      }
+      if (!da.length) {
+        pa("sacS", "En az bir DXF dosyas\u0131 ekleyin.");
+        return;
+      }
+      var e = da.filter(function (r) {
+        return r.okunuyor;
+      });
+      if (e.length) {
+        pa("sacS", "Dosyalar h\xE2l\xE2 okunuyor, birka\xE7 saniye bekleyin.");
+        return;
+      }
+      var t = da.filter(function (r) {
+        return r.hata;
+      });
+      if (t.length) {
+        pa(
+          "sacS",
+          "Okunamayan dosyalar var: " +
+            t
+              .map(function (r) {
+                return r.ad;
+              })
+              .join(", ") +
+            ". Dosya sat\u0131r\u0131ndaki mesaja bak\u0131n; d\xFCzeltin veya listeden kald\u0131r\u0131n.",
+        );
+        return;
+      }
+      var i = Tt();
+      if (i.hata) {
+        pa("sacS", i.hata);
+        return;
+      }
+      var n = {
+        dosyalar: da.map(function (r) {
+          return {
+            ad: r.ad,
+            adet: r.adet,
+            metin: r.metin,
+            katmanlar: r.secili ? Array.from(r.secili) : void 0,
+            enBuyuk: r.enBuyuk,
+          };
+        }),
+        plakalar: Ea.map(function (r) {
+          return { w: r.w, h: r.h, adet: r.adet };
+        }),
+        bosluk: M("s-bosluk"),
+        kenar: M("s-kenar"),
+        donus: parseInt(s("s-donus").value, 10),
+        sureMs: (M("s-sure") || 8) * 1e3,
+      };
+      Ba("sac", function () {
+        ((Ce = i), fi(n));
+      });
+    }));
+  function fi(a) {
+    ((s("sGonder").disabled = !0),
+      (s("sIptal").hidden = !1),
+      (s("sacS").innerHTML = '<p class="bos" id="ilerleme">Yerle\u015Fim hesaplan\u0131yor...</p>'));
+    function e(n) {
+      (je(), (za = n), Oe(n));
+    }
+    function t(n) {
+      (je(), pa("sacS", n));
+    }
+    var i = !1;
+    try {
+      ((Ia = ci()),
+        (i = !0),
+        (Ia.onmessage = function (n) {
+          var r = n.data;
+          if (r.tip === "ilerleme") {
+            var l = s("ilerleme");
+            l && (l.textContent = r.mesaj);
+          } else
+            r.tip === "bitti"
+              ? e(r.sonuc)
+              : r.tip === "hata" && t(r.kullanici ? r.mesaj : "Beklenmeyen bir hata olu\u015Ftu: " + r.mesaj);
+        }),
+        (Ia.onerror = function () {
+          t("Hesaplama \xE7al\u0131\u015Ft\u0131r\u0131lamad\u0131.");
+        }),
+        Ia.postMessage(a));
+    } catch (n) {
+      if (i) {
+        t("Hesaplama ba\u015Flat\u0131lamad\u0131.");
+        return;
+      }
+      setTimeout(function () {
+        try {
+          e(z.nest(a));
+        } catch (r) {
+          t(r.kullanici ? r.message : "Beklenmeyen bir hata olu\u015Ftu.");
+        }
+      }, 30);
+    }
+  }
+  function mi(a, e) {
+    var t = "";
+    return (
+      a.forEach(function (i) {
+        for (var n = 0; n < i.length; n += 2)
+          t += (n ? "L" : "M") + i[n].toFixed(2) + "," + (e - i[n + 1]).toFixed(2);
+        t += "Z";
+      }),
+      t
+    );
+  }
+  function vi(a, e) {
+    var t = Ce;
+    if (!t) return "";
+    var i = function (f) {
+        return (f * t.t * t.rho) / 1e6;
+      },
+      n = {};
+    a.plakalar.forEach(function (f) {
+      f.yerlesimler.forEach(function (k) {
+        n[k.ad] = (n[k.ad] || 0) + 1;
+      });
+    });
+    var r = a.parcaOzeti.map(function (f) {
+        var k = n[f.ad] || 0,
+          b = i(f.alan);
+        return { ad: f.ad, n: k, tek: b, top: b * k };
+      }),
+      l = r.reduce(function (f, k) {
+        return f + k.top;
+      }, 0),
+      d = a.plakalar.reduce(function (f, k) {
+        return f + i(k.w * k.h);
+      }, 0),
+      c = d - l,
+      o = e ? i(e) : 0,
+      u = o - l,
+      p = t.fiyat > 0,
+      m = function (f) {
+        return v(f, 2);
+      },
+      h =
+        '<div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line)"><h2>A\u011F\u0131rl\u0131k ve tahmini fiyat <small>' +
+        y(t.mal) +
+        " \xB7 " +
+        v(t.t, 2) +
+        " mm \xB7 " +
+        v(t.rho, 2) +
+        ' g/cm\xB3</small></h2><div class="fayans"><div class="vurgu"><b>' +
+        m(l) +
+        "<i>kg</i></b><span>Par\xE7alar\u0131n toplam a\u011F\u0131rl\u0131\u011F\u0131</span></div><div><b>" +
+        m(c) +
+        "<i>kg</i></b><span>Fire sac a\u011F\u0131rl\u0131\u011F\u0131 (saclar\u0131n tamam\u0131)</span></div>" +
+        (e
+          ? "<div><b>" + m(u) + "<i>kg</i></b><span>Fire (son sac k\u0131salt\u0131l\u0131rsa)</span></div>"
+          : "") +
+        "<div><b>" +
+        m(d) +
+        "<i>kg</i></b><span>Kullan\u0131lan saclar\u0131n a\u011F\u0131rl\u0131\u011F\u0131</span></div>" +
+        (p
+          ? '<div class="vurgu"><b>' +
+            m(l * t.fiyat) +
+            "<i>\u20BA</i></b><span>Par\xE7alar i\xE7in tahmini fiyat</span></div><div><b>" +
+            m(d * t.fiyat) +
+            "<i>\u20BA</i></b><span>Saclar\u0131n tamam\u0131 i\xE7in fiyat</span></div>"
+          : "") +
+        '</div><div class="tablo"><table><tr><th>Par\xE7a</th><th class="s">Adet</th><th class="s dm">Tek par\xE7a (kg)</th><th class="s">Toplam (kg)</th>' +
+        (p ? '<th class="s dm">Tek par\xE7a fiyat\u0131</th><th class="s">Toplam fiyat</th>' : "") +
+        "</tr>" +
+        r
+          .map(function (f) {
+            return (
+              '<tr><td class="m">' +
+              y(f.ad) +
+              '</td><td class="s">' +
+              f.n +
+              '</td><td class="s m dm">' +
+              v(f.tek, 3) +
+              '</td><td class="s m">' +
+              m(f.top) +
+              "</td>" +
+              (p
+                ? '<td class="s m dm">' +
+                  m(f.tek * t.fiyat) +
+                  '</td><td class="s m">' +
+                  m(f.top * t.fiyat) +
+                  "</td>"
+                : "") +
+              "</tr>"
+            );
+          })
+          .join("") +
+        '<tr><td><b>Toplam</b></td><td class="s"><b>' +
+        r.reduce(function (f, k) {
+          return f + k.n;
+        }, 0) +
+        '</b></td><td class="dm"></td><td class="s m"><b>' +
+        m(l) +
+        "</b></td>" +
+        (p ? '<td class="dm"></td><td class="s m"><b>' + m(l * t.fiyat) + "</b></td>" : "") +
+        '</tr></table></div><p class="not" style="margin-top:8px">A\u011F\u0131rl\u0131klar par\xE7an\u0131n net alan\u0131ndan (delikler d\xFC\u015F\xFCl\xFCr) hesaplan\u0131r. Fiyat yaln\u0131zca malzeme bedelinin tahminidir; kesim, i\u015F\xE7ilik, fire sac\u0131n sat\u0131\u015F de\u011Feri ve vergi dahil de\u011Fildir. Yaln\u0131zca bilgi ama\xE7l\u0131d\u0131r.' +
+        (p ? "" : " Fiyat g\xF6rmek i\xE7in soldaki forma birim fiyat (\u20BA / kg) girin.") +
+        "</p></div>";
+    return h;
+  }
+  function Oe(a, e) {
+    e = e || "sacS";
+    var t = {},
+      i = 0;
+    a.parcaOzeti.forEach(function (c) {
+      t[c.ad] = i++ % 6;
+    });
+    var n = a.plakalar[a.plakalar.length - 1],
+      r = null,
+      l = 0;
+    n &&
+      ((l =
+        a.plakalar.slice(0, -1).reduce(function (c, o) {
+          return c + o.w * o.h;
+        }, 0) +
+        n.h * n.kullanilanX),
+      (r = 100 * (1 - a.toplamParcaAlani / l)));
+    var d =
+      '<h2>Yerle\u015Fim sonucu</h2><div class="fayans"><div class="vurgu"><b>' +
+      a.plakalar.length +
+      "<i>sac</i></b><span>Kullan\u0131ld\u0131</span></div><div><b>%" +
+      v(a.fire, 1) +
+      "</b><span>Fire (saclar\u0131n tamam\u0131)</span></div>" +
+      (r !== null
+        ? "<div><b>%" + v(r, 1) + "</b><span>Fire (son sac k\u0131salt\u0131l\u0131rsa)</span></div>"
+        : "") +
+      "<div><b>" +
+      v(a.toplamParcaAlani / 1e6, 3) +
+      '<i>m\xB2</i></b><span>Par\xE7a alan\u0131</span></div></div><p class="not">Son sac\u0131n bo\u015F kalan k\u0131sm\u0131 art\u0131k olarak ba\u015Fka i\u015Fte kullan\u0131labilir. "Son sac k\u0131salt\u0131l\u0131rsa" de\u011Feri, son sac\u0131 par\xE7alar\u0131n bitti\u011Fi yere kadar kesmeniz halindeki firedir.</p>';
+    ((d +=
+      '<div class="tablo"><table><tr><th>Sac tipi</th><th class="s">Eldeki</th><th class="s">Gereken</th></tr>' +
+      a.tipOzeti
+        .map(function (c) {
+          return (
+            '<tr><td class="m">' +
+            y(c.ad) +
+            '</td><td class="s">' +
+            c.eldeki +
+            '</td><td class="s"><b>' +
+            c.kullanilan +
+            "</b></td></tr>"
+          );
+        })
+        .join("") +
+      "</table></div>"),
+      a.yerlesemeyen.length &&
+        (d +=
+          '<p class="hata" style="margin-top:10px">Yerle\u015Femeyen: ' +
+          a.yerlesemeyen
+            .map(function (c) {
+              return y(c.ad) + " \xD7 " + c.adet + " (" + y(c.neden) + ")";
+            })
+            .join("; ") +
+          "</p>"),
+      (d += vi(a, l)),
+      (d += Sa(
+        a.uyarilar.filter(function (c) {
+          return c !== "Baz\u0131 par\xE7alar yerle\u015Femedi.";
+        }),
+      )),
+      (d +=
+        '<div class="lej2">' +
+        a.parcaOzeti
+          .map(function (c) {
+            return (
+              '<span style="color:var(--p' +
+              t[c.ad] +
+              ')"><i>' +
+              y(c.ad) +
+              " \xD7 " +
+              c.istenen +
+              "</i></span>"
+            );
+          })
+          .join("") +
+        "</div>"),
+      a.plakalar.forEach(function (c) {
+        d +=
+          '<figure class="plaka"><figcaption><b>Plaka ' +
+          c.numara +
+          "</b><span>" +
+          y(c.ad) +
+          " mm</span><span>" +
+          c.parcaSayisi +
+          " par\xE7a</span><span>doluluk %" +
+          v(c.doluluk, 1) +
+          "</span><span>kullan\u0131lan X " +
+          v(c.kullanilanX, 0) +
+          ' mm</span></figcaption><svg viewBox="0 0 ' +
+          c.w +
+          " " +
+          c.h +
+          '" role="img" aria-label="Plaka ' +
+          c.numara +
+          ' yerle\u015Fimi"><rect x="0" y="0" width="' +
+          c.w +
+          '" height="' +
+          c.h +
+          '" fill="none" stroke="var(--ink)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
+          c.yerlesimler
+            .map(function (o) {
+              return (
+                '<path class="p' +
+                t[o.ad] +
+                '" d="' +
+                mi(o.halkalar, c.h) +
+                '"><title>' +
+                y(o.ad) +
+                "</title></path>"
+              );
+            })
+            .join("") +
+          "</svg></figure>";
+      }),
+      (d +=
+        '<div class="eylem"><button class="btn ana" type="button" id="sIndir">Yerle\u015Fim DXF indir</button><button class="btn" type="button" id="sPdf">PDF raporu al</button>' +
+        (e === "sacS" && !a.elle
+          ? '<button class="btn" type="button" id="sElle">Elle d\xFCzenle</button>'
+          : "") +
+        "</div>"),
+      (s(e).innerHTML = d + Fa),
+      s("sPdf").addEventListener("click", function () {
+        try {
+          Bi();
+        } catch (c) {
+          q("PDF olu\u015Fturulamad\u0131.");
+        }
+      }),
+      s("sIndir").addEventListener("click", function () {
+        Da("sac_yerlesim.dxf", z.nestDxf(za));
+      }),
+      s("sElle").addEventListener &&
+        e === "sacS" &&
+        !a.elle &&
+        s("sElle").addEventListener("click", function () {
+          xi(za);
+        }));
+  }
+  var g = null,
+    At = "oto",
+    Ne = 1e-6,
+    pi = function () {
+      return z._iç.parcaDondur;
+    };
+  function Xa() {
+    return Math.max(0, M("s-bosluk") || 0);
+  }
+  function Ka() {
+    return Math.max(0, M("s-kenar") || 0);
+  }
+  function Pt() {
+    var a = [];
+    return (
+      da.forEach(function (e) {
+        e.sonuc &&
+          e.sonuc.parcalar.forEach(function (t, i) {
+            a.push({
+              ad: e.sonuc.parcalar.length === 1 ? e.ad : e.ad + "#" + (i + 1),
+              part: t,
+              adet: Math.max(1, e.adet || 1),
+              don: {},
+            });
+          });
+      }),
+      a
+    );
+  }
+  function te(a, e) {
+    e = Math.round((((e % 360) + 360) % 360) * 100) / 100;
+    var t = String(e);
+    return a.don[t] || (a.don[t] = pi()(a.part, e));
+  }
+  function Ua(a, e, t, i) {
+    return (
+      (e = Math.round((((e % 360) + 360) % 360) * 100) / 100),
+      { id: ++g.sayac, t: a, aci: e, x: t, y: i, P: te(g.tipler[a], e), kotu: !1 }
+    );
+  }
+  function ie() {
+    return g.sheets[g.cur];
+  }
+  function Ft(a, e) {
+    var t = Ka(),
+      i = a.P;
+    return !(a.x < t - 1e-6 || a.y < t - 1e-6 || a.x + i.w > e.w - t + 1e-6 || a.y + i.h > e.h - t + 1e-6);
+  }
+  function ki(a, e, t, i, n, r, l) {
+    var d = Math.max(n - (e + a.w), e - (n + i.w), r - (t + a.h), t - (r + i.h));
+    if (d >= l) return l;
+    if (z._iç.cakisir(a, e, t, i, n, r, Ne)) return 0;
+    for (var c = l * l, o = z._iç.segMin2, u = 0; u < a.rings.length; u++)
+      for (var p = a.rings[u], m = 0; m < i.rings.length; m++) {
+        var h = i.rings[m];
+        if (!(
+          h.x1 + n < p.x0 + e - l ||
+          h.x0 + n > p.x1 + e + l ||
+          h.y1 + r < p.y0 + t - l ||
+          h.y0 + r > p.y1 + t + l
+        ))
+          for (var f = 0; f < p.n; f++)
+            for (
+              var k = p.xy[2 * f] + e,
+                b = p.xy[2 * f + 1] + t,
+                x = p.xy[2 * f + 2] + e,
+                E = p.xy[2 * f + 3] + t,
+                w = 0;
+              w < h.n;
+              w++
+            ) {
+              var S = h.xy[2 * w] + n,
+                D = h.xy[2 * w + 1] + r,
+                _ = h.xy[2 * w + 2] + n,
+                W = h.xy[2 * w + 3] + r;
+              if (!(
+                Math.min(S, _) > Math.max(k, x) + l ||
+                Math.max(S, _) < Math.min(k, x) - l ||
+                Math.min(D, W) > Math.max(b, E) + l ||
+                Math.max(D, W) < Math.min(b, E) - l
+              )) {
+                var G = o(k, b, x, E, S, D, _, W);
+                G < c && (c = G);
+              }
+            }
+      }
+    return Math.sqrt(c);
+  }
+  function Dt(a, e) {
+    var t = Xa(),
+      i = 1e9,
+      n = !1;
+    return (
+      e.items.forEach(function (r) {
+        if (r !== a) {
+          var l = ki(a.P, a.x, a.y, r.P, r.x, r.y, Math.max(t * 2, 60));
+          (l < i && (i = l), l < t - 1e-4 && (n = !0));
+        }
+      }),
+      { dis: !Ft(a, e), cak: n, en: i }
+    );
+  }
+  function Ye() {
+    var a = Xa();
+    (g.sheets.forEach(function (e) {
+      e.items.forEach(function (t) {
+        ((t.kotu = !1), (t.dis = !Ft(t, e)));
+      });
+    }),
+      g.sheets.forEach(function (e) {
+        for (var t = e.items.length, i = 0; i < t; i++)
+          for (var n = i + 1; n < t; n++) {
+            var r = e.items[i],
+              l = e.items[n];
+            z._iç.cakisir(r.P, r.x, r.y, l.P, l.x, l.y, Math.max(a, Ne)) && ((r.kotu = !0), (l.kotu = !0));
+          }
+        e.items.forEach(function (d) {
+          d.dis && (d.kotu = !0);
+        });
+      }));
+  }
+  function ne(a, e, t, i) {
+    var n = Ka(),
+      r = a.P,
+      l = Math.max(Xa(), Ne);
+    if (t < n - 1e-9 || i < n - 1e-9 || t + r.w > e.w - n + 1e-9 || i + r.h > e.h - n + 1e-9) return !1;
+    for (var d = 0; d < e.items.length; d++) {
+      var c = e.items[d];
+      if (c !== a && z._iç.cakisir(r, t, i, c.P, c.x, c.y, l)) return !1;
+    }
+    return !0;
+  }
+  function _e(a, e) {
+    var t = Ka(),
+      i = a.P,
+      n = Math.max(2, Math.min(e.w, e.h) / 120),
+      r = e.w - t - i.w,
+      l = e.h - t - i.h;
+    if (r < t - 1e-9 || l < t - 1e-9) return null;
+    for (var d = t; d <= l + 1e-9; d += n)
+      for (var c = t; c <= r + 1e-9; c += n) if (ne(a, e, c, d)) return hi(a, e, c, d);
+    return null;
+  }
+  function hi(a, e, t, i) {
+    return (
+      [
+        [-1, 0],
+        [0, -1],
+      ].forEach(function (n) {
+        [32, 16, 8, 4, 2, 1, 0.5, 0.25, 0.1].forEach(function (r) {
+          for (var l = 0; l < 400; l++) {
+            var d = t + n[0] * r,
+              c = i + n[1] * r;
+            if (ne(a, e, d, c)) ((t = d), (i = c));
+            else break;
+          }
+        });
+      }),
+      [t, i]
+    );
+  }
+  function yi(a, e, t, i) {
+    if (!ne(a, e, a.x, a.y)) return !1;
+    var n = a.x,
+      r = a.y,
+      l = n + "," + r;
+    return (
+      [Math.max(e.w, e.h) / 4, 256, 64, 16, 4, 1, 0.25, 0.05].forEach(function (d) {
+        for (var c = 0; c < 600; c++) {
+          var o = n + t * d,
+            u = r + i * d;
+          if (ne(a, e, o, u)) ((n = o), (r = u));
+          else break;
+        }
+      }),
+      (a.x = n),
+      (a.y = r),
+      n + "," + r !== l
+    );
+  }
+  function fe(a, e) {
+    var t = "",
+      i = a.P;
+    return (
+      i.rings.forEach(function (n) {
+        for (var r = 0; r < n.n; r++)
+          t +=
+            (r ? "L" : "M") +
+            (n.xy[2 * r] + a.x).toFixed(2) +
+            "," +
+            (e.h - (n.xy[2 * r + 1] + a.y)).toFixed(2);
+        t += "Z";
+      }),
+      t
+    );
+  }
+  function Ge(a) {
+    var e = 0;
+    return (
+      g.sheets.forEach(function (t) {
+        t.items.forEach(function (i) {
+          i.t === a && e++;
+        });
+      }),
+      g.tipler[a].adet - e
+    );
+  }
+  function bi(a, e) {
+    for (var t = ie(), i = 0, n = 0, r = 0; r < e; r++) {
+      var l = Ua(a, 0, 0, 0),
+        d = _e(l, t);
+      if ((d || ((l = Ua(a, 90, 0, 0)), (d = _e(l, t))), !d)) {
+        n++;
+        break;
+      }
+      ((l.x = d[0]), (l.y = d[1]), t.items.push(l), (g.sec = l), i++);
+    }
+    if (
+      (n &&
+        q(
+          "Bu sacta bo\u015F yer kalmad\u0131; ba\u015Fka sac ekleyin veya par\xE7ay\u0131 elle yerle\u015Ftirin.",
+        ),
+      !i && n)
+    ) {
+      var c = Ua(a, 0, Ka(), Ka());
+      (t.items.push(c), (g.sec = c));
+    }
+    N();
+  }
+  function gi() {
+    if (!da.length) {
+      pa("sacS", "En az bir DXF dosyas\u0131 ekleyin.");
+      return;
+    }
+    if (
+      da.some(function (n) {
+        return n.okunuyor;
+      })
+    ) {
+      pa("sacS", "Dosyalar h\xE2l\xE2 okunuyor, birka\xE7 saniye bekleyin.");
+      return;
+    }
+    var a = da.filter(function (n) {
+      return n.hata;
+    });
+    if (a.length) {
+      pa(
+        "sacS",
+        "Okunamayan dosyalar var: " +
+          a
+            .map(function (n) {
+              return n.ad;
+            })
+            .join(", ") +
+          ".",
+      );
+      return;
+    }
+    var e = Ea[0];
+    if (!e || !(e.w > 0 && e.h > 0)) {
+      pa("sacS", "Sac \xF6l\xE7\xFClerini girin.");
+      return;
+    }
+    var t = g,
+      i = Pt();
+    ((g = {
+      tipler: i,
+      sheets: [{ w: e.w, h: e.h, items: [] }],
+      cur: 0,
+      sec: null,
+      zoom: 1,
+      yapis: !0,
+      adim: 10,
+      sayac: 0,
+    }),
+      t &&
+        t.sheets.forEach(function (n, r) {
+          (r > 0
+            ? g.sheets.push({ w: n.w, h: n.h, items: [] })
+            : ((g.sheets[0].w = n.w), (g.sheets[0].h = n.h)),
+            n.items.forEach(function (l) {
+              var d = i
+                .map(function (c) {
+                  return c.ad;
+                })
+                .indexOf(t.tipler[l.t].ad);
+              d >= 0 && g.sheets[r].items.push(Ua(d, l.aci, l.x, l.y));
+            }));
+        }),
+      N());
+  }
+  function xi(a) {
+    var e = Pt(),
+      t = e.map(function (i) {
+        return i.ad;
+      });
+    ((g = { tipler: e, sheets: [], cur: 0, sec: null, zoom: 1, yapis: !0, adim: 10, sayac: 0 }),
+      a.plakalar.forEach(function (i) {
+        var n = { w: i.w, h: i.h, items: [] };
+        (i.yerlesimler.forEach(function (r) {
+          var l = t.indexOf(r.ad);
+          l >= 0 && n.items.push(Ua(l, r.aci || 0, r.x, r.y));
+        }),
+          g.sheets.push(n));
+      }),
+      g.sheets.length || g.sheets.push({ w: Ea[0].w, h: Ea[0].h, items: [] }),
+      Ue("elle", !0),
+      N());
+  }
+  function Bt() {
+    var a = "",
+      e = 0;
+    g.sheets.forEach(function (n, r) {
+      var l = n.items.reduce(function (d, c) {
+        return d + g.tipler[c.t].part.alan;
+      }, 0);
+      a +=
+        "<span>Sac " +
+        (r + 1) +
+        ": " +
+        n.items.length +
+        " par\xE7a \xB7 doluluk %" +
+        v((100 * l) / (n.w * n.h), 1) +
+        "</span>";
+    });
+    var t = g.tipler
+      .map(function (n, r) {
+        return { ad: n.ad, n: Ge(r) };
+      })
+      .filter(function (n) {
+        return n.n > 0;
+      });
+    Ye();
+    var i = 0;
+    return (
+      g.sheets.forEach(function (n) {
+        n.items.forEach(function (r) {
+          r.kotu && i++;
+        });
+      }),
+      '<div class="elle-ozet">' +
+        a +
+        (t.length
+          ? '<span class="eksik">Yerle\u015Fmeyen: ' +
+            t
+              .map(function (n) {
+                return y(n.ad) + " \xD7 " + n.n;
+              })
+              .join(", ") +
+            "</span>"
+          : '<span class="tamam">T\xFCm par\xE7alar yerle\u015Fti</span>') +
+        (i
+          ? '<span class="kotu">\u26A0 ' +
+            i +
+            " par\xE7a \xE7ak\u0131\u015F\u0131yor, aral\u0131k yetersiz veya sac d\u0131\u015F\u0131nda</span>"
+          : "") +
+        "</div>"
+    );
+  }
+  function N() {
+    if (g) {
+      var a = ie(),
+        e = Ka(),
+        t = Xa(),
+        i = g.sec,
+        n = "";
+      Ye();
+      var r = function (d) {
+          return d % 6;
+        },
+        l =
+          '<div class="kart elle-palet"><h3>1. Par\xE7ay\u0131 sac\u0131n \xFCst\xFCne ekleyin</h3><p class="not" style="margin:0 0 10px">Karttaki d\xFC\u011Fmeye bas\u0131nca par\xE7a sac\u0131n bo\u015F bir yerine gelir. Sonra s\xFCr\xFCkleyerek istedi\u011Finiz yere ta\u015F\u0131y\u0131n.</p><div class="elle-kartlar">' +
+          g.tipler
+            .map(function (d, c) {
+              var o = Ge(c);
+              return (
+                '<div class="elle-p"><div class="onizle p' +
+                r(c) +
+                '">' +
+                Si(d) +
+                '</div><div class="ad">' +
+                y(d.ad) +
+                "</div><small>" +
+                v(d.part.w, 1) +
+                " \xD7 " +
+                v(d.part.h, 1) +
+                ' mm</small><span class="kalan' +
+                (o < 0 ? " fazla" : o === 0 ? " tamam" : "") +
+                '">' +
+                (o > 0
+                  ? o + " adet yerle\u015Fmedi"
+                  : o < 0
+                    ? Math.abs(o) + " fazla"
+                    : "Hepsi yerle\u015Fti") +
+                '</span><button type="button" class="btn kucuk ana" data-ekle="' +
+                c +
+                '">Sac\u0131n \xFCst\xFCne ekle</button>' +
+                (o > 1
+                  ? '<button type="button" class="btn kucuk" data-ekle="' +
+                    c +
+                    '" data-hepsi="' +
+                    o +
+                    '">Kalan ' +
+                    o +
+                    " adedi ekle</button>"
+                  : "") +
+                "</div>"
+              );
+            })
+            .join("") +
+          "</div></div>";
+      ((n +=
+        '<div class="elle">' +
+        l +
+        '<h3 class="elle-bas">Sac</h3><div class="elle-ust"><div class="elle-tabs" role="tablist">' +
+        g.sheets
+          .map(function (d, c) {
+            return (
+              '<button type="button" role="tab" aria-selected="' +
+              (c === g.cur) +
+              '" data-sac="' +
+              c +
+              '">Sac ' +
+              (c + 1) +
+              "</button>"
+            );
+          })
+          .join("") +
+        '<button type="button" class="ekle" data-islem="sacekle">+ Sac</button>' +
+        (g.sheets.length > 1
+          ? '<button type="button" class="sil" data-islem="sacsil" aria-label="Bu sac\u0131 sil">Sac\u0131 sil</button>'
+          : "") +
+        '</div><div class="elle-boyut"><label>X <input type="number" min="1" step="any" inputmode="decimal" id="eSw" value="' +
+        a.w +
+        '"></label><label>Y <input type="number" min="1" step="any" inputmode="decimal" id="eSh" value="' +
+        a.h +
+        '"></label><small>mm</small></div></div><div class="elle-arac"><button type="button" data-islem="zoom-" aria-label="Uzakla\u015Ft\u0131r">\u2212</button><span>' +
+        Math.round(g.zoom * 100) +
+        '%</span><button type="button" data-islem="zoom+" aria-label="Yak\u0131nla\u015Ft\u0131r">+</button><button type="button" data-islem="sigdir">S\u0131\u011Fd\u0131r</button><label class="chk"><input type="checkbox" id="eYapis"' +
+        (g.yapis ? " checked" : "") +
+        '> Yap\u0131\u015F</label></div><div class="elle-kap"><svg id="eSvg" class="elle-svg" tabindex="0" style="width:' +
+        g.zoom * 100 +
+        '%" viewBox="0 0 ' +
+        a.w +
+        " " +
+        a.h +
+        '" role="img" aria-label="Sac ' +
+        (g.cur + 1) +
+        ' elle yerle\u015Fim alan\u0131"><rect x="0" y="0" width="' +
+        a.w +
+        '" height="' +
+        a.h +
+        '" class="sac"/><rect x="' +
+        e +
+        '" y="' +
+        e +
+        '" width="' +
+        Math.max(0, a.w - 2 * e) +
+        '" height="' +
+        Math.max(0, a.h - 2 * e) +
+        '" class="kenar"/>'),
+        i &&
+          a.items.indexOf(i) >= 0 &&
+          (n += '<path id="eHalo" class="halo" d="' + fe(i, a) + '" style="stroke-width:' + 2 * t + 'px"/>'),
+        a.items.forEach(function (d) {
+          n +=
+            '<path class="pc p' +
+            r(d.t) +
+            (d === i ? " sel" : "") +
+            (d.kotu ? " kotu" : "") +
+            '" data-id="' +
+            d.id +
+            '" d="' +
+            fe(d, a) +
+            '"><title>' +
+            y(g.tipler[d.t].ad) +
+            "</title></path>";
+        }),
+        (n +=
+          '</svg></div><p class="not elle-ipucu">Par\xE7ay\u0131 s\xFCr\xFCkleyerek yerle\u015Ftirin; telefonda dokunup s\xFCr\xFCkleyin. A\u015Fa\u011F\u0131daki alanlardan \xF6l\xE7\xFCl\xFC konum ve a\xE7\u0131 da girebilirsiniz.</p>'),
+        (n += '<div class="kart elle-sec" id="eSec">' + Rt() + "</div>"),
+        (n += Bt()),
+        (n +=
+          '<div class="eylem"><button type="button" class="btn ana" id="eRapor1">Raporu olu\u015Ftur ve DXF al</button><button type="button" class="btn" data-islem="temizle">Sac\u0131 bo\u015Falt</button></div><div id="eRapor"></div></div>'),
+        (s("sacS").innerHTML = n),
+        Ei());
+    }
+  }
+  function Si(a) {
+    var e = te(a, 0),
+      t = "";
+    return (
+      e.rings.forEach(function (i) {
+        for (var n = 0; n < i.n; n++)
+          t += (n ? "L" : "M") + i.xy[2 * n].toFixed(1) + "," + (e.h - i.xy[2 * n + 1]).toFixed(1);
+        t += "Z";
+      }),
+      '<svg viewBox="-2 -2 ' +
+        (e.w + 4) +
+        " " +
+        (e.h + 4) +
+        '" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="' +
+        t +
+        '"/></svg>'
+    );
+  }
+  function Rt() {
+    var a = ie(),
+      e = g.sec;
+    if (!e || a.items.indexOf(e) < 0)
+      return '<h3>2. Se\xE7ili par\xE7a</h3><p class="not" style="margin:0">Sac\u0131n \xFCzerindeki bir par\xE7aya dokunun; burada \xF6l\xE7\xFCl\xFC konum, d\xF6nd\xFCrme ve yaslama se\xE7enekleri \xE7\u0131kar.</p>';
+    var t = Dt(e, a),
+      i = Xa(),
+      n = [];
+    (t.dis && n.push("Par\xE7a sac\u0131n (veya kenar pay\u0131n\u0131n) d\u0131\u015F\u0131nda."),
+      t.cak &&
+        n.push(
+          t.en < 1e-4
+            ? "Ba\u015Fka par\xE7ayla \xFCst \xFCste biniyor."
+            : "Kom\u015Fu par\xE7aya " + v(t.en, 2) + " mm var; en az " + v(i, 2) + " mm olmal\u0131.",
+        ));
+    var r = e.P,
+      l = ["\u2191", "\u2193", "\u2190", "\u2192"];
+    return (
+      "<h3>2. Se\xE7ili par\xE7a: " +
+      y(g.tipler[e.t].ad) +
+      '</h3><div class="elle-alan"><label>X <small>mm</small><input type="number" step="any" id="eX" value="' +
+      v(e.x, 2).replace(/\./g, "").replace(",", ".") +
+      '" inputmode="decimal"></label><label>Y <small>mm</small><input type="number" step="any" id="eY" value="' +
+      v(e.y, 2).replace(/\./g, "").replace(",", ".") +
+      '" inputmode="decimal"></label><label>A\xE7\u0131 <small>\xB0</small><input type="number" step="any" id="eA" value="' +
+      e.aci +
+      '" inputmode="decimal"></label></div><div class="elle-donus"><button type="button" class="btn kucuk" data-aci="-90">\u221290\xB0</button><button type="button" class="btn kucuk" data-aci="90">+90\xB0</button><button type="button" class="btn kucuk" data-aci="-15">\u221215\xB0</button><button type="button" class="btn kucuk" data-aci="15">+15\xB0</button><button type="button" class="btn kucuk" data-aci="180">180\xB0</button></div><div class="elle-yasla"><span>Yasla:</span><button type="button" class="btn kucuk" data-yasla="0,1" aria-label="Yukar\u0131 yasla">\u2191</button><button type="button" class="btn kucuk" data-yasla="0,-1" aria-label="A\u015Fa\u011F\u0131 yasla">\u2193</button><button type="button" class="btn kucuk" data-yasla="-1,0" aria-label="Sola yasla">\u2190</button><button type="button" class="btn kucuk" data-yasla="1,0" aria-label="Sa\u011Fa yasla">\u2192</button></div><div class="elle-yasla"><span>Ad\u0131m:</span><input type="number" min="0.1" step="any" id="eAdim" value="' +
+      g.adim +
+      '" inputmode="decimal"><small>mm</small><button type="button" class="btn kucuk" data-it="0,1" aria-label="Yukar\u0131 it">\u2191</button><button type="button" class="btn kucuk" data-it="0,-1" aria-label="A\u015Fa\u011F\u0131 it">\u2193</button><button type="button" class="btn kucuk" data-it="-1,0" aria-label="Sola it">\u2190</button><button type="button" class="btn kucuk" data-it="1,0" aria-label="Sa\u011Fa it">\u2192</button></div><div class="elle-yasla"><button type="button" class="btn kucuk" data-islem="cogalt">\xC7o\u011Falt</button><button type="button" class="btn kucuk" data-islem="sil">Sil</button>' +
+      (g.sheets.length > 1
+        ? '<select id="eSacSec" aria-label="Sac\u0131 de\u011Fi\u015Ftir">' +
+          g.sheets
+            .map(function (d, c) {
+              return (
+                '<option value="' +
+                c +
+                '"' +
+                (c === g.cur ? " selected" : "") +
+                ">Sac " +
+                (c + 1) +
+                "</option>"
+              );
+            })
+            .join("") +
+          "</select>"
+        : "") +
+      '</div><p class="elle-bilgi' +
+      (n.length ? " kotu" : "") +
+      '" id="eBilgi">' +
+      (n.length
+        ? "\u26A0 " + y(n.join(" "))
+        : t.en < 1e8 && t.en < Math.max(i * 2, 60)
+          ? "En yak\u0131n par\xE7a: " + v(t.en, 2) + " mm"
+          : "\xC7ak\u0131\u015Fma yok.") +
+      " <span>Kutu: " +
+      v(r.w, 1) +
+      " \xD7 " +
+      v(r.h, 1) +
+      " mm</span></p>"
+    );
+  }
+  function hn() {
+    g && s("eSec") && (s("eSec").innerHTML = Rt());
+  }
+  function yn() {
+    var a = document.querySelector(".elle-ozet");
+    if (a) {
+      var e = document.createElement("div");
+      ((e.innerHTML = Bt()), a.replaceWith(e.firstChild));
+    }
+  }
+  function Xe(a) {
+    var e = ie(),
+      t = e.items.indexOf(a);
+    (t >= 0 && e.items.splice(t, 1), g.sec === a && (g.sec = null));
+  }
+  function Ei() {
+    var a = ie(),
+      e = s("sacS"),
+      t = s("eSvg");
+    (e.querySelector(".elle").addEventListener("click", function (c) {
+      var o = c.target.closest("button");
+      if (o) {
+        var u = g.sec;
+        if (o.dataset.sac !== void 0) {
+          ((g.cur = +o.dataset.sac), (g.sec = null), N());
+          return;
+        }
+        if (o.dataset.ekle !== void 0) {
+          bi(+o.dataset.ekle, o.dataset.hepsi ? +o.dataset.hepsi : 1);
+          return;
+        }
+        if (o.dataset.aci !== void 0 && u) {
+          var p = u.x + u.P.w / 2,
+            m = u.y + u.P.h / 2;
+          ((u.aci = (((u.aci + +o.dataset.aci) % 360) + 360) % 360),
+            (u.P = te(g.tipler[u.t], u.aci)),
+            (u.aci = u.P.aci),
+            (u.x = p - u.P.w / 2),
+            (u.y = m - u.P.h / 2),
+            N());
+          return;
+        }
+        if (o.dataset.yasla !== void 0 && u) {
+          var h = o.dataset.yasla.split(",").map(Number);
+          (!yi(u, a, h[0], h[1]) &&
+            !ne(u, a, u.x, u.y) &&
+            q("\xD6nce par\xE7ay\u0131 \xE7ak\u0131\u015Fmayan bir yere ta\u015F\u0131y\u0131n."),
+            N());
+          return;
+        }
+        if (o.dataset.it !== void 0 && u) {
+          var f = o.dataset.it.split(",").map(Number),
+            k = Math.max(0.01, parseFloat(s("eAdim").value) || 1);
+          ((g.adim = k), (u.x += f[0] * k), (u.y += f[1] * k), N());
+          return;
+        }
+        switch (o.dataset.islem) {
+          case "sacekle": {
+            var b = g.sheets[g.sheets.length - 1];
+            (g.sheets.push({ w: b.w, h: b.h, items: [] }),
+              (g.cur = g.sheets.length - 1),
+              (g.sec = null),
+              N());
+            break;
+          }
+          case "sacsil":
+            (g.sheets.splice(g.cur, 1), (g.cur = Math.max(0, g.cur - 1)), (g.sec = null), N());
+            break;
+          case "zoom+":
+            ((g.zoom = Math.min(8, g.zoom * 1.5)), N());
+            break;
+          case "zoom-":
+            ((g.zoom = Math.max(1, g.zoom / 1.5)), N());
+            break;
+          case "sigdir":
+            ((g.zoom = 1), N());
+            break;
+          case "temizle":
+            ((a.items = []), (g.sec = null), N());
+            break;
+          case "sil":
+            u && (Xe(u), N());
+            break;
+          case "cogalt":
+            if (u) {
+              var x = Ua(u.t, u.aci, u.x, u.y),
+                E = _e(x, a);
+              (E ? ((x.x = E[0]), (x.y = E[1])) : ((x.x = u.x + 10), (x.y = u.y + 10)),
+                a.items.push(x),
+                (g.sec = x),
+                N());
+            }
+            break;
+        }
+      }
+    }),
+      e.querySelector(".elle").addEventListener("change", function (c) {
+        var o = c.target,
+          u = g.sec;
+        if (o.id === "eSw" || o.id === "eSh") {
+          var p = parseFloat(s("eSw").value),
+            m = parseFloat(s("eSh").value);
+          p > 0 && m > 0 && ((a.w = p), (a.h = m), N());
+          return;
+        }
+        if (o.id === "eYapis") {
+          g.yapis = o.checked;
+          return;
+        }
+        if (u) {
+          if (o.id === "eX" || o.id === "eY") {
+            var h = parseFloat(s("eX").value),
+              f = parseFloat(s("eY").value);
+            (isNaN(h) || (u.x = h), isNaN(f) || (u.y = f), N());
+            return;
+          }
+          if (o.id === "eA") {
+            var k = parseFloat(o.value);
+            if (!isNaN(k)) {
+              var b = u.x + u.P.w / 2,
+                x = u.y + u.P.h / 2;
+              ((u.P = te(g.tipler[u.t], k)),
+                (u.aci = u.P.aci),
+                (u.x = b - u.P.w / 2),
+                (u.y = x - u.P.h / 2),
+                N());
+            }
+            return;
+          }
+          if (o.id === "eSacSec") {
+            var E = +o.value;
+            (Xe(u), g.sheets[E].items.push(u), (g.cur = E), (g.sec = u), N());
+          }
+        }
+      }),
+      s("eRapor1").addEventListener("click", function () {
+        Ba("sac", Mi);
+      }));
+    var i = null;
+    function n(c) {
+      var o = t.createSVGPoint();
+      ((o.x = c.clientX), (o.y = c.clientY));
+      var u = t.getScreenCTM();
+      return u ? o.matrixTransform(u.inverse()) : { x: 0, y: 0 };
+    }
+    t.addEventListener("pointerdown", function (c) {
+      var o = c.target.closest && c.target.closest(".pc");
+      if (!o) {
+        g.sec && ((g.sec = null), N());
+        return;
+      }
+      var u = a.items.filter(function (h) {
+        return String(h.id) === o.dataset.id;
+      })[0];
+      if (u) {
+        var p = g.sec !== u;
+        g.sec = u;
+        var m = n(c);
+        i = { it: u, px: m.x, py: m.y, x0: u.x, y0: u.y, oynadi: !1, yeni: p };
+        try {
+          t.setPointerCapture(c.pointerId);
+        } catch (h) {}
+        c.preventDefault();
+      }
+    });
+    var r = !1,
+      l = null;
+    t.addEventListener("pointermove", function (c) {
+      i &&
+        ((l = c),
+        !r &&
+          ((r = !0),
+          requestAnimationFrame(function () {
+            if (((r = !1), !(!i || !l))) {
+              var o = n(l),
+                u = i.it,
+                p = i.x0 + (o.x - i.px),
+                m = i.y0 - (o.y - i.py);
+              if ((Math.abs(o.x - i.px) + Math.abs(o.y - i.py) > 1 && (i.oynadi = !0), !!i.oynadi)) {
+                if (g.yapis) {
+                  var h = zi(u, a, p, m, t.clientWidth ? 12 / (t.clientWidth / a.w) : 5);
+                  ((p = h[0]), (m = h[1]));
+                }
+                ((u.x = p), (u.y = m));
+                var f = t.querySelector('.pc[data-id="' + u.id + '"]');
+                f && f.setAttribute("d", fe(u, a));
+                var k = s("eHalo");
+                k && k.setAttribute && k.setAttribute("d", fe(u, a));
+                var b = Dt(u, a);
+                f && f.classList.toggle("kotu", b.dis || b.cak);
+                var x = s("eBilgi");
+                x && x.firstChild && (x.className = "elle-bilgi" + (b.dis || b.cak ? " kotu" : ""));
+              }
+            }
+          })));
+    });
+    function d() {
+      if (i) {
+        var c = i;
+        ((i = null), (c.oynadi || c.yeni) && N());
+      }
+    }
+    (t.addEventListener("pointerup", d),
+      t.addEventListener("pointercancel", d),
+      t.addEventListener("keydown", function (c) {
+        var o = g.sec;
+        if (o) {
+          var u = Math.max(0.01, parseFloat(s("eAdim").value) || g.adim) * (c.shiftKey ? 10 : 1),
+            p = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }[c.key];
+          if (p) {
+            ((o.x += p[0] * u), (o.y += p[1] * u), N());
+            var m = s("eSvg");
+            (m && m.focus && m.focus(), c.preventDefault());
+          } else if (c.key === "Delete" || c.key === "Backspace") (Xe(o), N(), c.preventDefault());
+          else if (c.key === "r" || c.key === "R") {
+            var h = o.x + o.P.w / 2,
+              f = o.y + o.P.h / 2;
+            ((o.P = te(g.tipler[o.t], o.aci + 90)),
+              (o.aci = o.P.aci),
+              (o.x = h - o.P.w / 2),
+              (o.y = f - o.P.h / 2),
+              N());
+            var k = s("eSvg");
+            k && k.focus && k.focus();
+          }
+        }
+      }));
+  }
+  function zi(a, e, t, i, n) {
+    var r = Xa(),
+      l = Ka(),
+      d = a.P,
+      c = [l, e.w - l - d.w],
+      o = [l, e.h - l - d.h];
+    e.items.forEach(function (f) {
+      if (f !== a) {
+        var k = f.P,
+          b = i < f.y + k.h + r + n && i + d.h > f.y - r - n,
+          x = t < f.x + k.w + r + n && t + d.w > f.x - r - n;
+        (b && c.push(f.x + k.w + r, f.x - r - d.w),
+          x && o.push(f.y + k.h + r, f.y - r - d.h),
+          c.push(f.x, f.x + k.w - d.w),
+          o.push(f.y, f.y + k.h - d.h));
+      }
+    });
+    var u = t,
+      p = i,
+      m = n,
+      h = n;
+    return (
+      c.forEach(function (f) {
+        var k = Math.abs(f - t);
+        k < m && ((m = k), (u = f));
+      }),
+      o.forEach(function (f) {
+        var k = Math.abs(f - i);
+        k < h && ((h = k), (p = f));
+      }),
+      [u, p]
+    );
+  }
+  function Mi() {
+    Ye();
+    var a = Tt();
+    if (a.hata) {
+      q(a.hata);
+      return;
+    }
+    Ce = a;
+    var e = {},
+      t = [],
+      i = 0,
+      n = 0,
+      r = 0;
+    if (
+      (g.sheets.forEach(function (u, p) {
+        if (u.items.length) {
+          var m = 0,
+            h = 0,
+            f = u.items.map(function (b) {
+              ((m += g.tipler[b.t].part.alan), (h = Math.max(h, b.x + b.P.w)), b.kotu && r++);
+              var x = b.P.rings.map(function (E) {
+                for (var w = new Array(2 * E.n), S = 0; S < E.n; S++)
+                  ((w[2 * S] = E.xy[2 * S] + b.x), (w[2 * S + 1] = E.xy[2 * S + 1] + b.y));
+                return w;
+              });
+              return { ad: g.tipler[b.t].ad, aci: b.aci, x: b.x, y: b.y, halkalar: x };
+            }),
+            k = u.w + "x" + u.h;
+          ((e[k] = e[k] || { ad: k, w: u.w, h: u.h, eldeki: "\u2013", kullanilan: 0 }),
+            e[k].kullanilan++,
+            t.push({
+              numara: t.length + 1,
+              tip: 0,
+              w: u.w,
+              h: u.h,
+              ad: k,
+              parcaSayisi: u.items.length,
+              parcaAlani: m,
+              doluluk: (100 * m) / (u.w * u.h),
+              kullanilanX: h,
+              yerlesimler: f,
+            }),
+            (i += m),
+            (n += u.w * u.h));
+        }
+      }),
+      !t.length)
+    ) {
+      q("\xD6nce sac\u0131n \xFCzerine par\xE7a yerle\u015Ftirin.");
+      return;
+    }
+    var l = [];
+    g.tipler.forEach(function (u, p) {
+      var m = Ge(p);
+      m > 0 && l.push({ ad: u.ad, adet: m, neden: "Elle yerle\u015Ftirilmedi." });
+    });
+    var d = [];
+    r &&
+      d.push(
+        r +
+          " par\xE7a \xE7ak\u0131\u015F\u0131yor, aral\u0131\u011F\u0131 sa\u011Flam\u0131yor veya sac d\u0131\u015F\u0131nda. DXF'i kullanmadan \xF6nce d\xFCzeltin.",
+      );
+    var c = {
+      plakalar: t,
+      tipOzeti: Object.keys(e).map(function (u) {
+        return e[u];
+      }),
+      yerlesemeyen: l,
+      uyarilar: d,
+      toplamParcaAlani: i,
+      toplamPlakaAlani: n,
+      fire: 100 * (1 - i / n),
+      parcaOzeti: g.tipler.map(function (u) {
+        return {
+          ad: u.ad,
+          istenen: u.adet,
+          delikSayisi: u.part.delikler.length,
+          w: u.part.w,
+          h: u.part.h,
+          alan: u.part.alan,
+        };
+      }),
+      elle: !0,
+    };
+    ((za = c), Oe(c, "eRapor"));
+    var o = s("eRapor");
+    o.scrollIntoView && o.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  function Ue(a, e) {
+    ((At = a),
+      [].forEach.call(document.querySelectorAll("#sMod button"), function (t) {
+        t.setAttribute("aria-pressed", String(t.dataset.mod === a));
+      }),
+      [].forEach.call(document.querySelectorAll("#sacF .oto"), function (t) {
+        t.hidden = a === "elle";
+      }),
+      (s("sGonder").textContent =
+        a === "elle"
+          ? g
+            ? "Par\xE7alar\u0131 g\xFCncelle ve d\xFCzenle"
+            : "Elle yerle\u015Ftirmeye ba\u015Fla"
+          : "Yerle\u015Ftir"),
+      !e && a === "oto" && za && !za.elle && Oe(za));
+  }
+  s("sMod").addEventListener &&
+    [].forEach.call(document.querySelectorAll("#sMod button"), function (a) {
+      a.addEventListener("click", function () {
+        Ue(a.dataset.mod);
+      });
+    });
+  function wi() {
+    var a = z.atolye,
+      e = function (c) {
+        var o = parseFloat(String(s(c).value).replace(",", "."));
+        return isNaN(o) ? NaN : o;
+      };
+    function t(c) {
+      return (
+        '<div class="fayans">' +
+        c
+          .map(function (o, u) {
+            return (
+              "<div" +
+              (u < 2 ? ' class="vurgu"' : "") +
+              "><b>" +
+              y(o[1]) +
+              (o[2] ? "<i>" + y(o[2]) + "</i>" : "") +
+              "</b><span>" +
+              y(o[0]) +
+              "</span></div>"
+            );
+          })
+          .join("") +
+        "</div>"
+      );
+    }
+    function i(c, o) {
+      try {
+        o();
+      } catch (u) {
+        if (u && u.kullanici) pa(c, u.message);
+        else throw u;
+      }
+    }
+    var n = function (c) {
+      return v(c, 2);
+    };
+    if (Y("devir")) {
+      let c = function () {
+          var u = a.VC[+s("dv-mal").value];
+          s("dv-vc").value = u[+s("dv-tak").value + 1];
+        },
+        o = function () {
+          ((s("dv-zk").hidden = r !== "freze"),
+            (s("dv-dad").innerHTML =
+              (r === "torna"
+                ? "\u0130\u015F par\xE7as\u0131 \xE7ap\u0131"
+                : r === "freze"
+                  ? "Freze \xE7ap\u0131"
+                  : "Matkap \xE7ap\u0131") + " <small>mm</small>"),
+            (s("dv-fad").innerHTML =
+              r === "freze"
+                ? "Di\u015F ba\u015F\u0131na ilerleme <small>mm/di\u015F</small>"
+                : "\u0130lerleme <small>mm/dev</small>"),
+            (s("dv-f").value = d[r]));
+        };
+      var r = "torna",
+        l = !0;
+      s("dv-mal").innerHTML = a.VC.map(function (u, p) {
+        return '<option value="' + p + '">' + y(u[1]) + "</option>";
+      }).join("");
+      var d = { torna: 0.2, freze: 0.08, matkap: 0.15 };
+      (Qe("dvF", function (u) {
+        ((r = u), o());
+      }),
+        s("dv-mal").addEventListener("change", c),
+        s("dv-tak").addEventListener("change", c),
+        c(),
+        o(),
+        s("dvF").addEventListener("submit", function (u) {
+          (u.preventDefault(),
+            i("dvS", function () {
+              var p = a.devir({ islem: r, D: e("dv-d"), vc: e("dv-vc"), z: e("dv-z"), f: e("dv-f") });
+              s("dvS").innerHTML =
+                '<div class="kart"><h2>Sonu\xE7</h2>' +
+                t([
+                  ["Devir", v(p.n, 0), "dev/dk"],
+                  ["\u0130lerleme h\u0131z\u0131", v(p.vf, 0), "mm/dk"],
+                  ["Kesme h\u0131z\u0131", v(p.vc, 0), "m/dk"],
+                  [
+                    p.islem === "freze"
+                      ? "Di\u015F ba\u015F\u0131na ilerleme"
+                      : "Devir ba\u015F\u0131na ilerleme",
+                    v(p.f, 3),
+                    p.islem === "freze" ? "mm/di\u015F" : "mm/dev",
+                  ],
+                ]) +
+                Sa(p.uyarilar) +
+                '<p class="not" style="margin-top:10px">Devir n = 1000 \xD7 Vc / (\u03C0 \xD7 D), ilerleme h\u0131z\u0131 Vf = f \xD7 n (frezede f \xD7 di\u015F say\u0131s\u0131 \xD7 n). De\u011Ferler ba\u015Flang\u0131\xE7 i\xE7indir; tezg\xE2h g\xFCc\xFC, rijitlik, so\u011Futma ve tak\u0131m katalo\u011Funa g\xF6re ayarlay\u0131n.</p></div>';
+            }));
+        }));
+    }
+    if (
+      (Y("kesim") &&
+        s("ksF").addEventListener("submit", function (c) {
+          (c.preventDefault(),
+            i("ksS", function () {
+              var o = a.kesim({
+                  uzunluk: e("ks-uz"),
+                  hiz: e("ks-hz"),
+                  delik: e("ks-dl"),
+                  delme: e("ks-dm"),
+                  ucret: e("ks-uc"),
+                  adet: e("ks-ad"),
+                  hazirlik: e("ks-hz2"),
+                  kg: e("ks-kg"),
+                  kgFiyat: e("ks-kf"),
+                  fire: e("ks-fr"),
+                  kar: e("ks-kr"),
+                }),
+                u = o.sn / 60;
+              s("ksS").innerHTML =
+                '<div class="kart"><h2>Sonu\xE7</h2>' +
+                t([
+                  ["Par\xE7a ba\u015F\u0131 fiyat", n(o.birim), "\u20BA"],
+                  ["Toplam (" + o.adet + " adet)", n(o.toplam), "\u20BA"],
+                  ["Par\xE7a ba\u015F\u0131 kesim s\xFCresi", v(u, 2), "dk"],
+                  ["Toplam makine s\xFCresi", v(o.saat, 2), "saat"],
+                ]) +
+                '<div class="tablo"><table class="bilgi"><tr><td>Makine bedeli (par\xE7a ba\u015F\u0131)</td><td class="s m">' +
+                n(o.makine) +
+                ' \u20BA</td></tr><tr><td>Malzeme (fire dahil)</td><td class="s m">' +
+                n(o.malz) +
+                ' \u20BA</td></tr><tr><td>Haz\u0131rl\u0131k (par\xE7a ba\u015F\u0131)</td><td class="s m">' +
+                n(o.hazirBirim) +
+                ' \u20BA</td></tr><tr><td>Maliyet (k\xE2rs\u0131z)</td><td class="s m">' +
+                n(o.birimMaliyet) +
+                ' \u20BA</td></tr></table></div><p class="not" style="margin-top:10px">S\xFCre = kesim uzunlu\u011Fu / kesim h\u0131z\u0131 + delme say\u0131s\u0131 \xD7 delme s\xFCresi. Kesim h\u0131z\u0131 malzeme ve kal\u0131nl\u0131\u011Fa g\xF6re makinenizin kesim tablosundan al\u0131nmal\u0131d\u0131r. Gaz, elektrik, fason ve vergi ayr\u0131ca eklenmelidir. Bu bir fiyat tahminidir.</p></div>';
+            }));
+        }),
+      Y("tork"))
+    ) {
+      let c = function () {
+        i("trS", function () {
+          var o = a.tork(s("tr-d").value, s("tr-s").value, s("tr-u").value),
+            u = o.nm < 10 ? 1 : 0,
+            p = a.TORK.d
+              .map(function (m) {
+                var h = a.TORK.surtunme.find(function (f) {
+                  return f[0] === s("tr-u").value;
+                })[2];
+                return (
+                  "<tr" +
+                  (m[0] === o.ad ? ' class="on"' : "") +
+                  "><td>" +
+                  m[0] +
+                  "</td>" +
+                  [1, 2, 3]
+                    .map(function (f) {
+                      var k = m[f] * h;
+                      return '<td class="s m">' + v(k, k < 10 ? 1 : 0) + "</td>";
+                    })
+                    .join("") +
+                  "</tr>"
+                );
+              })
+              .join("");
+          s("trS").innerHTML =
+            '<div class="kart"><h2>' +
+            y(o.ad) +
+            " \xB7 " +
+            y(o.sinif) +
+            "</h2>" +
+            t([
+              ["S\u0131kma torku", v(o.nm, u), "N\xB7m"],
+              ["kgf\xB7m", v(o.kgfm, 2), "kgf\xB7m"],
+              ["lbf\xB7ft", v(o.lbfft, 1), "lbf\xB7ft"],
+            ]) +
+            '<h2 style="margin-top:16px">Tablo <small>N\xB7m</small></h2><div class="tablo"><table><tr><th>C\u0131vata</th><th class="s">8.8</th><th class="s">10.9</th><th class="s">12.9</th></tr>' +
+            p +
+            `</table></div><p class="not" style="margin-top:10px">Metrik kaba di\u015F, \xF6n y\xFCkleme akma s\u0131n\u0131r\u0131n\u0131n yakla\u015F\u0131k %90'\u0131 ve s\xFCrt\xFCnme katsay\u0131s\u0131 yakla\u015F\u0131k 0,14 i\xE7in yuvarlat\u0131lm\u0131\u015F tipik de\u011Ferlerdir (VDI 2230 t\xFCr\xFC tablolar). Ger\xE7ek tork ya\u011Flamaya, kaplamaya ve y\xFCzeye g\xF6re \xB1%25 de\u011Fi\u015Febilir. G\xFCvenlik a\xE7\u0131s\u0131ndan kritik ba\u011Flant\u0131larda (bas\u0131n\xE7l\u0131, dinamik, ta\u015F\u0131y\u0131c\u0131) \xFCretici veya standart tablosunu ve tork anahtar\u0131 kalibrasyonunu esas al\u0131n.</p></div>`;
+        });
+      };
+      ((s("tr-d").innerHTML = a.TORK.d
+        .map(function (o) {
+          return "<option" + (o[0] === "M8" ? " selected" : "") + ">" + o[0] + "</option>";
+        })
+        .join("")),
+        (s("tr-u").innerHTML = a.TORK.surtunme
+          .map(function (o) {
+            return (
+              '<option value="' +
+              o[0] +
+              '"' +
+              (o[0] === "normal" ? " selected" : "") +
+              ">" +
+              y(o[1]) +
+              "</option>"
+            );
+          })
+          .join("")),
+        s("trF").addEventListener("submit", function (o) {
+          (o.preventDefault(), c());
+        }),
+        ["tr-d", "tr-s", "tr-u"].forEach(function (o) {
+          s(o).addEventListener("change", c);
+        }),
+        c());
+    }
+    if (Y("birim")) {
+      let c = function () {
+          var u = a.BIRIM[s("br-t").value].b,
+            p = u
+              .map(function (m) {
+                return "<option>" + y(m[0]) + "</option>";
+              })
+              .join("");
+          ((s("br-a").innerHTML = p),
+            (s("br-b").innerHTML = p),
+            (s("br-b").selectedIndex = Math.min(1, u.length - 1)));
+        },
+        o = function () {
+          i("brS", function () {
+            var u = s("br-t").value,
+              p = e("br-v"),
+              m = s("br-a").value,
+              h = s("br-b").value,
+              f = a.cevir(u, p, m, h),
+              k = a.BIRIM[u].b,
+              b = function (x) {
+                return Math.abs(x) >= 1e12 || (x !== 0 && Math.abs(x) < 1e-5)
+                  ? x.toExponential(4).replace(".", ",")
+                  : x.toLocaleString("tr-TR", { maximumFractionDigits: 6 });
+              };
+            s("brS").innerHTML =
+              '<div class="kart"><h2>Sonu\xE7</h2>' +
+              t([[b(p) + " " + m, b(f), h]]) +
+              '<h2 style="margin-top:16px">T\xFCm birimler</h2><div class="tablo"><table class="bilgi">' +
+              k
+                .map(function (x) {
+                  return (
+                    "<tr><td>" + y(x[0]) + '</td><td class="s m">' + b(a.cevir(u, p, m, x[0])) + "</td></tr>"
+                  );
+                })
+                .join("") +
+              "</table></div></div>";
+          });
+        };
+      ((s("br-t").innerHTML = Object.keys(a.BIRIM)
+        .map(function (u) {
+          return '<option value="' + u + '">' + y(a.BIRIM[u].ad) + "</option>";
+        })
+        .join("")),
+        s("br-t").addEventListener("change", function () {
+          (c(), o());
+        }),
+        ["br-v", "br-a", "br-b"].forEach(function (u) {
+          (s(u).addEventListener("input", o), s(u).addEventListener("change", o));
+        }),
+        s("brF").addEventListener("submit", function (u) {
+          u.preventDefault();
+        }),
+        c(),
+        o());
+    }
+  }
+  var j = 1240,
+    ua = 1754,
+    O = "#0b0f17",
+    Ha = "#1638d4",
+    aa = "#5a6b8c",
+    We = "Arial, Helvetica, sans-serif",
+    Li =
+      "Bu \xE7\u0131kt\u0131 bir hesaplama yard\u0131mc\u0131s\u0131d\u0131r ve tahmini de\u011Ferler i\xE7erir. \xDCretime ge\xE7meden \xF6nce \xF6l\xE7\xFCleri kontrol edin, m\xFCmk\xFCnse deneme par\xE7as\u0131/kesimi yap\u0131n.";
+  function Ti(a) {
+    var e = [],
+      t = 0,
+      i = {},
+      n = new TextEncoder();
+    function r(p) {
+      var m = typeof p == "string" ? n.encode(p) : p;
+      (e.push(m), (t += m.length));
+    }
+    function l(p, m) {
+      ((i[p] = t),
+        r(
+          p +
+            ` 0 obj
+` +
+            m +
+            `
+endobj
+`,
+        ));
+    }
+    var d = 3 + a.length * 3,
+      c = [];
+    (r(`%PDF-1.4
+`),
+      r(new Uint8Array([37, 226, 227, 207, 211, 10])),
+      l(1, "<< /Type /Catalog /Pages 2 0 R >>"),
+      a.forEach(function (p, m) {
+        c.push(4 + m * 3 + 2 + " 0 R");
+      }),
+      l(2, "<< /Type /Pages /Kids [" + c.join(" ") + "] /Count " + a.length + " >>"),
+      l(
+        3,
+        "<< /Title (Ama Yarin Pazardir) /Creator (ama-yarin-pazardir.peekdock.com) /Producer (ama-yarin-pazardir.peekdock.com) >>",
+      ),
+      a.forEach(function (p, m) {
+        for (
+          var h = 4 + m * 3,
+            f = h + 1,
+            k = h + 2,
+            b = p.toDataURL("image/jpeg", 0.9).split(",")[1],
+            x = atob(b),
+            E = new Uint8Array(x.length),
+            w = 0;
+          w < x.length;
+          w++
+        )
+          E[w] = x.charCodeAt(w);
+        ((i[h] = t),
+          r(
+            h +
+              ` 0 obj
+<< /Type /XObject /Subtype /Image /Width ` +
+              p.width +
+              " /Height " +
+              p.height +
+              " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " +
+              E.length +
+              ` >>
+stream
+`,
+          ),
+          r(E),
+          r(`
+endstream
+endobj
+`));
+        var S = "q 595.28 0 0 841.89 0 0 cm /Im0 Do Q";
+        (l(
+          f,
+          "<< /Length " +
+            S.length +
+            ` >>
+stream
+` +
+            S +
+            `
+endstream`,
+        ),
+          l(
+            k,
+            "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 " +
+              h +
+              " 0 R >> >> /Contents " +
+              f +
+              " 0 R >>",
+          ));
+      }));
+    var o = t;
+    r(
+      `xref
+0 ` +
+        (d + 1) +
+        `
+0000000000 65535 f 
+`,
+    );
+    for (var u = 1; u <= d; u++)
+      r(
+        String(i[u]).padStart(10, "0") +
+          ` 00000 n 
+`,
+      );
+    return (
+      r(
+        `trailer
+<< /Size ` +
+          (d + 1) +
+          ` /Root 1 0 R /Info 3 0 R >>
+startxref
+` +
+          o +
+          `
+%%EOF`,
+      ),
+      new Blob(e, { type: "application/pdf" })
+    );
+  }
+  function Ve(a, e) {
+    ze(a, function () {
+      Ai(a, e);
+    });
+  }
+  function Ai(a, e) {
+    var t = Ti(e),
+      i = URL.createObjectURL(t),
+      n = document.createElement("a");
+    ((n.href = i),
+      (n.download = a),
+      document.body.appendChild(n),
+      n.click(),
+      n.remove(),
+      setTimeout(function () {
+        URL.revokeObjectURL(i);
+      }, 4e3),
+      q(a + " indirildi."));
+  }
+  function T(a, e, t, i, n, r, l, d) {
+    ((a.font = (l || 400) + " " + n + "px " + We),
+      (a.fillStyle = r),
+      (a.textAlign = d || "left"),
+      (a.textBaseline = "alphabetic"),
+      a.fillText(e, t, i));
+  }
+  function re(a, e, t, i, n, r, l, d, c) {
+    a.font = (d || 400) + " " + r + "px " + We;
+    var o = String(e).split(" "),
+      u = "";
+    return (
+      o.forEach(function (p) {
+        var m = u ? u + " " + p : p;
+        a.measureText(m).width > n && u ? (T(a, u, t, i, r, l, d), (i += c || r * 1.35), (u = p)) : (u = m);
+      }),
+      u && (T(a, u, t, i, r, l, d), (i += c || r * 1.35)),
+      i
+    );
+  }
+  function me(a, e, t, i, n, r) {
+    (a.beginPath(),
+      a.moveTo(e + r, t),
+      a.arcTo(e + i, t, e + i, t + n, r),
+      a.arcTo(e + i, t + n, e, t + n, r),
+      a.arcTo(e, t + n, e, t, r),
+      a.arcTo(e, t, e + i, t, r),
+      a.closePath());
+  }
+  function Wa(a, e) {
+    var t = document.createElement("canvas");
+    ((t.width = j), (t.height = ua));
+    var i = t.getContext("2d");
+    return (
+      (i.fillStyle = "#fff"),
+      i.fillRect(0, 0, j, ua),
+      (i.fillStyle = O),
+      i.fillRect(0, 0, j, 130),
+      i.save(),
+      i.translate(60, 30),
+      i.scale(70 / 34, 70 / 34),
+      (i.fillStyle = Ha),
+      me(i, 0, 0, 34, 34, 8),
+      i.fill(),
+      (i.strokeStyle = "#fff"),
+      (i.lineWidth = 3.2),
+      (i.lineCap = "round"),
+      (i.lineJoin = "round"),
+      i.beginPath(),
+      i.moveTo(8, 24),
+      i.lineTo(17, 24),
+      i.lineTo(17, 10),
+      i.lineTo(26, 10),
+      i.stroke(),
+      i.restore(),
+      T(i, a, 150, 66, 42, "#fff", 700),
+      T(i, e || "\u0130malat Masas\u0131 \xB7 ama-yarin-pazardir.peekdock.com", 150, 104, 24, "#cfd8dc", 400),
+      T(i, new Date().toLocaleDateString("tr-TR"), j - 60, 76, 26, "#cfd8dc", 400, "right"),
+      { cv: t, g: i, y: 190 }
+    );
+  }
+  function Ze(a, e) {
+    var t = a.length;
+    return (
+      a.forEach(function (i, n) {
+        var r = i.g;
+        if (!e) {
+          (r.save(),
+            (r.globalAlpha = 0.075),
+            (r.fillStyle = Ha),
+            (r.font = "700 70px " + We),
+            (r.textAlign = "center"),
+            (r.textBaseline = "middle"),
+            r.translate(j / 2, ua / 2 + 40),
+            r.rotate(-Math.PI / 5));
+          for (var l = -3; l <= 3; l++) r.fillText("ama-yarin-pazardir.peekdock.com", 0, l * 300);
+          r.restore();
+        }
+        ((r.fillStyle = "#e1e7ea"),
+          r.fillRect(60, ua - 112, j - 120, 2),
+          re(r, Li, 60, ua - 78, j - 420, 19, aa, 400, 26),
+          T(r, "ama-yarin-pazardir.peekdock.com", j - 60, ua - 70, 24, Ha, 700, "right"),
+          T(r, "Sayfa " + (n + 1) + " / " + t, j - 60, ua - 40, 19, aa, 400, "right"));
+      }),
+      a.map(function (i) {
+        return i.cv;
+      })
+    );
+  }
+  function Pi(a, e, t) {
+    return new Promise(function (i) {
+      var n = new Image();
+      ((n.onload = function () {
+        i(n);
+      }),
+        (n.onerror = function () {
+          i(null);
+        }),
+        (n.src =
+          "data:image/svg+xml;charset=utf-8," +
+          encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="' +
+              e +
+              '" height="' +
+              t +
+              '" font-family="Arial,Helvetica,sans-serif" viewBox="0 -14 240 186">' +
+              a.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "") +
+              "</svg>",
+          )));
+    });
+  }
+  function Fi(a, e) {
+    var t = !!e.pro,
+      i = [],
+      n = Wa("Fiyat Teklifi", t && e.firma ? e.firma : "Teklif no: " + (e.no || "-")),
+      r = n.g;
+    i.push(n);
+    function l() {
+      ((n = Wa("Fiyat Teklifi", "devam")), i.push(n), (r = n.g));
+    }
+    var d = function (b) {
+        return b.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " \u20BA";
+      },
+      c = [
+        ["M\xFC\u015Fteri", e.musteri || "-"],
+        ["Teklif no", e.no || "-"],
+        ["Ge\xE7erlilik", e.gun ? e.gun + " g\xFCn" : "-"],
+      ];
+    (t && e.iletisim && c.push(["\u0130leti\u015Fim", e.iletisim]),
+      c.forEach(function (b) {
+        (T(r, b[0], 60, n.y, 24, aa, 400), T(r, b[1], 300, n.y, 26, O, 700), (n.y += 40));
+      }),
+      (n.y += 20));
+    var o = [60, 560, 700, 920, j - 60];
+    function u() {
+      ((r.fillStyle = O),
+        r.fillRect(60, n.y, j - 120, 52),
+        [
+          ["Kalem", o[0] + 16, "left"],
+          ["Adet", o[2] - 16, "right"],
+          ["Birim (\u20BA)", o[3] - 16, "right"],
+          ["Tutar (\u20BA)", o[4] - 16, "right"],
+        ].forEach(function (b) {
+          T(r, b[0], b[1], n.y + 35, 24, "#fff", 700, b[2]);
+        }),
+        (n.y += 52));
+    }
+    u();
+    var p = 0;
+    a.forEach(function (b, x) {
+      n.y + 80 > ua - 160 && (l(), u());
+      var E = b.maliyet || 0,
+        w = b.adet ? E / b.adet : 0;
+      ((p += E),
+        (r.fillStyle = x % 2 ? "#f4f8ff" : "#fff"),
+        r.fillRect(60, n.y, j - 120, 72),
+        T(r, String(b.ad).slice(0, 38), o[0] + 16, n.y + 30, 24, O, 700),
+        T(r, String(b.ozet).slice(0, 60), o[0] + 16, n.y + 58, 18, aa, 400),
+        T(r, String(b.adet), o[2] - 16, n.y + 42, 24, O, 400, "right"),
+        T(r, E ? d(w) : "-", o[3] - 16, n.y + 42, 24, O, 400, "right"),
+        T(r, E ? d(E) : "-", o[4] - 16, n.y + 42, 24, O, 700, "right"),
+        (n.y += 72));
+    });
+    var m = e.ek > 0 ? e.ek : 0,
+      h = p + m,
+      f = (h * (e.kdv || 0)) / 100,
+      k = h + f;
+    ((n.y += 24),
+      n.y + 260 > ua - 160 && l(),
+      [
+        ["Malzeme toplam\u0131", p],
+        m ? ["\u0130\u015F\xE7ilik / kesim / ek bedel", m] : null,
+        e.kdv ? ["KDV %" + e.kdv, f] : null,
+      ].forEach(function (b) {
+        b &&
+          (T(r, b[0], o[3] - 60, n.y, 26, aa, 400, "right"),
+          T(r, d(b[1]), o[4] - 16, n.y, 26, O, 400, "right"),
+          (n.y += 44));
+      }),
+      (r.fillStyle = Ha),
+      r.fillRect(o[2] - 60, n.y - 6, o[4] - o[2] + 60, 64),
+      T(r, "GENEL TOPLAM", o[3] - 60, n.y + 36, 26, "#fff", 700, "right"),
+      T(r, d(k), o[4] - 16, n.y + 38, 30, "#fff", 700, "right"),
+      (n.y += 100),
+      e.not && (n.y = re(r, "Not: " + e.not, 60, n.y, j - 120, 24, O, 400, 34)),
+      (n.y = re(
+        r,
+        "Malzeme bedelleri par\xE7a listesindeki teorik a\u011F\u0131rl\u0131k ve girilen birim fiyattan hesaplanm\u0131\u015Ft\u0131r; fiili fiyat piyasa ko\u015Fullar\u0131na g\xF6re de\u011Fi\u015Febilir.",
+        60,
+        n.y + 10,
+        j - 120,
+        20,
+        aa,
+        400,
+        28,
+      )),
+      Ve("teklif.pdf", Ze(i, t)));
+  }
+  async function Di() {
+    var a = Be;
+    if (!a) return;
+    var e;
+    try {
+      e = Mt();
+    } catch (x) {
+      e = null;
+    }
+    var t = Wa("Profil Kesim Plan\u0131", e ? e.ad : "Boy kesim optimizasyonu"),
+      i = [t],
+      n = t,
+      r = n.g;
+    function l() {
+      ((n = Wa("Profil Kesim Plan\u0131", "devam")), i.push(n), (r = n.g));
+    }
+    function d(x) {
+      n.y + x > ua - 140 && l();
+    }
+    if (e) {
+      var c = await Pi(
+        z.agirlik.cizim(e.sid, Object.assign({ pal: z.agirlik.PAL_RESIM }, Ie(e.v))),
+        560,
+        434,
+      );
+      ((r.fillStyle = "#f4f8ff"),
+        me(r, 60, n.y, j - 120, 470, 20),
+        r.fill(),
+        c && r.drawImage(c, 80, n.y + 18, 560, 434),
+        T(r, e.ad, 680, n.y + 60, 34, O, 700));
+      var o = n.y + 112;
+      if (
+        (e.liste.forEach(function (x) {
+          (x[0] &&
+            ((r.fillStyle = Ha),
+            r.beginPath(),
+            r.arc(700, o - 9, 17, 0, 7),
+            r.fill(),
+            T(r, x[0], 700, o - 2, 20, "#fff", 700, "center")),
+            T(r, x[1], 735, o - 2, 25, aa, 400),
+            T(r, x[2], j - 80, o - 2, 27, O, 700, "right"),
+            (o += 46));
+        }),
+        e.kgm > 0)
+      ) {
+        var u = e.kgm * ((a.cubukSayisi * a.anaBoy) / 1e3);
+        (T(r, e.malAd + " \xB7 " + v(e.kgm, 3) + " kg/m", 680, n.y + 440, 24, aa, 400),
+          T(
+            r,
+            a.cubukSayisi + " \xE7ubuk \u2248 " + v(u, 1) + " kg",
+            j - 80,
+            n.y + 440,
+            24,
+            aa,
+            400,
+            "right",
+          ));
+      }
+      n.y += 510;
+    }
+    var p = [
+        [a.cubukSayisi + " \xE7ubuk", v(a.anaBoy, 0) + " mm boyunda"],
+        ["%" + v(a.firePct, 1), "Fire"],
+        [v(a.fire, 0) + " mm", "Toplam fire"],
+        [v(a.kerf, 1) + " mm", "Testere pay\u0131"],
+      ],
+      m = (j - 120 - 60) / 4;
+    (p.forEach(function (x, E) {
+      var w = 60 + E * (m + 20);
+      ((r.fillStyle = E === 0 ? Ha : "#f4f8ff"),
+        me(r, w, n.y, m, 120, 16),
+        r.fill(),
+        T(r, x[0], w + m / 2, n.y + 60, 36, E === 0 ? "#fff" : O, 800, "center"),
+        T(r, x[1], w + m / 2, n.y + 98, 21, E === 0 ? "#e3ecff" : aa, 400, "center"));
+    }),
+      (n.y += 196),
+      T(r, "Kesim d\xFCzeni", 60, n.y, 34, O, 700),
+      (n.y += 28));
+    var h = 200,
+      f = j - 60 - h - 150;
+    (a.gruplar.forEach(function (x) {
+      d(84);
+      var E = n.y + 8;
+      T(r, x.adet + " \xD7", 60, E + 34, 30, O, 700);
+      var w = h;
+      x.parcalar.forEach(function (D, _) {
+        if (_ > 0 && a.kerf > 0) {
+          var W = Math.max(2, (a.kerf / a.anaBoy) * f);
+          ((r.fillStyle = "#000"), r.fillRect(w, E, W, 50), (w += W));
+        }
+        var G = (D / a.anaBoy) * f;
+        ((r.fillStyle = _ % 2 ? "#e3ecff" : "#c9d7ff"),
+          r.fillRect(w, E, G, 50),
+          (r.strokeStyle = O),
+          (r.lineWidth = 1.5),
+          r.strokeRect(w, E, G, 50),
+          G > 60 && T(r, v(D, 0), w + G / 2, E + 34, 22, O, 700, "center"),
+          (w += G));
+      });
+      var S = (x.artik / a.anaBoy) * f;
+      ((r.fillStyle = "#e9ecee"),
+        r.fillRect(w, E, S, 50),
+        (r.strokeStyle = "#9aa7ae"),
+        r.setLineDash([6, 5]),
+        r.strokeRect(w, E, S, 50),
+        r.setLineDash([]),
+        T(r, "art\u0131k " + v(x.artik, 0), j - 60, E + 34, 24, aa, 400, "right"),
+        (n.y += 72));
+    }),
+      (n.y += 24),
+      d(200),
+      T(r, "Kesim listesi", 60, n.y, 34, O, 700),
+      (n.y += 24));
+    var k = {};
+    a.gruplar.forEach(function (x) {
+      x.parcalar.forEach(function (E) {
+        k[E] = (k[E] || 0) + x.adet;
+      });
+    });
+    var b = Object.keys(k)
+      .map(Number)
+      .sort(function (x, E) {
+        return E - x;
+      });
+    ((r.fillStyle = O),
+      r.fillRect(60, n.y, 520, 48),
+      T(r, "Kesilecek boy", 80, n.y + 33, 24, "#fff", 700),
+      T(r, "Adet", 560, n.y + 33, 24, "#fff", 700, "right"),
+      (n.y += 48),
+      b.forEach(function (x, E) {
+        (d(50),
+          (r.fillStyle = E % 2 ? "#f4f8ff" : "#fff"),
+          r.fillRect(60, n.y, 520, 48),
+          T(r, v(x, 1) + " mm", 80, n.y + 33, 26, O, 400),
+          T(r, String(k[x]), 560, n.y + 33, 26, O, 700, "right"),
+          (n.y += 48));
+      }),
+      (n.y += 20),
+      d(100),
+      (n.y = re(
+        r,
+        "Her \xE7ubukta par\xE7alar\u0131n toplam\u0131 + (par\xE7a say\u0131s\u0131 \u2212 1) \xD7 testere pay\u0131, ana boyu a\u015Fmaz. Gri taral\u0131 b\xF6l\xFCm \xE7ubukta kalan art\u0131kt\u0131r, siyah \xE7izgiler testere pay\u0131d\u0131r.",
+        60,
+        n.y + 10,
+        j - 120,
+        21,
+        aa,
+        400,
+        30,
+      )),
+      Ve("profil-kesim-plani.pdf", Ze(i)));
+  }
+  function Bi() {
+    var a = za;
+    if (!a) return;
+    var e = [],
+      t = Wa("Sac Yerle\u015Fim Raporu", a.elle ? "Elle yerle\u015Ftirme" : "Otomatik yerle\u015Fim"),
+      i = t.g;
+    e.push(t);
+    function n() {
+      ((t = Wa("Sac Yerle\u015Fim Raporu", "devam")), e.push(t), (i = t.g));
+    }
+    var r = [
+        [a.plakalar.length + " sac", "kullan\u0131ld\u0131"],
+        ["%" + v(a.fire, 1), "Fire (t\xFCm saclar)"],
+        [v(a.toplamParcaAlani / 1e6, 3) + " m\xB2", "Par\xE7a alan\u0131"],
+        [
+          a.plakalar.reduce(function (u, p) {
+            return u + p.parcaSayisi;
+          }, 0) + " par\xE7a",
+          "yerle\u015Fti",
+        ],
+      ],
+      l = (j - 120 - 60) / 4;
+    (r.forEach(function (u, p) {
+      var m = 60 + p * (l + 20);
+      ((i.fillStyle = p === 0 ? Ha : "#f4f8ff"),
+        me(i, m, t.y, l, 120, 16),
+        i.fill(),
+        T(i, u[0], m + l / 2, t.y + 60, 36, p === 0 ? "#fff" : O, 800, "center"),
+        T(i, u[1], m + l / 2, t.y + 98, 21, p === 0 ? "#e3ecff" : aa, 400, "center"));
+    }),
+      (t.y += 160),
+      (a.uyarilar || []).forEach(function (u) {
+        t.y = re(i, "\u26A0 " + u, 60, t.y, j - 120, 23, "#b3261e", 700, 32);
+      }));
+    var d = {},
+      c = ["#8ea0f0", "#ffa48f", "#7fdcb5", "#c4b2fb", "#ffd27f", "#a3e3ee"],
+      o = 0;
+    (a.parcaOzeti.forEach(function (u) {
+      d[u.ad] = c[o++ % c.length];
+    }),
+      a.plakalar.forEach(function (u) {
+        var p = j - 120,
+          m = Math.min(760, (p * u.h) / u.w),
+          h = Math.min(p / u.w, m / u.h),
+          f = u.w * h,
+          k = u.h * h;
+        (t.y + k + 110 > ua - 140 && n(),
+          T(
+            i,
+            "Sac " + u.numara + " \xB7 " + v(u.w, 0) + " \xD7 " + v(u.h, 0) + " mm",
+            60,
+            t.y + 10,
+            30,
+            O,
+            700,
+          ),
+          T(
+            i,
+            u.parcaSayisi + " par\xE7a \xB7 doluluk %" + v(u.doluluk, 1),
+            j - 60,
+            t.y + 10,
+            26,
+            aa,
+            400,
+            "right",
+          ),
+          (t.y += 36));
+        var b = 60 + (p - f) / 2,
+          x = t.y;
+        ((i.fillStyle = "#f4f8ff"),
+          i.fillRect(b, x, f, k),
+          (i.strokeStyle = O),
+          (i.lineWidth = 3),
+          i.strokeRect(b, x, f, k),
+          u.yerlesimler.forEach(function (E) {
+            (i.beginPath(),
+              E.halkalar.forEach(function (w) {
+                for (var S = 0; S < w.length; S += 2) {
+                  var D = b + w[S] * h,
+                    _ = x + k - w[S + 1] * h;
+                  S ? i.lineTo(D, _) : i.moveTo(D, _);
+                }
+                i.closePath();
+              }),
+              (i.fillStyle = d[E.ad] || "#ccc"),
+              i.fill("evenodd"),
+              (i.strokeStyle = O),
+              (i.lineWidth = 1.4),
+              i.stroke());
+          }),
+          (t.y += k + 50));
+      }),
+      t.y + 260 > ua - 140 && n(),
+      T(i, "Par\xE7a listesi", 60, t.y, 32, O, 700),
+      (t.y += 20),
+      a.parcaOzeti.forEach(function (u, p) {
+        t.y + 52 > ua - 140 && n();
+        var m = 0;
+        (a.plakalar.forEach(function (h) {
+          h.yerlesimler.forEach(function (f) {
+            f.ad === u.ad && m++;
+          });
+        }),
+          (i.fillStyle = p % 2 ? "#f4f8ff" : "#fff"),
+          i.fillRect(60, t.y, j - 120, 48),
+          (i.fillStyle = d[u.ad]),
+          i.fillRect(70, t.y + 14, 20, 20),
+          T(i, u.ad, 104, t.y + 33, 24, O, 700),
+          T(i, v(u.w, 1) + " \xD7 " + v(u.h, 1) + " mm", 700, t.y + 33, 24, aa, 400),
+          T(
+            i,
+            m + " / " + u.istenen + " adet",
+            j - 80,
+            t.y + 33,
+            24,
+            m === u.istenen ? O : "#b3261e",
+            700,
+            "right",
+          ),
+          (t.y += 48));
+      }),
+      Ve("sac-yerlesim-raporu.pdf", Ze(e)));
+  }
+  var ve = null;
+  function Ri() {
+    ((s("ds-modul").innerHTML = z.disli.STANDART.map(function (a) {
+      return '<option value="' + a + '">';
+    }).join("")),
+      s("ds-tip").addEventListener("change", function () {
+        s("ds-betaKutu").hidden = s("ds-tip").value !== "helisel";
+      }),
+      s("dsF").addEventListener("input", function () {
+        ve && (s("dsS").classList.add("bayat"), (s("dsBn").hidden = !1));
+      }),
+      s("dsF").addEventListener("change", function () {
+        ve && (s("dsS").classList.add("bayat"), (s("dsBn").hidden = !1));
+      }),
+      s("dsF").addEventListener("submit", function (a) {
+        a.preventDefault();
+        var e = Ii();
+        try {
+          (z.disli.hesapla(e), z.disli.profil(e, 2));
+        } catch (t) {
+          if (!t.kullanici) throw t;
+          (s("dsS").classList.remove("bayat"),
+            (s("dsBn").hidden = !0),
+            (s("dsS").innerHTML = '<div class="kart"><p class="hata">' + y(t.message) + "</p></div>"),
+            (ve = null));
+          return;
+        }
+        Ba("disli", function () {
+          Ci(e);
+        });
+      }));
+  }
+  function Ii() {
+    return {
+      tip: s("ds-tip").value,
+      m: M("ds-m"),
+      z: M("ds-z"),
+      aci: M("ds-aci"),
+      beta: M("ds-beta"),
+      x: M("ds-x"),
+      ha: M("ds-ha"),
+      c: M("ds-c"),
+      z2: M("ds-z2"),
+      x2: M("ds-x2"),
+      n1: M("ds-n1"),
+      b: M("ds-b"),
+      delik: M("ds-delik"),
+    };
+  }
+  function Ki(a, e) {
+    var t = z.disli.profil(a, e.z > 80 ? 3 : 6),
+      i = e.da / 2,
+      n = i * 0.1,
+      r = i / 260,
+      l =
+        "M" +
+        t.pts
+          .map(function (c) {
+            return c[0].toFixed(3) + "," + (-c[1]).toFixed(3);
+          })
+          .join("L") +
+        "Z",
+      d = function (c, o) {
+        return '<circle class="' + o + '" r="' + (c / 2).toFixed(3) + '"/>';
+      };
+    return (
+      '<svg class="sema" viewBox="' +
+      (-i - n) +
+      " " +
+      (-i - n) +
+      " " +
+      2 * (i + n) +
+      " " +
+      2 * (i + n) +
+      '" role="img" aria-label="Di\u015Fli profili"><path class="profil" d="' +
+      l +
+      '" style="stroke-width:' +
+      (r * 1.6).toFixed(3) +
+      '"/><g fill="none" stroke-width="' +
+      (r * 1).toFixed(3) +
+      '">' +
+      d(e.d, "dis-bolum").replace(
+        "<circle",
+        '<circle stroke-dasharray="' + (r * 8).toFixed(2) + " " + (r * 5).toFixed(2) + '"',
+      ) +
+      d(e.db, "dis-taban") +
+      "</g>" +
+      (e.g.delik > 0
+        ? '<circle r="' +
+          e.g.delik / 2 +
+          '" class="dis-delik" style="stroke-width:' +
+          (r * 1.6).toFixed(3) +
+          '"/>'
+        : "") +
+      '<path class="ince-cizgi" style="stroke-width:' +
+      (r * 0.8).toFixed(3) +
+      ";stroke-dasharray:" +
+      (r * 10).toFixed(2) +
+      " " +
+      (r * 6).toFixed(2) +
+      '" d="M' +
+      (-i - n * 0.6) +
+      ",0H" +
+      (i + n * 0.6) +
+      "M0," +
+      (-i - n * 0.6) +
+      "V" +
+      (i + n * 0.6) +
+      '"/></svg>'
+    );
+  }
+  function Hi(a, e) {
+    var t = z.disli.profil(a, 5).pts,
+      i = t.length,
+      n = e.b > 0 ? e.b : Math.max(5 * e.m, 8),
+      r = e.beta ? 18 : 1,
+      l = e.g.delik > 0 && e.g.delik < e.df - 0.5 ? e.g.delik : 0,
+      d = l ? Math.max(24, Math.round(i / 2)) : 0,
+      c = e.beta ? Math.tan((e.beta * Math.PI) / 180) / (e.d / 2) : 0,
+      o = [],
+      u = [],
+      p = [],
+      m = [];
+    function h(L, R) {
+      var A = c * R,
+        F = Math.cos(A),
+        K = Math.sin(A);
+      return [L[0] * F - L[1] * K, L[0] * K + L[1] * F];
+    }
+    function f(L, R, A) {
+      return [R, A, L];
+    }
+    function k(L, R, A, F, K) {
+      ([L, R, A].forEach(function (I) {
+        (o.push(I), u.push(F), m.push(K));
+      }),
+        p.push(o.length - 3, o.length - 2, o.length - 1));
+    }
+    function b(L, R, A, F) {
+      var K = [R[0] - L[0], R[1] - L[1], R[2] - L[2]],
+        I = [A[0] - L[0], A[1] - L[1], A[2] - L[2]],
+        P = [K[1] * I[2] - K[2] * I[1], K[2] * I[0] - K[0] * I[2], K[0] * I[1] - K[1] * I[0]],
+        H = Math.hypot(P[0], P[1], P[2]) || 1;
+      P = [P[0] / H, P[1] / H, P[2] / H];
+      var X = [(L[0] + R[0] + A[0]) / 3, 0, (L[2] + R[2] + A[2]) / 3],
+        V = P[0] * X[0] + P[2] * X[2];
+      return (F ? V < 0 : V > 0) ? [-P[0], -P[1], -P[2]] : P;
+    }
+    function x(L, R, A) {
+      for (var F = L.length, K = 0; K < r; K++)
+        for (var I = (n * K) / r, P = (n * (K + 1)) / r, H = 0; H < F; H++) {
+          var X = (H + 1) % F,
+            V = h(L[H], I),
+            Z = h(L[X], I),
+            ma = h(L[X], P),
+            ca = h(L[H], P),
+            na = f(V[0], V[1], I),
+            ra = f(Z[0], Z[1], I),
+            ea = f(ma[0], ma[1], P),
+            J = f(ca[0], ca[1], P),
+            $ = b(na, ra, ea, R);
+          (k(na, ra, ea, $, A), k(na, ea, J, $, A));
+        }
+    }
+    function E(L, R) {
+      var A = [0, R ? 1 : -1, 0],
+        F = t.map(function (ta) {
+          var Q = h(ta, L);
+          return f(Q[0], Q[1], L);
+        });
+      if (!l) {
+        for (var K = f(0, 0, L), I = 0; I < i; I++) k(K, F[I], F[(I + 1) % i], A, 2);
+        return;
+      }
+      for (var P = [], H = 0; H < d; H++) {
+        var X = (2 * Math.PI * H) / d,
+          V = h([(l / 2) * Math.cos(X), (l / 2) * Math.sin(X)], L);
+        P.push(f(V[0], V[1], L));
+      }
+      for (
+        var Z = function (ta) {
+            return Math.atan2(ta[0], ta[2]);
+          },
+          ma = Z(F[0]),
+          ca = function (ta) {
+            for (var Q = Z(ta) - ma; Q < 0;) Q += 2 * Math.PI;
+            for (; Q >= 2 * Math.PI;) Q -= 2 * Math.PI;
+            return Q;
+          },
+          na = F.map(ca),
+          ra = P.map(ca),
+          ea = ra.indexOf(Math.min.apply(null, ra)),
+          J = 0,
+          $ = 0;
+        J < i || $ < d;
+      ) {
+        var ya = F[J % i],
+          U = P[(ea + $) % d];
+        J < i && ($ >= d || na[J] <= ra[(ea + $) % d])
+          ? (k(ya, F[(J + 1) % i], U, A, 2), J++)
+          : (k(U, ya, P[(ea + $ + 1) % d], A, 2), $++);
+      }
+    }
+    if ((x(t, !0, 0), E(0, !1), E(n, !0), l)) {
+      for (var w = [], S = 0; S < d; S++) {
+        var D = (2 * Math.PI * S) / d;
+        w.push([(l / 2) * Math.cos(D), (l / 2) * Math.sin(D)]);
+      }
+      x(w.reverse(), !1, 1);
+    }
+    for (
+      var _ = o.length,
+        W = new Float32Array(_ * 3),
+        G = new Float32Array(_ * 3),
+        wa = [1e18, 1e18, 1e18],
+        B = [-1e18, -1e18, -1e18],
+        C = 0;
+      C < _;
+      C++
+    )
+      for (var S = 0; S < 3; S++)
+        ((W[3 * C + S] = o[C][S]),
+          (G[3 * C + S] = u[C][S]),
+          o[C][S] < wa[S] && (wa[S] = o[C][S]),
+          o[C][S] > B[S] && (B[S] = o[C][S]));
+    return {
+      pos: W,
+      nor: G,
+      tri: new Uint32Array(p),
+      tip: new Uint8Array(
+        m.filter(function (L, R) {
+          return R % 3 === 0;
+        }),
+      ),
+      min: wa,
+      max: B,
+      L: 0,
+    };
+  }
+  var $e = null;
+  function Ci(a) {
+    var e = z.disli.hesapla(a);
+    ((ve = e), s("dsS").classList.remove("bayat"), (s("dsBn").hidden = !0));
+    var t = function (r, l) {
+        return v(r, l === void 0 ? 3 : l);
+      },
+      i =
+        '<div class="fayans"><div class="vurgu"><b>' +
+        t(e.d) +
+        '<i>mm</i></b><span>B\xF6l\xFCm dairesi \xE7ap\u0131</span></div><div class="vurgu"><b>' +
+        t(e.da) +
+        "<i>mm</i></b><span>D\u0131\u015F \xE7ap</span></div><div><b>" +
+        t(e.df) +
+        "<i>mm</i></b><span>Di\u015F dibi \xE7ap\u0131</span></div><div><b>" +
+        t(e.h, 2) +
+        '<i>mm</i></b><span>Di\u015F y\xFCksekli\u011Fi</span></div></div><div class="gorunum"><div class="kart"><h2>Profil <small>enine kesit</small></h2><div class="masa dis-masa">' +
+        Ki(a, e) +
+        '</div><div class="lejant"><span class="kes">Di\u015F profili</span><span class="bk">B\xF6l\xFCm dairesi</span><span class="ref">Taban dairesi</span></div></div><div class="kart"><h2>3B g\xF6r\xFCn\xFCm <small>s\xFCr\xFCkleyerek d\xF6nd\xFCr\xFCn</small></h2><div class="masa uc" style="min-height:380px"><canvas id="dsTuval" aria-label="Di\u015Fli 3 boyutlu g\xF6r\xFCn\xFCm"></canvas><div class="araclar"><button type="button" id="dsSifirla">\u0130zometrik</button></div><div class="ipucu">s\xFCr\xFCkle: d\xF6nd\xFCr \xB7 tekerlek: yak\u0131nla\u015Ft\u0131r</div></div></div></div><div class="kart" style="margin-top:16px"><h2>\xD6l\xE7\xFCler</h2><div class="tablo"><table class="bilgi">' +
+        [
+          ["Mod\xFCl (normal)", t(e.m, 3) + " mm"],
+          e.beta ? ["Enine mod\xFCl", t(e.mt, 4) + " mm"] : null,
+          [
+            "Bas\u0131n\xE7 a\xE7\u0131s\u0131",
+            t(e.a, 2) + "\xB0" + (e.beta ? " (enine " + t(e.at, 3) + "\xB0)" : ""),
+          ],
+          e.beta
+            ? ["Helis a\xE7\u0131s\u0131", t(e.beta, 2) + "\xB0  \xB7  hatve " + t(e.lead, 1) + " mm"]
+            : null,
+          ["Taban dairesi \xE7ap\u0131", t(e.db) + " mm"],
+          ["Di\u015F ba\u015F\u0131 y\xFCksekli\u011Fi", t(e.hb, 3) + " mm"],
+          ["Di\u015F dibi y\xFCksekli\u011Fi", t(e.hd, 3) + " mm"],
+          ["Ad\u0131m (normal)", t(e.p, 4) + " mm"],
+          ["Di\u015F kal\u0131nl\u0131\u011F\u0131 (b\xF6l\xFCm dairesi)", t(e.sn, 4) + " mm"],
+          ["Di\u015F ucu kal\u0131nl\u0131\u011F\u0131", t(e.sa, 3) + " mm"],
+          ["Oyulmas\u0131z en az di\u015F say\u0131s\u0131", t(e.zmin, 1)],
+          e.b ? ["Di\u015F geni\u015Fli\u011Fi", t(e.b, 2) + " mm"] : null,
+        ]
+          .filter(Boolean)
+          .map(function (r) {
+            return "<tr><td>" + y(r[0]) + '</td><td class="m">' + y(r[1]) + "</td></tr>";
+          })
+          .join("") +
+        "</table></div></div>";
+    if (e.cift) {
+      var n = e.cift;
+      i +=
+        '<div class="kart" style="margin-top:16px"><h2>Di\u015Fli \xE7ifti <small>' +
+        e.z +
+        " / " +
+        n.z2 +
+        ' di\u015F</small></h2><div class="fayans" style="margin-bottom:12px"><div class="vurgu"><b>' +
+        t(n.aw, 3) +
+        '<i>mm</i></b><span>Eksen mesafesi</span></div><div class="vurgu"><b>1 : ' +
+        t(n.i, 3) +
+        "</b><span>\u0130letim oran\u0131</span></div><div><b>" +
+        t(n.eps, 2) +
+        "</b><span>Kavrama oran\u0131</span></div>" +
+        (n.n2
+          ? "<div><b>" + t(n.n2, 1) + "<i>dev/dk</i></b><span>\xC7\u0131k\u0131\u015F devri</span></div>"
+          : "") +
+        '</div><div class="tablo"><table class="bilgi">' +
+        [
+          ["Kar\u015F\u0131 di\u015Fli b\xF6l\xFCm \xE7ap\u0131", t(n.d2) + " mm"],
+          ["Kar\u015F\u0131 di\u015Fli d\u0131\u015F \xE7ap", t(n.da2) + " mm"],
+          ["Kar\u015F\u0131 di\u015Fli di\u015F dibi \xE7ap\u0131", t(n.df2) + " mm"],
+          [
+            "Standart eksen mesafesi",
+            t(n.a0, 3) +
+              " mm" +
+              (Math.abs(n.aw - n.a0) > 1e-6 ? " (kayd\u0131rma ile " + t(n.aw, 3) + " mm)" : ""),
+          ],
+        ]
+          .map(function (r) {
+            return "<tr><td>" + y(r[0]) + '</td><td class="m">' + y(r[1]) + "</td></tr>";
+          })
+          .join("") +
+        "</table></div></div>";
+    }
+    ((i +=
+      Sa(e.uyarilar) +
+      '<p class="not" style="margin-top:10px">Bu hesap geometri (\xF6l\xE7\xFC) hesab\u0131d\u0131r; di\u015Fin dayan\u0131m\u0131, a\u015F\u0131nma ve y\xFCzey bas\u0131nc\u0131 hesab\u0131 i\xE7ermez. Sonu\xE7lar yaln\u0131zca bilgi ama\xE7l\u0131d\u0131r; imalattan \xF6nce do\u011Frulay\u0131n. DXF, di\u015Flinin evolvent profilini verir; helisel di\u015Flide enine kesit profilidir.</p><div class="eylem"><button class="btn ana" type="button" id="dsIndir">Di\u015Fli profilini DXF indir</button></div>' +
+      Fa),
+      (s("dsS").innerHTML = i),
+      ($e = Me(s("dsTuval"))),
+      $e.ayarla(null, Hi(a, e)),
+      s("dsSifirla").addEventListener("click", function () {
+        $e.sifirla();
+      }),
+      s("dsIndir").addEventListener("click", function () {
+        Da("disli_m" + String(e.m).replace(".", "_") + "_z" + e.z + ".dxf", z.disli.dxf(a));
+      }));
+  }
+  function ji() {
+    var a = function () {
+      var e = s("mb-mod").value,
+        t = s("mb-tip").value === "helisel";
+      ((s("mb-tipK").hidden = e !== "dis"),
+        (s("mb-betaK").hidden = !(e === "dis" && t)),
+        (s("mb-daK").hidden = e !== "dis"),
+        (s("mb-pK").hidden = e !== "adim"),
+        (s("mb-zK").hidden = e === "adim"),
+        (s("mb-z2K").hidden = e !== "eksen"),
+        (s("mb-aK").hidden = e !== "eksen"));
+    };
+    (s("mb-mod").addEventListener("change", a),
+      s("mb-tip").addEventListener("change", a),
+      a(),
+      s("mbF").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var t = {
+            mod: s("mb-mod").value,
+            tip: s("mb-tip").value,
+            beta: M("mb-beta"),
+            z: M("mb-z"),
+            da: M("mb-da"),
+            p: M("mb-p"),
+            z2: M("mb-z2"),
+            a: M("mb-a"),
+          },
+          i;
+        try {
+          i = z.disli.modulBul(t);
+        } catch (r) {
+          if (!r.kullanici) throw r;
+          s("mbS").innerHTML = '<div class="kart"><p class="hata">' + y(r.message) + "</p></div>";
+          return;
+        }
+        var n = function (r, l) {
+          return v(r, l);
+        };
+        s("mbS").innerHTML =
+          '<div class="fayans"><div class="vurgu"><b>' +
+          n(i.standart, 3) +
+          "</b><span>En yak\u0131n standart mod\xFCl</span></div><div><b>" +
+          n(i.m, 4) +
+          "</b><span>Hesaplanan mod\xFCl</span></div><div><b>%" +
+          n(i.sapma, 1) +
+          "</b><span>Sapma</span></div><div><b>" +
+          n(i.dpi, 2) +
+          '</b><span>Diametral pitch (di\u015Fli/in\xE7)</span></div></div><div class="kart"><h2>Ayr\u0131nt\u0131</h2><div class="tablo"><table class="bilgi">' +
+          i.ayrinti
+            .map(function (r) {
+              return "<tr><td>" + y(r[0]) + '</td><td class="m">' + y(r[1]) + "</td></tr>";
+            })
+            .join("") +
+          "</table></div>" +
+          Sa(i.uyarilar) +
+          '<p class="not" style="margin-top:10px">Standart mod\xFCller: ' +
+          z.disli.STANDART.join(", ") +
+          ". \xD6l\xE7\xFCm hassas yap\u0131lmazsa sonu\xE7 sapabilir; yaln\u0131zca bilgi ama\xE7l\u0131d\u0131r.</p></div>";
+      }));
+  }
+  function Oi() {
+    var a = function (l, d, c) {
+        return (
+          '<circle cx="' +
+          l +
+          '" cy="' +
+          d +
+          '" r="9.5" style="fill:var(--accent)"/><text x="' +
+          l +
+          '" y="' +
+          (d + 3.8) +
+          '" text-anchor="middle" style="fill:#fff;font:700 ' +
+          (c.length > 1 ? 10 : 12) +
+          'px Arial,sans-serif">' +
+          c +
+          "</text>"
+        );
+      },
+      e = function (l, d, c, o, u) {
+        return (
+          '<line x1="' +
+          l +
+          '" y1="' +
+          d +
+          '" x2="' +
+          c +
+          '" y2="' +
+          o +
+          '" style="stroke:var(--accent);stroke-width:1.6' +
+          (u ? ";stroke-dasharray:5 3;stroke-width:1.2" : "") +
+          '"/>'
+        );
+      },
+      t = function (l, d, c, o) {
+        return (
+          '<line x1="' +
+          l +
+          '" y1="' +
+          d +
+          '" x2="' +
+          c +
+          '" y2="' +
+          o +
+          '" style="stroke:var(--mut);stroke-width:.9"/>'
+        );
+      },
+      i = "M20 118V82",
+      n = [45, 95, 145, 195];
+    (n.forEach(function (l) {
+      i += "L" + (l - 19.8) + " 82L" + (l - 6.7) + " 46L" + (l + 6.7) + " 46L" + (l + 19.8) + " 82";
+    }),
+      (i += "L228 82V118Z"));
+    var r =
+      '<path d="' +
+      i +
+      '" style="fill:var(--accent-soft);stroke:var(--ink);stroke-width:2;stroke-linejoin:round"/>' +
+      e(12, 62, 236, 62, 1) +
+      t(45, 44, 45, 22) +
+      t(95, 44, 95, 22) +
+      e(45, 26, 95, 26) +
+      a(70, 26, "B") +
+      a(95, 73, "A") +
+      t(205, 46, 252, 46) +
+      t(228, 82, 252, 82) +
+      e(248, 46, 248, 82) +
+      a(248, 64, "h") +
+      t(228, 118, 252, 118) +
+      e(248, 82, 248, 118) +
+      a(248, 100, "C") +
+      '<text x="8" y="138" style="fill:var(--mut);font:10.5px Arial,sans-serif">A: mod\xFCl (m)  \xB7  B: ad\u0131m = \u03C0\xB7m  \xB7  h: di\u015F y\xFCksekli\u011Fi</text><text x="8" y="151" style="fill:var(--mut);font:10.5px Arial,sans-serif">C: g\xF6vde y\xFCksekli\u011Fi  \xB7  kesik \xE7izgi: b\xF6l\xFCm \xE7izgisi</text>';
+    s("krCizim").innerHTML =
+      '<svg class="cz" viewBox="0 0 268 158" role="img" aria-label="Kremayer \xF6l\xE7\xFCleri">' +
+      r +
+      "</svg>";
+  }
+  var It = null;
+  function Ni() {
+    Oi();
+    var a = function () {
+      s("kr-betaK").hidden = s("kr-tip").value !== "helisel";
+    };
+    (s("kr-tip").addEventListener("change", a),
+      a(),
+      s("krF").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var t = {
+          tip: s("kr-tip").value,
+          m: M("kr-m"),
+          aci: M("kr-aci"),
+          beta: M("kr-beta"),
+          L: M("kr-L"),
+          N: M("kr-N"),
+          H: M("kr-H"),
+          z: M("kr-z"),
+          x: M("kr-x"),
+          n1: M("kr-n1"),
+        };
+        (t.N && !s("kr-L").value && (t.L = 0), t.N && (t.L = 0));
+        var i;
+        try {
+          i = z.disli.kremayer(t);
+        } catch (d) {
+          if (!d.kullanici) throw d;
+          s("krS").innerHTML = '<div class="kart"><p class="hata">' + y(d.message) + "</p></div>";
+          return;
+        }
+        It = t;
+        var n = function (d, c) {
+            return v(d, c === void 0 ? 3 : c);
+          },
+          r =
+            '<div class="fayans"><div class="vurgu"><b>' +
+            n(i.pt, 4) +
+            "<i>mm</i></b><span>Di\u015F ad\u0131m\u0131" +
+            (i.beta ? " (boyuna)" : "") +
+            '</span></div><div class="vurgu"><b>' +
+            i.N +
+            "</b><span>Di\u015F say\u0131s\u0131</span></div><div><b>" +
+            n(i.boy, 2) +
+            "<i>mm</i></b><span>Toplam boy</span></div><div><b>" +
+            n(i.h, 3) +
+            '<i>mm</i></b><span>Di\u015F y\xFCksekli\u011Fi</span></div></div><div class="kart"><h2>Kremayer \xF6l\xE7\xFCleri</h2><div class="tablo"><table class="bilgi">' +
+            [
+              ["Mod\xFCl (normal)", n(i.m, 3) + " mm"],
+              i.beta ? ["Normal ad\u0131m", n(i.pn, 4) + " mm"] : null,
+              i.beta ? ["Helis a\xE7\u0131s\u0131", n(i.beta, 3) + "\xB0"] : null,
+              [
+                "Bas\u0131n\xE7 a\xE7\u0131s\u0131",
+                n(i.a, 2) + "\xB0" + (i.beta ? " (enine " + n(i.at, 3) + "\xB0)" : ""),
+              ],
+              ["Di\u015F ba\u015F\u0131 y\xFCksekli\u011Fi", n(i.ha, 3) + " mm"],
+              ["Di\u015F dibi y\xFCksekli\u011Fi", n(i.hf, 3) + " mm"],
+              ["Di\u015F kal\u0131nl\u0131\u011F\u0131 (b\xF6l\xFCm \xE7izgisi)", n(i.s, 4) + " mm"],
+              ["Di\u015F ucu kal\u0131nl\u0131\u011F\u0131", n(i.sa, 3) + " mm"],
+              i.artik > 0.001 ? ["Boydan artan", n(i.artik, 2) + " mm"] : null,
+              i.kalinlik ? ["Toplam kal\u0131nl\u0131k (di\u015F dahil)", n(i.kalinlik, 3) + " mm"] : null,
+            ]
+              .filter(Boolean)
+              .map(function (d) {
+                return "<tr><td>" + y(d[0]) + '</td><td class="m">' + y(d[1]) + "</td></tr>";
+              })
+              .join("") +
+            "</table></div></div>";
+        if (i.pinyon) {
+          var l = i.pinyon;
+          r +=
+            '<div class="kart" style="margin-top:16px"><h2>Pinyon <small>' +
+            l.z +
+            ' di\u015F</small></h2><div class="fayans" style="margin-bottom:12px"><div class="vurgu"><b>' +
+            n(l.tur, 3) +
+            '<i>mm</i></b><span>Pinyon bir turda yol</span></div><div class="vurgu"><b>' +
+            n(l.eksen, 3) +
+            "<i>mm</i></b><span>Eksen - b\xF6l\xFCm \xE7izgisi</span></div>" +
+            (l.hiz
+              ? "<div><b>" + n(l.hiz, 2) + "<i>m/dk</i></b><span>Kremayer h\u0131z\u0131</span></div>"
+              : "") +
+            '</div><div class="tablo"><table class="bilgi">' +
+            [
+              ["Pinyon b\xF6l\xFCm \xE7ap\u0131", n(l.d) + " mm"],
+              ["Pinyon d\u0131\u015F \xE7ap", n(l.da) + " mm"],
+              ["Kremayer boyunca tur say\u0131s\u0131", n(l.turSayisi, 2)],
+              l.sirt ? ["Eksen - kremayer s\u0131rt\u0131", n(l.sirt, 3) + " mm"] : null,
+            ]
+              .filter(Boolean)
+              .map(function (d) {
+                return "<tr><td>" + y(d[0]) + '</td><td class="m">' + y(d[1]) + "</td></tr>";
+              })
+              .join("") +
+            "</table></div></div>";
+        }
+        ((r +=
+          Sa(i.uyarilar) +
+          '<p class="not" style="margin-top:10px">Standart temel kremayer profili (di\u015F ba\u015F\u0131 1\xB7m, di\u015F dibi 1,25\xB7m) varsay\u0131l\u0131r. Geometri hesab\u0131d\u0131r; dayan\u0131m ve a\u015F\u0131nma hesab\u0131 i\xE7ermez. DXF, kremayerin yan g\xF6r\xFCn\xFC\u015F profilini verir (en \xE7ok 300 di\u015F).</p><div class="eylem"><button class="btn ana" type="button" id="krIndir">Kremayer profilini DXF indir</button></div>' +
+          Fa),
+          (s("krS").innerHTML = r),
+          s("krIndir").addEventListener("click", function () {
+            Da(
+              "kremayer_m" + String(i.m).replace(".", "_") + "_" + Math.min(i.N, 300) + "dis.dxf",
+              z.disli.kremayerDxf(It),
+            );
+          }));
+      }));
+  }
+  function Qe(a, e) {
+    var t = [].slice.call(s(a).querySelectorAll(".seg button"));
+    t.forEach(function (i) {
+      i.addEventListener("click", function () {
+        (t.forEach(function (n) {
+          n.setAttribute("aria-pressed", String(n === i));
+        }),
+          e(i.dataset.v));
+      });
+    });
+  }
+  function Kt(a, e, t, i) {
+    s(a).innerHTML = e
+      .map(function (l, d) {
+        return (
+          '<button type="button" role="radio" aria-checked="false" data-i="' +
+          d +
+          '">' +
+          y(i(l)) +
+          "</button>"
+        );
+      })
+      .join("");
+    var n = [].slice.call(s(a).querySelectorAll("button"));
+    function r(l) {
+      (n.forEach(function (d, c) {
+        (d.setAttribute("aria-checked", String(c === l)), d.classList.toggle("on", c === l));
+      }),
+        t(l));
+    }
+    return (
+      n.forEach(function (l, d) {
+        l.addEventListener("click", function () {
+          r(d);
+        });
+      }),
+      r
+    );
+  }
+  var Je = function (a, e, t) {
+    return (
+      '<div class="tablo"><table><tr>' +
+      a
+        .map(function (i, n) {
+          return '<th class="' + (n ? "s" : "") + (i[1] ? " dm" : "") + '">' + y(i[0]) + "</th>";
+        })
+        .join("") +
+      "</tr>" +
+      e
+        .map(function (i, n) {
+          return (
+            "<tr" +
+            (n === t ? ' class="sec"' : "") +
+            ">" +
+            i
+              .map(function (r, l) {
+                return (
+                  '<td class="' +
+                  (l ? "s m" : "") +
+                  (a[l][1] ? " dm" : "") +
+                  '">' +
+                  y(r == null ? "-" : String(r).replace(".", ",")) +
+                  "</td>"
+                );
+              })
+              .join("") +
+            "</tr>"
+          );
+        })
+        .join("") +
+      "</table></div>"
+    );
+  };
+  function qe(a, e) {
+    return (
+      '<div class="fayans">' +
+      a
+        .map(function (t, i) {
+          return (
+            "<div" +
+            (i < 2 ? ' class="vurgu"' : "") +
+            "><b>" +
+            y(String(t[1]).replace(".", ",")) +
+            (t[2] ? "<i>" + t[2] + "</i>" : "") +
+            "</b><span>" +
+            y(t[0]) +
+            "</span></div>"
+          );
+        })
+        .join("") +
+      "</div>" +
+      (e || "")
+    );
+  }
+  function Yi() {
+    var a = z.vida,
+      e = "kaba",
+      t,
+      i = "BSW",
+      n;
+    function r() {
+      return e === "kaba" ? a.METRIK : a.METRIK_INCE;
+    }
+    function l(m) {
+      var h = r(),
+        f = h[m],
+        k = [
+          ["Ad\u0131m", f.P, "mm"],
+          ["K\u0131lavuz (matkap)", f.matkap, "mm"],
+          ["Anahtar a\u011Fz\u0131", f.anahtar, f.anahtar ? "mm" : ""],
+          ["Ge\xE7i\u015F deli\u011Fi (orta)", f.gecis, f.gecis ? "mm" : ""],
+        ].filter(function (b) {
+          return b[1] !== null;
+        });
+      s("vmS").innerHTML =
+        '<h2 class="vbaslik">' +
+        y(f.ad) +
+        (f.ince ? " <small>ince di\u015F</small>" : " <small>kaba di\u015F</small>") +
+        "</h2>" +
+        qe(k) +
+        '<div class="kart" style="margin-top:14px"><h2>Di\u015F \xE7aplar\u0131</h2><div class="tablo"><table class="bilgi">' +
+        [
+          ["D\u0131\u015F \xE7ap (d)", f.d],
+          ["Ad\u0131m (P)", f.P],
+          ["B\xF6l\xFCm \xE7ap\u0131 (d2)", f.d2],
+          ["C\u0131vata \xE7ekirdek \xE7ap\u0131 (d3)", f.d3],
+          ["Somun di\u015F dibi \xE7ap\u0131 (D1)", f.D1],
+          ["Gerilme kesit alan\u0131", f.alan + " mm\xB2"],
+        ]
+          .map(function (b) {
+            return (
+              "<tr><td>" +
+              y(b[0]) +
+              '</td><td class="m">' +
+              y(String(b[1]).replace(".", ",") + (typeof b[1] == "number" ? " mm" : "")) +
+              "</td></tr>"
+            );
+          })
+          .join("") +
+        '</table></div><p class="not" style="margin-top:10px">ISO metrik di\u015F (60\xB0). K\u0131lavuz \xE7ap\u0131 yakla\u015F\u0131k de\u011Ferdir; malzemeye g\xF6re de\u011Fi\u015Febilir. Anahtar a\u011Fz\u0131 ISO 4017/4032, ge\xE7i\u015F deli\u011Fi ISO 273 orta seri de\u011Feridir.</p></div><div class="kart" style="margin-top:14px"><h2>Tablo</h2>' +
+        Je(
+          [["\xD6l\xE7\xFC"], ["Ad\u0131m"], ["K\u0131lavuz", 1], ["Anahtar", 1], ["Ge\xE7i\u015F", 1]],
+          h.map(function (b) {
+            return [b.ad, b.P, b.matkap, b.anahtar, b.gecis];
+          }),
+          m,
+        ) +
+        "</div>";
+    }
+    Y("metrik") &&
+      s("metrik").dataset.tur === "ince" &&
+      ((e = "ince"),
+      [].forEach.call(s("vmF").querySelectorAll(".seg button"), function (m) {
+        m.setAttribute("aria-pressed", String(m.dataset.v === "ince"));
+      }));
+    function d() {
+      ((t = Kt("vmChips", r(), l, function (m) {
+        return m.ad;
+      })),
+        t(
+          r().findIndex(function (m) {
+            return m.d === 8;
+          }),
+        ));
+    }
+    Y("metrik") &&
+      (Qe("vmF", function (m) {
+        ((e = m), d());
+      }),
+      d());
+    function c() {
+      return i === "BSW" ? a.BSW : i === "BSF" ? a.BSF : a.BSP;
+    }
+    function o(m) {
+      var h = c(),
+        f = h[m],
+        k = i === "BSP",
+        b = [
+          ["D\u0131\u015F \xE7ap", f.d, "mm"],
+          ["Ad\u0131m", f.P, "mm"],
+          ["Di\u015F / in\xE7", f.tpi, ""],
+          ["\xC7ekirdek \xE7ap\u0131", f.cek, "mm"],
+        ];
+      (k && f.matkap && b.push(["K\u0131lavuz (matkap)", f.matkap, "mm"]),
+        (s("vwS").innerHTML =
+          '<h2 class="vbaslik">' +
+          y((k ? "" : i + " ") + f.ad + '"') +
+          " <small>" +
+          f.tpi +
+          " di\u015F/in\xE7</small></h2>" +
+          qe(b) +
+          '<div class="kart" style="margin-top:14px"><h2>Tablo</h2>' +
+          Je(
+            [
+              ["\xD6l\xE7\xFC"],
+              ["D\u0131\u015F \xE7ap"],
+              ["Di\u015F/in\xE7", 1],
+              ["Ad\u0131m", 1],
+              ["\xC7ekirdek"],
+            ],
+            h.map(function (x) {
+              return ["" + x.ad + '"', x.d, x.tpi, x.P, x.cek];
+            }),
+            m,
+          ) +
+          '<p class="not" style="margin-top:10px">Whitworth di\u015F 55\xB0; \xE7ekirdek \xE7ap\u0131 d \u2212 1,28\xB7P olarak hesaplanm\u0131\u015Ft\u0131r. BSP (G) silindirik boru di\u015Fidir; konik (R/Rp) di\u015F i\xE7in \xFCretici tablosuna bak\u0131n. Yakla\u015F\u0131k de\u011Ferlerdir.</p></div>'));
+    }
+    function u() {
+      ((n = Kt("vwChips", c(), o, function (m) {
+        return m.ad + '"';
+      })),
+        n(0));
+    }
+    (Y("whitworth") &&
+      s("whitworth").dataset.seri &&
+      ((i = s("whitworth").dataset.seri),
+      [].forEach.call(s("vwF").querySelectorAll(".seg button"), function (m) {
+        m.setAttribute("aria-pressed", String(m.dataset.v === i));
+      })),
+      Y("whitworth") &&
+        (Qe("vwF", function (m) {
+          ((i = m), u());
+        }),
+        u()));
+    function p(m) {
+      var h = function (x, E, w) {
+          return (
+            '<circle cx="' +
+            x +
+            '" cy="' +
+            E +
+            '" r="10" style="fill:var(--accent)"/><text x="' +
+            x +
+            '" y="' +
+            (E + 3.6) +
+            '" text-anchor="middle" style="fill:#fff;font:700 ' +
+            (w.length > 1 ? 10 : 12) +
+            'px Arial,sans-serif">' +
+            w +
+            "</text>"
+          );
+        },
+        f = function (x, E, w, S, D) {
+          return (
+            '<line x1="' +
+            x +
+            '" y1="' +
+            E +
+            '" x2="' +
+            w +
+            '" y2="' +
+            S +
+            '" style="stroke:var(--accent);stroke-width:1.6' +
+            (D ? ";stroke-dasharray:4 3" : "") +
+            '"/>'
+          );
+        },
+        k = function (x, E, w, S) {
+          return (
+            '<line x1="' +
+            x +
+            '" y1="' +
+            E +
+            '" x2="' +
+            w +
+            '" y2="' +
+            S +
+            '" style="stroke:var(--mut);stroke-width:.9"/>'
+          );
+        },
+        b = "stroke:var(--ink);stroke-width:2;stroke-linejoin:round";
+      return (
+        '<svg class="cz" viewBox="0 0 360 190" role="img" aria-label="Kama \xF6l\xE7\xFCleri"><circle cx="85" cy="100" r="76" style="fill:var(--panel-2);' +
+        b +
+        '"/><circle cx="85" cy="100" r="48" style="fill:var(--accent-soft);' +
+        b +
+        '"/><rect x="76" y="46" width="18" height="34" style="fill:var(--panel);stroke:var(--accent);stroke-width:2.2"/><line x1="37" y1="100" x2="133" y2="100" style="stroke:var(--accent);stroke-width:1.4;stroke-dasharray:4 3"/>' +
+        h(85, 112, "d") +
+        '<text x="85" y="184" text-anchor="middle" style="fill:var(--mut);font:11px Arial,sans-serif">mil ve poyra (kesit)</text><rect x="222" y="40" width="46" height="84" style="fill:var(--panel);stroke:var(--accent);stroke-width:2.4"/><line x1="196" y1="82" x2="300" y2="82" style="stroke:var(--ink);stroke-width:1.4;stroke-dasharray:5 3"/><text x="298" y="86" style="fill:var(--mut);font:10px Arial,sans-serif">mil y\xFCzeyi</text>' +
+        k(222, 124, 222, 140) +
+        k(268, 124, 268, 140) +
+        f(222, 136, 268, 136) +
+        h(245, 136, "b") +
+        k(268, 40, 290, 40) +
+        k(268, 124, 290, 124) +
+        f(286, 40, 286, 124) +
+        h(286, 62, "h") +
+        k(196, 40, 222, 40) +
+        k(196, 82, 222, 82) +
+        k(196, 124, 222, 124) +
+        f(204, 40, 204, 82) +
+        h(204, 61, "t2") +
+        f(204, 82, 204, 124) +
+        h(204, 103, "t1") +
+        '<text x="245" y="184" text-anchor="middle" style="fill:var(--mut);font:11px Arial,sans-serif">kama (ayr\u0131nt\u0131)</text></svg>'
+      );
+    }
+    Y("kama") &&
+      (s("kmF").addEventListener("submit", function (m) {
+        m.preventDefault();
+        var h;
+        try {
+          h = a.kamaBul(M("km-d"));
+        } catch (k) {
+          if (!k.kullanici) throw k;
+          s("kmS").innerHTML = '<div class="kart"><p class="hata">' + y(k.message) + "</p></div>";
+          return;
+        }
+        var f = a.KAMA.findIndex(function (k) {
+          return k.b === h.b && k.dmin === h.dmin;
+        });
+        s("kmS").innerHTML =
+          qe([
+            ["Kama eni \xD7 y\xFCksekli\u011Fi (b \xD7 h)", h.b + " \xD7 " + h.h, "mm"],
+            ["Mil yuvas\u0131 derinli\u011Fi (t1)", h.t1, "mm"],
+            ["Poyra yuvas\u0131 derinli\u011Fi (t2)", h.t2, "mm"],
+            ["Milde \xF6l\xE7\xFC (d \u2212 t1)", h.milOlcu, "mm"],
+            ["Poyrada \xF6l\xE7\xFC (d + t2)", h.poyraOlcu, "mm"],
+          ]) +
+          '<div class="kart" style="margin-top:14px"><h2>\xC7izim</h2>' +
+          p(h) +
+          '</div><div class="kart" style="margin-top:14px"><h2>Tablo <small>DIN 6885-1</small></h2>' +
+          Je(
+            [["Mil \xE7ap\u0131"], ["b \xD7 h"], ["t1", 1], ["t2", 1]],
+            a.KAMA.map(function (k) {
+              return [k.dmin + " \u2013 " + k.dmax, k.b + " \xD7 " + k.h, k.t1, k.t2];
+            }),
+            f,
+          ) +
+          '<p class="not" style="margin-top:10px">Mil \xE7ap\u0131 aral\u0131\u011F\u0131 "\xFCst\xFC \u2013 dahil" \u015Feklindedir (\xF6r. 22 \u2013 30: 22 mm \xFCst\xFC, 30 mm dahil). Kama boyu, tork ve dayan\u0131m i\xE7in ayr\u0131ca hesap yap\u0131n; de\u011Ferler bilgi ama\xE7l\u0131d\u0131r.</p></div>';
+      }),
+      s("kmF").dispatchEvent(new Event("submit", { cancelable: !0 })));
+  }
+  var Ma = {},
+    Ca = null,
+    ha = [],
+    Ht = "ABCDEFGH";
+  function Va() {
+    return z.agirlik.SEKIL.filter(function (a) {
+      return a.id === s("ag-sekil").value;
+    })[0];
+  }
+  function bn(a) {
+    return a.alan.filter(function (e) {
+      return !e.sec;
+    });
+  }
+  function _i() {
+    var a = Ma.std || {};
+    return a.seri || "IPE";
+  }
+  function at(a, e) {
+    var t = { seri: _i(), olcu: (Ma.std || {}).olcu };
+    return (e && ((t.delik = +e.dn > 0 ? +e.dn : 0), a.id === "disk" && (t.merkez = +e.d > 0)), t);
+  }
+  function et() {
+    var a = Va();
+    (pe(), (s("agCizim").innerHTML = z.agirlik.cizim(a.id, at(a, Ma[a.id]))));
+  }
+  function Ct(a) {
+    ((s("ag-sekil").value = a),
+      [].forEach.call(s("agSecici").querySelectorAll("[data-sid]"), function (n) {
+        var r = n.dataset.sid === a;
+        (n.setAttribute("aria-checked", String(r)), n.classList.toggle("on", r));
+      }));
+    var e = Va();
+    ((s("agSecili").textContent = e.ad), (s("agBaslik").textContent = e.ad + " \u2013 \xF6l\xE7\xFCler"));
+    var t = s("agSecici").querySelector(".on");
+    if (t) {
+      var i = s("agSecici");
+      i.scrollLeft = Math.max(0, t.offsetLeft - (i.clientWidth - t.offsetWidth) / 2);
+    }
+    (jt(), et(), tt());
+  }
+  function Gi() {
+    var a = z.agirlik,
+      e = {},
+      t = "";
+    (a.SEKIL.forEach(function (r) {
+      (e[r.grup] = e[r.grup] || []).push(r);
+    }),
+      a.SEKIL.forEach(function (r) {
+        t +=
+          '<button type="button" class="skare" role="radio" aria-checked="false" data-sid="' +
+          r.id +
+          '">' +
+          a.cizim(r.id, { mini: !0, seri: "IPE" }) +
+          "<span>" +
+          y(r.ad) +
+          "</span></button>";
+      }),
+      (s("agSecici").innerHTML = t),
+      (s("ag-mal").innerHTML = a.MALZEME.map(function (r) {
+        return (
+          '<option value="' +
+          r[0] +
+          '">' +
+          y(r[1]) +
+          (r[2] ? " (" + String(r[2]).replace(".", ",") + " g/cm\xB3)" : "") +
+          "</option>"
+        );
+      }).join("")));
+    var i =
+      document.getElementById("agirlik").dataset.sekil ||
+      (location.search.match(/[?&]sekil=(\w+)/) || [])[1] ||
+      "sac";
+    (a.SEKIL.some(function (r) {
+      return r.id === i;
+    }) || (i = "sac"),
+      [].forEach.call(s("agSecici").querySelectorAll("[data-sid]"), function (r) {
+        r.addEventListener("click", function () {
+          (pe(), Ct(r.dataset.sid));
+        });
+      }),
+      Ct(i));
+    var n = document.getElementById("agirlik").dataset.malzeme;
+    (n && ((s("ag-mal").value = n), (s("agOzel").hidden = n !== "ozel")),
+      s("ag-mal").addEventListener("change", function () {
+        ((s("agOzel").hidden = s("ag-mal").value !== "ozel"), tt());
+      }),
+      s("agF").addEventListener("input", tt),
+      s("agAlanlar").addEventListener("input", function (r) {
+        ["dn", "d"].indexOf(r.target.dataset.id) >= 0 && et();
+      }),
+      s("agAlanlar").addEventListener("change", function (r) {
+        r.target.dataset.id === "seri" && (pe(), jt(), et());
+      }),
+      s("agF").addEventListener("submit", function (r) {
+        r.preventDefault();
+        var l = Xi();
+        try {
+          z.agirlik.hesapla(s("ag-sekil").value, l);
+        } catch (d) {
+          if (!d.kullanici) throw d;
+          ((s("agS").innerHTML = '<div class="kart"><p class="hata">' + y(d.message) + "</p></div>"),
+            (Ca = null));
+          return;
+        }
+        Ba("agirlik", function () {
+          $i(l);
+        });
+      }));
+  }
+  function pe() {
+    var a = Va(),
+      e = (Ma[a.id] = Ma[a.id] || {});
+    [].forEach.call(s("agAlanlar").querySelectorAll("[data-id]"), function (t) {
+      e[t.dataset.id] = t.value;
+    });
+  }
+  function jt() {
+    var a = Va(),
+      e = (Ma[a.id] = Ma[a.id] || {}),
+      t = "",
+      i = 0;
+    (a.alan.forEach(function (n) {
+      var r = e[n.id] !== void 0 ? e[n.id] : n.v,
+        l = n.sec || n.harfsiz ? "" : '<b class="hrf">' + Ht[i++] + "</b>";
+      if (n.sec) {
+        var d = n.sec;
+        if (a.id === "std" && n.id === "olcu") {
+          var c = e.seri || "IPE";
+          ((d = Object.keys(z.agirlik.STANDART[c]).map(function (o) {
+            return [o, o + " (" + String(z.agirlik.STANDART[c][o]).replace(".", ",") + " kg/m)"];
+          })),
+            z.agirlik.STANDART[c][r] || (r = d[0][0]));
+        }
+        t +=
+          '<div style="grid-column:1/-1"><label for="agf-' +
+          n.id +
+          '">' +
+          y(n.ad) +
+          '</label><select id="agf-' +
+          n.id +
+          '" data-id="' +
+          n.id +
+          '">' +
+          d
+            .map(function (o) {
+              return (
+                '<option value="' +
+                o[0] +
+                '"' +
+                (String(r) === o[0] ? " selected" : "") +
+                ">" +
+                y(o[1]) +
+                "</option>"
+              );
+            })
+            .join("") +
+          "</select></div>";
+      } else
+        t +=
+          '<div><label for="agf-' +
+          n.id +
+          '">' +
+          l +
+          y(n.ad) +
+          (n.birim ? " <small>" + y(n.birim) + "</small>" : "") +
+          '</label><input id="agf-' +
+          n.id +
+          '" data-id="' +
+          n.id +
+          '" type="number" step="any" min="0" inputmode="decimal" value="' +
+          r +
+          '"></div>';
+    }),
+      (s("agAlanlar").innerHTML = t));
+  }
+  function Xi() {
+    pe();
+    var a = Va(),
+      e = Object.assign({}, Ma[a.id]);
+    return (
+      (e.mal = s("ag-mal").value),
+      (e.rho = M("ag-rho")),
+      (e.adet = M("ag-adet")),
+      (e.fiyat = M("ag-fiyat")),
+      e
+    );
+  }
+  function tt() {
+    Ca && (s("agS").classList.add("bayat"), (s("agBn").hidden = !1));
+  }
+  function Ot(a) {
+    var e = z.agirlik.SEKIL.filter(function (n) {
+        return n.id === a.sid;
+      })[0],
+      t = 0,
+      i = [];
+    return (
+      e.alan.forEach(function (n) {
+        if (n.sec) {
+          e.id === "std" && n.id === "seri" && i.push(["", "Profil", a.v.seri + " " + a.v.olcu]);
+          return;
+        }
+        if (n.harfsiz) {
+          n.id === "dn" && +a.v.dn > 0 && i.push(["", "Delik", a.v.dn + " adet \xD8" + a.v.dd + " mm"]);
+          return;
+        }
+        i.push([Ht[t++], n.ad, a.v[n.id] + (n.birim ? " " + n.birim : "")]);
+      }),
+      i
+    );
+  }
+  function Ui(a) {
+    return (
+      '<div class="agkart-ic"><div class="agkart-cz">' +
+      z.agirlik.cizim(a.sid, Object.assign({ seri: a.v.seri, olcu: a.v.olcu }, at({ id: a.sid }, a.v))) +
+      '</div><ul class="olculer">' +
+      Ot(a)
+        .map(function (e) {
+          return (
+            "<li>" +
+            (e[0] ? '<b class="hrf">' + e[0] + "</b>" : "") +
+            "<span>" +
+            y(e[1]) +
+            "</span><strong>" +
+            y(e[2]) +
+            "</strong></li>"
+          );
+        })
+        .join("") +
+      "</ul></div>"
+    );
+  }
+  function Za(a) {
+    return String(a).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function Wi() {
+    Ca && ze("agirlik.png", Vi);
+  }
+  function Vi() {
+    var a = Ca;
+    if (a) {
+      var e = z.agirlik.PAL_RESIM,
+        t = 720,
+        i = Ot(a),
+        n = [
+          ["Toplam a\u011F\u0131rl\u0131k (" + a.adet + " adet)", v(a.top, 2) + " kg"],
+          ["Birim a\u011F\u0131rl\u0131k", v(a.kg, 3) + " kg"],
+        ];
+      (a.kgm && n.push(["Metre a\u011F\u0131rl\u0131\u011F\u0131", v(a.kgm, 3) + " kg/m"]),
+        a.maliyet && n.push(["Tahmini maliyet", v(a.maliyet, 2) + " \u20BA"]),
+        n.push(["Malzeme", a.malAd + " \xB7 " + v(a.rho, 2) + " g/cm\xB3"]));
+      var r = 460 + Math.max(i.length, 1) * 0 + n.length * 40 + 70,
+        l =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="' +
+          t +
+          '" height="' +
+          r +
+          '" viewBox="0 0 ' +
+          t +
+          " " +
+          r +
+          '" font-family="Arial,Helvetica,sans-serif"><rect width="' +
+          t +
+          '" height="' +
+          r +
+          '" fill="#fff"/><rect width="' +
+          t +
+          '" height="84" fill="' +
+          e.ink +
+          '"/><text x="32" y="38" font-size="26" font-weight="700" fill="#fff">' +
+          Za(a.ad) +
+          '</text><text x="32" y="64" font-size="16" fill="#cfd8dc">A\u011F\u0131rl\u0131k hesab\u0131 \xB7 ' +
+          Za(a.malAd) +
+          '</text><svg x="24" y="100" width="400" height="280" viewBox="0 -14 240 186">' +
+          z.agirlik
+            .cizim(a.sid, Object.assign({ pal: e, seri: a.v.seri, olcu: a.v.olcu }, at({ id: a.sid }, a.v)))
+            .replace(/^<svg[^>]*>/, "")
+            .replace(/<\/svg>$/, "") +
+          "</svg>";
+      i.forEach(function (o, u) {
+        var p = 130 + u * 44;
+        l +=
+          (o[0]
+            ? '<circle cx="452" cy="' +
+              (p - 6) +
+              '" r="13" fill="' +
+              e.acc +
+              '"/><text x="452" y="' +
+              p +
+              '" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">' +
+              o[0] +
+              "</text>"
+            : "") +
+          '<text x="476" y="' +
+          (p - 8) +
+          '" font-size="13" fill="' +
+          e.mut +
+          '">' +
+          Za(o[1]) +
+          '</text><text x="476" y="' +
+          (p + 10) +
+          '" font-size="18" font-weight="700" fill="' +
+          e.ink +
+          '">' +
+          Za(o[2]) +
+          "</text>";
+      });
+      var d = 410;
+      ((l +=
+        '<line x1="32" y1="' + (d - 14) + '" x2="' + (t - 32) + '" y2="' + (d - 14) + '" stroke="#dde3e6"/>'),
+        n.forEach(function (o, u) {
+          var p = d + 20 + u * 40,
+            m = u === 0;
+          l +=
+            '<text x="32" y="' +
+            p +
+            '" font-size="' +
+            (m ? 18 : 16) +
+            '" fill="' +
+            e.mut +
+            '">' +
+            Za(o[0]) +
+            '</text><text x="' +
+            (t - 32) +
+            '" y="' +
+            p +
+            '" text-anchor="end" font-size="' +
+            (m ? 30 : 20) +
+            '" font-weight="700" fill="' +
+            (m ? e.acc : e.ink) +
+            '">' +
+            Za(o[1]) +
+            "</text>";
+        }),
+        (l +=
+          '<g opacity=".09" fill="' +
+          e.acc +
+          '" font-size="46" font-weight="700" text-anchor="middle" transform="rotate(-24 ' +
+          t / 2 +
+          " " +
+          r / 2 +
+          ')"><text x="' +
+          t / 2 +
+          '" y="' +
+          r * 0.3 +
+          '">ama-yarin-pazardir.peekdock.com</text><text x="' +
+          t / 2 +
+          '" y="' +
+          r * 0.58 +
+          '">ama-yarin-pazardir.peekdock.com</text><text x="' +
+          t / 2 +
+          '" y="' +
+          r * 0.86 +
+          '">ama-yarin-pazardir.peekdock.com</text></g><text x="' +
+          t / 2 +
+          '" y="' +
+          (r - 38) +
+          '" text-anchor="middle" font-size="12" fill="' +
+          e.mut +
+          '">Tahmini de\u011Ferlerdir; \xFCretimden \xF6nce \xF6l\xE7\xFCleri kontrol edin ve deneme yap\u0131n.</text><text x="' +
+          t / 2 +
+          '" y="' +
+          (r - 18) +
+          '" text-anchor="middle" font-size="15" fill="' +
+          e.mut +
+          '">ama-yarin-pazardir.peekdock.com</text></svg>'));
+      var c = new Image();
+      ((c.onload = function () {
+        var o = document.createElement("canvas");
+        ((o.width = t * 2), (o.height = r * 2));
+        var u = o.getContext("2d");
+        (u.scale(2, 2),
+          u.drawImage(c, 0, 0, t, r),
+          o.toBlob(function (p) {
+            if (!p) {
+              q("G\xF6rsel olu\u015Fturulamad\u0131.");
+              return;
+            }
+            var m = "agirlik-" + a.sid + ".png";
+            try {
+              var h = new File([p], m, { type: "image/png" });
+              if (
+                navigator.canShare &&
+                navigator.canShare({ files: [h] }) &&
+                /Mobi|Android/i.test(navigator.userAgent)
+              ) {
+                navigator.share({ files: [h], title: a.ad }).catch(function () {});
+                return;
+              }
+            } catch (b) {}
+            var f = URL.createObjectURL(p),
+              k = document.createElement("a");
+            ((k.href = f),
+              (k.download = m),
+              document.body.appendChild(k),
+              k.click(),
+              k.remove(),
+              setTimeout(function () {
+                URL.revokeObjectURL(f);
+              }, 3e3));
+          }, "image/png"));
+      }),
+        (c.onerror = function () {
+          q("G\xF6rsel olu\u015Fturulamad\u0131.");
+        }),
+        (c.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(l)));
+    }
+  }
+  function Zi() {
+    if (!ha.length) return "";
+    var a = 0,
+      e = 0,
+      t = !1;
+    return (
+      ha.forEach(function (i) {
+        ((a += i.top), i.maliyet && ((e += i.maliyet), (t = !0)));
+      }),
+      '<div class="kart" style="margin-top:16px" id="agListeKart"><h2>Par\xE7a listesi <small>' +
+        ha.length +
+        ' kalem</small></h2><div class="tablo"><table><tr><th>Par\xE7a</th><th class="s">Adet</th><th class="s">Birim (kg)</th><th class="s">Toplam (kg)</th>' +
+        (t ? '<th class="s">Maliyet (\u20BA)</th>' : "") +
+        "<th></th></tr>" +
+        ha
+          .map(function (i, n) {
+            return (
+              "<tr><td>" +
+              y(i.ad) +
+              '<br><span style="color:var(--mut);font-size:12px">' +
+              y(i.ozet) +
+              '</span></td><td class="s m">' +
+              i.adet +
+              '</td><td class="s m">' +
+              v(i.kg, 3) +
+              '</td><td class="s m">' +
+              v(i.top, 2) +
+              "</td>" +
+              (t ? '<td class="s m">' + (i.maliyet ? v(i.maliyet, 2) : "-") + "</td>" : "") +
+              '<td class="s"><button class="btn sil" type="button" data-lsil="' +
+              n +
+              '" aria-label="Sat\u0131r\u0131 sil">\u2715</button></td></tr>'
+            );
+          })
+          .join("") +
+        '<tr class="liste-toplam"><td>Toplam</td><td></td><td></td><td class="s m">' +
+        v(a, 2) +
+        "</td>" +
+        (t ? '<td class="s m">' + v(e, 2) + "</td>" : "") +
+        '<td></td></tr></table></div><div class="eylem"><button class="btn" type="button" id="agCsv">Listeyi CSV kaydet</button><button class="btn ana" type="button" id="agTeklif">Teklif PDF\u2019i haz\u0131rla</button><button class="btn" type="button" id="agTemizle">Listeyi temizle</button></div></div>'
+    );
+  }
+  function Nt() {
+    var a = s("agS");
+    ([].forEach.call(a.querySelectorAll("[data-lsil]"), function (n) {
+      n.addEventListener("click", function () {
+        (ha.splice(+n.dataset.lsil, 1), ke());
+      });
+    }),
+      a.querySelector("#agCsv") &&
+        (a.querySelector("#agCsv").addEventListener("click", function () {
+          var n = `\uFEFFPar\xE7a;\xD6l\xE7\xFC;Malzeme;Adet;Birim kg;Toplam kg;Maliyet TL
+`;
+          (ha.forEach(function (r) {
+            n +=
+              [
+                r.ad,
+                r.ozet,
+                r.mal,
+                r.adet,
+                r.kg.toFixed(3).replace(".", ","),
+                r.top.toFixed(2).replace(".", ","),
+                r.maliyet ? r.maliyet.toFixed(2).replace(".", ",") : "",
+              ].join(";") +
+              `
+`;
+          }),
+            Da("agirlik_listesi.csv", n));
+        }),
+        a.querySelector("#agTemizle").addEventListener("click", function () {
+          ((ha = []), ke());
+        })));
+    var e = a.querySelector("#agTeklif");
+    e &&
+      e.addEventListener("click", function () {
+        var n = ' disabled title="Pro \xF6zellik"',
+          r = ha.every(function (o) {
+            return !o.maliyet;
+          });
+        Le(
+          "<h3>Teklif PDF'i</h3>" +
+            (r
+              ? '<p class="uyari">\u26A0 Listede fiyat yok. \xD6nce malzeme birim fiyat\u0131n\u0131 (\u20BA/kg) girip par\xE7alar\u0131 \xF6yle ekleyin.</p>'
+              : "") +
+            '<div class="izgara teklif-form"><label>M\xFC\u015Fteri ad\u0131<input id="tkMus" maxlength="60"></label><label>Teklif no<input id="tkNo" maxlength="20"></label><label>Ge\xE7erlilik (g\xFCn)<input id="tkGun" inputmode="numeric" value="7"></label><label>KDV %<input id="tkKdv" inputmode="decimal" value="20"></label><label>\u0130\u015F\xE7ilik / kesim / ek bedel (\u20BA)<input id="tkEk" inputmode="decimal" placeholder="0"></label><label>Not<input id="tkNot" maxlength="120"></label><label>Firma ad\u0131 <span class="pro-etk">PRO</span><input id="tkFirma"' +
+            n +
+            ' placeholder="Pro ile a\xE7\u0131l\u0131r"></label><label>Telefon / e-posta <span class="pro-etk">PRO</span><input id="tkIlt"' +
+            n +
+            ` placeholder="Pro ile a\xE7\u0131l\u0131r"></label></div><p class="not">\xDCcretsiz s\xFCr\xFCmde PDF'te site filigran\u0131 bulunur. Pro s\xFCr\xFCmde filigran kalkar, firma ad\u0131 ve ileti\u015Fim bilgileriniz eklenir (yak\u0131nda).</p><div class="onay-btn"><button type="button" class="btn" id="tkIptal">Vazge\xE7</button> <button type="button" class="btn ana" id="tkTamam">PDF olu\u015Ftur</button></div>`,
+        );
+        var l = s("ortModal"),
+          d = function (o) {
+            return (l.querySelector("#" + o).value || "").trim();
+          },
+          c = function (o, u) {
+            var p = parseFloat(d(o).replace(",", "."));
+            return isNaN(p) ? u : Math.max(0, p);
+          };
+        ((l.querySelector("#tkIptal").onclick = Ya),
+          (l.querySelector("#tkTamam").onclick = function () {
+            var o = {
+              musteri: d("tkMus"),
+              no: d("tkNo"),
+              gun: c("tkGun", 0),
+              kdv: Math.min(100, c("tkKdv", 0)),
+              ek: c("tkEk", 0),
+              not: d("tkNot"),
+              pro: !1,
+              firma: "",
+              iletisim: "",
+            };
+            Ya();
+            try {
+              Fi(ha.slice(), o);
+            } catch (u) {
+              q("PDF olu\u015Fturulamad\u0131.");
+            }
+          }));
+      });
+    var t = a.querySelector("#agPng");
+    t && t.addEventListener("click", Wi);
+    var i = a.querySelector("#agEkle");
+    i &&
+      i.addEventListener("click", function () {
+        (ha.push(Ca), ke(), q("Listeye eklendi."));
+      });
+  }
+  function ke() {
+    ((s("agS").innerHTML = Yt()), Nt());
+  }
+  function Yt() {
+    var a = Ca,
+      e = "";
+    return (
+      a
+        ? ((e +=
+            '<div class="fayans"><div class="vurgu"><b>' +
+            v(a.top, 2) +
+            "<i>kg</i></b><span>Toplam a\u011F\u0131rl\u0131k (" +
+            a.adet +
+            " adet)</span></div><div><b>" +
+            v(a.kg, 3) +
+            "<i>kg</i></b><span>Birim a\u011F\u0131rl\u0131k</span></div>" +
+            (a.kgm
+              ? "<div><b>" +
+                v(a.kgm, 3) +
+                "<i>kg/m</i></b><span>Metre a\u011F\u0131rl\u0131\u011F\u0131</span></div>"
+              : "") +
+            (a.maliyet
+              ? "<div><b>" + v(a.maliyet, 2) + "<i>\u20BA</i></b><span>Toplam maliyet</span></div>"
+              : "") +
+            "</div>"),
+          (e +=
+            '<div class="kart agkart"><h2>' +
+            y(a.ad) +
+            "</h2>" +
+            Ui(a) +
+            '<div class="tablo"><table class="bilgi">' +
+            [
+              ["Malzeme", a.malAd + " (" + v(a.rho, 2) + " g/cm\xB3)"],
+              ["Kesit alan\u0131", v(a.kesit, 3) + " cm\xB2"],
+              ["Hacim (birim)", v(a.hacim, 1) + " cm\xB3"],
+            ]
+              .concat(a.yuz ? [["Y\xFCzey alan\u0131 (toplam)", v(a.yuz, 3) + " m\xB2"]] : [])
+              .concat(a.ekstra)
+              .map(function (t) {
+                return "<tr><td>" + y(t[0]) + '</td><td class="m">' + y(t[1]) + "</td></tr>";
+              })
+              .join("") +
+            '</table></div><p class="not" style="margin-top:10px">Standart profil de\u011Ferleri katalog a\u011F\u0131rl\u0131klar\u0131d\u0131r; \xFCretici ve tolerans fark\u0131 olabilir. \xD6l\xE7\xFCyle girilen profillerde k\xF6k yuvarlakl\u0131klar\u0131 ihmal edilir.</p><div class="eylem"><button class="btn ana" type="button" id="agEkle">Listeye ekle</button><button class="btn" type="button" id="agPng">G\xF6rsel olarak kaydet (PNG)</button></div>' +
+            Fa +
+            "</div>"))
+        : (e += '<p class="bos">\u015Eekil ve \xF6l\xE7\xFCleri girip "Hesapla"ya bas\u0131n.</p>'),
+      e + Zi()
+    );
+  }
+  function $i(a) {
+    var e = z.agirlik.hesapla(s("ag-sekil").value, a),
+      t = Va();
+    ((e.ozet = t.alan
+      .filter(function (i) {
+        return !i.sec && !(i.harfsiz && !+a[i.id]);
+      })
+      .map(function (i) {
+        return i.ad + " " + a[i.id] + (i.birim ? " " + i.birim : "");
+      })
+      .join(" \xB7 ")),
+      t.id === "std" && (e.ozet = a.seri + " " + a.olcu + " \xB7 boy " + a.bo),
+      (e.mal = e.malAd),
+      (e.sid = t.id),
+      (e.v = a),
+      (Ca = e),
+      s("agS").classList.remove("bayat"),
+      (s("agBn").hidden = !0),
+      ke());
+  }
+  function Qi() {
+    var a = [].slice.call(document.querySelectorAll("[data-alt]"));
+    if (!a.length) return;
+    function e(t, i) {
+      if (
+        (a.some(function (n) {
+          return n.dataset.alt === t;
+        }) || (t = a[0].dataset.alt),
+        a.forEach(function (n) {
+          var r = n.dataset.alt === t;
+          (n.setAttribute("aria-selected", String(r)), (n.tabIndex = r ? 0 : -1));
+          var l = document.getElementById(n.dataset.alt);
+          l && (l.hidden = !r);
+        }),
+        i)
+      )
+        try {
+          history.replaceState(null, "", "#" + t);
+        } catch (n) {}
+      setTimeout(function () {
+        (t === "boru" && ka && ka.ciz(), t === "katalog" && xa && xa.ciz());
+      }, 0);
+    }
+    (a.forEach(function (t) {
+      t.addEventListener("click", function () {
+        e(t.dataset.alt, !0);
+      });
+    }),
+      window.addEventListener("hashchange", function () {
+        e(location.hash.slice(1), !1);
+      }),
+      e(location.hash.slice(1), !1));
+  }
+  function Y(a) {
+    return !!document.getElementById(a);
+  }
+  if (
+    (Y("boru") &&
+      (ft(),
+      Te(),
+      window.addEventListener("load", function () {
+        ka && ka.ciz();
+      })),
+    Y("katalog") &&
+      (ti(),
+      window.addEventListener("load", function () {
+        xa && xa.ciz();
+      })),
+    Y("profil") && (ri(), xt()),
+    Y("sac") && (He(), ui()),
+    Y("dishesap"))
+  ) {
+    Ri();
+    var _t = s("dishesap").dataset.tip;
+    _t && ((s("ds-tip").value = _t), s("ds-tip").dispatchEvent(new Event("change")));
+  }
+  (Y("modulbul") && ji(),
+    Y("kremayer") && Ni(),
+    (Y("metrik") || Y("whitworth") || Y("kama")) && Yi(),
+    (Y("devir") || Y("kesim") || Y("tork") || Y("birim")) && wi(),
+    Y("agirlik") && (Gi(), (s("agS").innerHTML = Yt()), Nt()),
+    document.addEventListener(
+      "submit",
+      function (a) {
+        var e = a.target;
+        !e ||
+          !e.matches ||
+          !e.matches("form.yan") ||
+          setTimeout(function () {
+            var t = e.closest(".is");
+            if (!(!t || window.innerWidth > 900)) {
+              var i = t.lastElementChild;
+              if (!(!i || i === e || !i.firstElementChild)) {
+                var n = i.getBoundingClientRect().top;
+                n > window.innerHeight * 0.55 &&
+                  window.scrollTo({ top: window.pageYOffset + n - 70, behavior: "smooth" });
+              }
+            }
+          }, 350);
+      },
+      !0,
+    ),
+    Qi());
+})();

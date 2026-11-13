@@ -1,0 +1,11 @@
+{
+  "name": "ama-yarin-pazardir",
+  "version": "1.8.1",
+  "private": true,
+  "description": "Ama Yarın Pazardır — sac açılım, boy kesim, nesting, ağırlık ve dişli hesap araçları (statik site)",
+  "type": "module",
+  "scripts": {
+    "dev": "node sunucu.mjs 8080",
+    "deploy": "npx wrangler pages deploy public --project-name ama-yarin-pazardir --branch main"
+  }
+}

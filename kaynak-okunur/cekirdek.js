@@ -1,0 +1,5180 @@
+/*! © Ama Yarın Pazardır · ama-yarin-pazardir.peekdock.com · Tüm hakları saklıdır. İzinsiz kopyalanamaz. */
+((function (La) {
+  "use strict";
+  class E extends Error {
+    constructor(n) {
+      (super(n), (this.kullanici = !0));
+    }
+  }
+  const aa = 0.15,
+    q = 0.05,
+    ca = 2e4,
+    L = 8 * 1024 * 1024,
+    Ta = 300,
+    F = { 0: 1, 1: 25.4, 2: 304.8, 4: 1, 5: 10, 6: 1e3, 9: 0.0254, 10: 914.4 },
+    ha = { ç: "c", Ç: "C", ğ: "g", Ğ: "G", ı: "i", İ: "I", ö: "o", Ö: "O", ş: "s", Ş: "S", ü: "u", Ü: "U" };
+  function J(e) {
+    return String(e)
+      .replace(/[çÇğĞıİöÖşŞüÜ]/g, (n) => ha[n])
+      .replace(/[^\x20-\x7e]/g, "?");
+  }
+  function ba(e) {
+    const n = Number(e).toFixed(4);
+    return n.indexOf(".") >= 0 ? n.replace(/0+$/, "").replace(/\.$/, "") : n;
+  }
+  function oa(e, n) {
+    const t = [],
+      a = (s, m) => {
+        (t.push(String(s)), t.push(String(m)));
+      };
+    (a(0, "SECTION"),
+      a(2, "HEADER"),
+      a(9, "$ACADVER"),
+      a(1, "AC1009"),
+      a(9, "$INSUNITS"),
+      a(70, 4),
+      a(0, "ENDSEC"),
+      a(0, "SECTION"),
+      a(2, "TABLES"),
+      a(0, "TABLE"),
+      a(2, "LTYPE"),
+      a(70, 2),
+      a(0, "LTYPE"),
+      a(2, "CONTINUOUS"),
+      a(70, 0),
+      a(3, "Solid line"),
+      a(72, 65),
+      a(73, 0),
+      a(40, 0),
+      a(0, "LTYPE"),
+      a(2, "DASHED"),
+      a(70, 0),
+      a(3, "Dashed"),
+      a(72, 65),
+      a(73, 2),
+      a(40, 15),
+      a(49, 10),
+      a(49, -5),
+      a(0, "ENDTAB"),
+      a(0, "TABLE"),
+      a(2, "LAYER"),
+      a(70, e.length));
+    for (const s of e) (a(0, "LAYER"), a(2, s.ad), a(70, 0), a(62, s.renk), a(6, s.cizgi || "CONTINUOUS"));
+    (a(0, "ENDTAB"), a(0, "ENDSEC"), a(0, "SECTION"), a(2, "ENTITIES"));
+    for (const s of n)
+      if (s.t === "poly") {
+        (a(0, "POLYLINE"), a(8, s.katman), a(66, 1), a(10, 0), a(20, 0), a(30, 0), a(70, s.kapali ? 1 : 0));
+        for (const m of s.pts) (a(0, "VERTEX"), a(8, s.katman), a(10, ba(m[0])), a(20, ba(m[1])), a(30, 0));
+        (a(0, "SEQEND"), a(8, s.katman));
+      } else
+        s.t === "line"
+          ? (a(0, "LINE"),
+            a(8, s.katman),
+            a(10, ba(s.x1)),
+            a(20, ba(s.y1)),
+            a(30, 0),
+            a(11, ba(s.x2)),
+            a(21, ba(s.y2)),
+            a(31, 0))
+          : s.t === "arc"
+            ? (a(0, "ARC"),
+              a(8, s.katman),
+              a(10, ba(s.cx)),
+              a(20, ba(s.cy)),
+              a(30, 0),
+              a(40, ba(s.r)),
+              a(50, ba(s.a0)),
+              a(51, ba(s.a1)))
+            : s.t === "text" &&
+              (a(0, "TEXT"),
+              a(8, s.katman),
+              a(10, ba(s.x)),
+              a(20, ba(s.y)),
+              a(30, 0),
+              a(40, ba(s.h)),
+              a(1, J(s.metin)),
+              s.aci && a(50, ba(s.aci)));
+    return (
+      a(0, "ENDSEC"),
+      a(0, "EOF"),
+      t.join(`
+`) +
+        `
+`
+    );
+  }
+  let fa = null;
+  function G(e) {
+    if (!fa) {
+      fa = new Uint32Array(256);
+      for (let t = 0; t < 256; t++) {
+        let a = t;
+        for (let s = 0; s < 8; s++) a = a & 1 ? 3988292384 ^ (a >>> 1) : a >>> 1;
+        fa[t] = a >>> 0;
+      }
+    }
+    let n = 4294967295;
+    for (let t = 0; t < e.length; t++) n = fa[(n ^ e[t]) & 255] ^ (n >>> 8);
+    return (n ^ 4294967295) >>> 0;
+  }
+  function la(e, n) {
+    const t = new TextEncoder().encode(e),
+      a = new TextEncoder().encode(n),
+      s = G(a),
+      m = 30 + t.length,
+      i = 46 + t.length,
+      k = m + a.length + i + 22,
+      h = new ArrayBuffer(k),
+      r = new DataView(h),
+      l = new Uint8Array(h);
+    let c = 0;
+    (r.setUint32(c, 67324752, !0),
+      (c += 4),
+      r.setUint16(c, 20, !0),
+      (c += 2),
+      r.setUint16(c, 2048, !0),
+      (c += 2),
+      r.setUint16(c, 0, !0),
+      (c += 2),
+      r.setUint16(c, 0, !0),
+      (c += 2),
+      r.setUint16(c, 33, !0),
+      (c += 2),
+      r.setUint32(c, s, !0),
+      (c += 4),
+      r.setUint32(c, a.length, !0),
+      (c += 4),
+      r.setUint32(c, a.length, !0),
+      (c += 4),
+      r.setUint16(c, t.length, !0),
+      (c += 2),
+      r.setUint16(c, 0, !0),
+      (c += 2),
+      l.set(t, c),
+      (c += t.length),
+      l.set(a, c),
+      (c += a.length));
+    const p = c;
+    return (
+      r.setUint32(c, 33639248, !0),
+      (c += 4),
+      r.setUint16(c, 20, !0),
+      (c += 2),
+      r.setUint16(c, 20, !0),
+      (c += 2),
+      r.setUint16(c, 2048, !0),
+      (c += 2),
+      r.setUint16(c, 0, !0),
+      (c += 2),
+      r.setUint16(c, 0, !0),
+      (c += 2),
+      r.setUint16(c, 33, !0),
+      (c += 2),
+      r.setUint32(c, s, !0),
+      (c += 4),
+      r.setUint32(c, a.length, !0),
+      (c += 4),
+      r.setUint32(c, a.length, !0),
+      (c += 4),
+      r.setUint16(c, t.length, !0),
+      (c += 2),
+      r.setUint16(c, 0, !0),
+      (c += 2),
+      r.setUint16(c, 0, !0),
+      (c += 2),
+      r.setUint16(c, 0, !0),
+      (c += 2),
+      r.setUint16(c, 0, !0),
+      (c += 2),
+      r.setUint32(c, 0, !0),
+      (c += 4),
+      r.setUint32(c, 0, !0),
+      (c += 4),
+      l.set(t, c),
+      (c += t.length),
+      r.setUint32(c, 101010256, !0),
+      (c += 4),
+      r.setUint16(c, 0, !0),
+      (c += 2),
+      r.setUint16(c, 0, !0),
+      (c += 2),
+      r.setUint16(c, 1, !0),
+      (c += 2),
+      r.setUint16(c, 1, !0),
+      (c += 2),
+      r.setUint32(c, i, !0),
+      (c += 4),
+      r.setUint32(c, p, !0),
+      (c += 4),
+      r.setUint16(c, 0, !0),
+      (c += 2),
+      l
+    );
+  }
+  const Ma = { celik: 7.85, paslanmaz: 7.93, aluminyum: 2.7 },
+    za = ["yuvarlak", "kare", "cokgen", "konik"];
+  function B(e, n) {
+    if (!(e > 0)) throw new E(n + " 0'dan b\xFCy\xFCk olmal\u0131.");
+    return e;
+  }
+  function f(e) {
+    const n = e.tip || "yuvarlak";
+    if (za.indexOf(n) < 0) throw new E("Bilinmeyen boru tipi.");
+    const t = +e.et,
+      a = e.k === void 0 || e.k === "" || e.k === null ? 0.5 : +e.k,
+      s = +(e.kaynak || 0),
+      m = Ma[e.malzeme] ? e.malzeme : "celik";
+    if ((B(t, "Sac kal\u0131nl\u0131\u011F\u0131"), !(a >= 0.2 && a <= 0.5)))
+      throw new E("K fakt\xF6r\xFC 0,2 ile 0,5 aras\u0131nda olmal\u0131.");
+    if (!(s >= 0)) throw new E("Kaynak aral\u0131\u011F\u0131 negatif olamaz.");
+    const i = {
+      tip: n,
+      et: t,
+      k: a,
+      kaynak: s,
+      malzeme: m,
+      uyarilar: [],
+      segs: [],
+      cizgiler: [],
+      onCizgiler: [],
+    };
+    if (n === "yuvarlak") {
+      const k = B(+e.dis, "D\u0131\u015F \xE7ap"),
+        h = B(+e.boy, "Boru boyu"),
+        r = e.dilim === void 0 || e.dilim === "" ? 4 : Math.round(+e.dilim),
+        l = +(e.onBukum || 0);
+      if (k <= 2 * t)
+        throw new E(
+          "D\u0131\u015F \xE7ap, sac kal\u0131nl\u0131\u011F\u0131n\u0131n iki kat\u0131ndan b\xFCy\xFCk olmal\u0131.",
+        );
+      if (!(r >= 1 && r <= 36)) throw new E("Dilim say\u0131s\u0131 1 ile 36 aras\u0131nda olmal\u0131.");
+      if (!(l >= 0)) throw new E("\xD6n b\xFCk\xFCm pay\u0131 negatif olamaz.");
+      const c = k - 2 * t,
+        p = c + 2 * a * t,
+        x = Math.PI * p - s;
+      if (!(x > 0)) throw new E("Kaynak aral\u0131\u011F\u0131 \xE7evreye g\xF6re \xE7ok b\xFCy\xFCk.");
+      Object.assign(i, {
+        dis: k,
+        boy: h,
+        dilim: r,
+        onBukum: l,
+        ic: c,
+        notr: p,
+        cikis: "rulo",
+        genislik: x,
+        uzunluk: h,
+      });
+      for (let P = 1; P < r; P++) i.cizgiler.push({ x: (x * P) / r, tur: "ref" });
+      (l > 0 &&
+        ((i.onCizgiler = [l, x - l]),
+        l * 2 >= x &&
+          i.uyarilar.push(
+            "\xD6n b\xFCk\xFCm pay\u0131 a\xE7\u0131l\u0131m geni\u015Fli\u011Fine g\xF6re \xE7ok b\xFCy\xFCk g\xF6r\xFCn\xFCyor.",
+          )),
+        (i.segs = [{ tur: "duz", len: x }]));
+      const b = k / t;
+      (b < 10
+        ? i.uyarilar.push(
+            "D\u0131\u015F \xE7ap / et kal\u0131nl\u0131\u011F\u0131 oran\u0131 10'un alt\u0131nda. Bu kal\u0131n ve k\xFC\xE7\xFCk \xE7apl\u0131 boru rulo makinesinde zor b\xFCk\xFClebilir; K fakt\xF6r\xFCn\xFC deneme ile do\u011Frulay\u0131n.",
+          )
+        : b < 20 &&
+          i.uyarilar.push(
+            "D\u0131\u015F \xE7ap / et kal\u0131nl\u0131\u011F\u0131 oran\u0131 d\xFC\u015F\xFCk. K fakt\xF6r\xFCn\xFC ilk par\xE7ada deneme ile do\u011Frulaman\u0131z \xF6nerilir.",
+          ),
+        (i.kesit = { tur: "daire", ro: k / 2, ri: k / 2 - t }),
+        (i.boy3 = h),
+        (i.alan = x * h));
+    } else if (n === "kare" || n === "cokgen") {
+      const k = B(+e.boy, "Boru boyu"),
+        h = e.ri === void 0 || e.ri === "" || e.ri === null ? t : +e.ri;
+      if (!(h >= 0)) throw new E("\u0130\xE7 b\xFCk\xFCm yar\u0131\xE7ap\u0131 negatif olamaz.");
+      const r = h + t;
+      h < t &&
+        i.uyarilar.push(
+          "\u0130\xE7 b\xFCk\xFCm yar\u0131\xE7ap\u0131 sac kal\u0131nl\u0131\u011F\u0131ndan k\xFC\xE7\xFCk; abkantta \xE7atlama riski olur, kal\u0131p ve malzemeye g\xF6re kontrol edin.",
+        );
+      let l, c, p;
+      if (n === "kare") {
+        const g = B(+e.a, "D\u0131\u015F geni\u015Flik"),
+          U = B(+e.b, "D\u0131\u015F y\xFCkseklik"),
+          R = g - 2 * r,
+          X = U - 2 * r;
+        if (R <= 0.01 || X <= 0.01)
+          throw new E(
+            "D\u0131\u015F \xF6l\xE7\xFCler, k\xF6\u015Fe yar\u0131\xE7ap\u0131na (i\xE7 yar\u0131\xE7ap + et kal\u0131nl\u0131\u011F\u0131) g\xF6re \xE7ok k\xFC\xE7\xFCk.",
+          );
+        ((c = Math.PI / 2),
+          (l = [R, X, R, X]),
+          Object.assign(i, { a: g, b: U }),
+          (p = { tur: "kare", a: g, b: U, ro: r, ri: h }));
+      } else {
+        const g = Math.round(+e.n),
+          U = B(+e.af, "D\u0131\u015F \xF6l\xE7\xFC (kar\u015F\u0131l\u0131kl\u0131 kenar mesafesi)");
+        if (!(g >= 3 && g <= 24)) throw new E("Kenar say\u0131s\u0131 3 ile 24 aras\u0131nda olmal\u0131.");
+        const R = (2 * Math.PI) / g,
+          X = r * Math.tan(R / 2),
+          j = U * Math.tan(Math.PI / g),
+          _ = j - 2 * X;
+        if (_ <= 0.01 || U / 2 - r <= 0.01)
+          throw new E(
+            "D\u0131\u015F \xF6l\xE7\xFC, k\xF6\u015Fe yar\u0131\xE7ap\u0131na g\xF6re \xE7ok k\xFC\xE7\xFCk.",
+          );
+        ((c = R),
+          (l = new Array(g).fill(_)),
+          Object.assign(i, { n: g, af: U }),
+          (p = { tur: "cokgen", n: g, af: U, ro: r, ri: h }));
+      }
+      const x = c * (h + a * t),
+        b = l.length,
+        P = l[0] / 2 - s / 2;
+      if (P <= 0)
+        throw new E("Kaynak aral\u0131\u011F\u0131 kenar uzunlu\u011Funa g\xF6re \xE7ok b\xFCy\xFCk.");
+      i.segs.push({ tur: "duz", len: P });
+      let D = P;
+      for (let g = 0; g < b; g++) {
+        (i.segs.push({ tur: "bukum", len: x, aci: (c * 180) / Math.PI }),
+          i.cizgiler.push({ x: D + x / 2, tur: "bukum", aci: (c * 180) / Math.PI }),
+          (D += x));
+        const U = g < b - 1 ? l[g + 1] : P;
+        (i.segs.push({ tur: "duz", len: U }), (D += U));
+      }
+      (Object.assign(i, {
+        ri: h,
+        ro: r,
+        boy: k,
+        cikis: "abkant",
+        genislik: D,
+        uzunluk: k,
+        bukumPayi: x,
+        kesit: p,
+        boy3: k,
+      }),
+        (i.alan = D * k));
+    } else {
+      const k = B(+e.d1, "B\xFCy\xFCk d\u0131\u015F \xE7ap"),
+        h = B(+e.d2, "K\xFC\xE7\xFCk d\u0131\u015F \xE7ap"),
+        r = B(+e.h, "Y\xFCkseklik"),
+        l = Math.max(k, h),
+        c = Math.min(k, h),
+        p = l / 2 - t * (1 - a),
+        x = c / 2 - t * (1 - a);
+      if (x <= 0)
+        throw new E(
+          "K\xFC\xE7\xFCk \xE7ap, sac kal\u0131nl\u0131\u011F\u0131na g\xF6re \xE7ok k\xFC\xE7\xFCk.",
+        );
+      const b = p - x;
+      if (b < 1e-6)
+        throw new E(
+          'B\xFCy\xFCk ve k\xFC\xE7\xFCk \xE7ap ayn\u0131. Silindir i\xE7in "Yuvarlak" tipini se\xE7in.',
+        );
+      const P = Math.hypot(r, b),
+        D = (P * p) / b,
+        g = (P * x) / b,
+        U = (2 * Math.PI * b) / P,
+        R = U - s / D;
+      if (!(R > 0))
+        throw new E("Kaynak aral\u0131\u011F\u0131 a\xE7\u0131l\u0131ma g\xF6re \xE7ok b\xFCy\xFCk.");
+      const X = -Math.PI / 2 - R / 2,
+        j = -Math.PI / 2 + R / 2,
+        _ = [
+          [D * Math.cos(X), D * Math.sin(X)],
+          [D * Math.cos(j), D * Math.sin(j)],
+          [g * Math.cos(X), g * Math.sin(X)],
+          [g * Math.cos(j), g * Math.sin(j)],
+        ];
+      for (let A = 0; A <= 720; A++) {
+        const Y = X + ((j - X) * A) / 720;
+        _.push([D * Math.cos(Y), D * Math.sin(Y)], [g * Math.cos(Y), g * Math.sin(Y)]);
+      }
+      const T = M(_);
+      (Object.assign(i, {
+        dis1: l,
+        dis2: c,
+        h: r,
+        rn1: p,
+        rn2: x,
+        R1: D,
+        R2: g,
+        phi: U,
+        faz: R,
+        a0: X,
+        a1: j,
+        egimUzunlugu: P,
+        cikis: "rulo",
+        ox: -T[0],
+        oy: -T[1],
+        genislik: T[2] - T[0],
+        uzunluk: T[3] - T[1],
+        boy3: r,
+        kesit: { tur: "konik", r0: l / 2, r1: c / 2, et: t },
+      }),
+        (i.alan = (R / 2) * (D * D - g * g)),
+        (R * 180) / Math.PI > 200 &&
+          i.uyarilar.push(
+            "A\xE7\u0131l\u0131m a\xE7\u0131s\u0131 b\xFCy\xFCk; sac yerle\u015Fimini ve rulo makinesi kapasitesini kontrol edin.",
+          ));
+    }
+    if (i.kesit.tur === "daire" || i.kesit.tur === "konik") {
+      const k = (i.dis || i.dis1) / t;
+      n === "konik" &&
+        k < 10 &&
+        i.uyarilar.push(
+          "K\xFC\xE7\xFCk u\xE7ta \xE7ap / et oran\u0131 d\xFC\u015F\xFCk; rulo ile b\xFCkmek zor olabilir.",
+        );
+    }
+    return ((i.agirlik = (i.alan * t * Ma[m]) / 1e6), i);
+  }
+  function o(e) {
+    const n = [];
+    if (e.tip === "konik") {
+      const s = e.ox,
+        m = e.oy,
+        i = 180 / Math.PI,
+        k = (P, D) => [s + P * Math.cos(D), m + P * Math.sin(D)],
+        h = k(e.R1, e.a0),
+        r = k(e.R1, e.a1),
+        l = k(e.R2, e.a0),
+        c = k(e.R2, e.a1);
+      (n.push({ t: "arc", katman: "KESIM", cx: s, cy: m, r: e.R1, a0: e.a0 * i, a1: e.a1 * i }),
+        n.push({ t: "arc", katman: "KESIM", cx: s, cy: m, r: e.R2, a0: e.a0 * i, a1: e.a1 * i }),
+        n.push({ t: "line", katman: "KESIM", x1: h[0], y1: h[1], x2: l[0], y2: l[1] }),
+        n.push({ t: "line", katman: "KESIM", x1: r[0], y1: r[1], x2: c[0], y2: c[1] }));
+      const p = -Math.PI / 2,
+        x = k(e.R1, p),
+        b = k(e.R2, p);
+      return (n.push({ t: "line", katman: "BUKUM_REF", x1: x[0], y1: x[1], x2: b[0], y2: b[1] }), n);
+    }
+    const t = e.genislik,
+      a = e.uzunluk;
+    n.push({
+      t: "poly",
+      katman: "KESIM",
+      kapali: !0,
+      pts: [
+        [0, 0],
+        [t, 0],
+        [t, a],
+        [0, a],
+      ],
+    });
+    for (const s of e.cizgiler)
+      n.push({
+        t: "line",
+        katman: s.tur === "bukum" ? "BUKUM" : "BUKUM_REF",
+        x1: s.x,
+        y1: 0,
+        x2: s.x,
+        y2: a,
+      });
+    for (const s of e.onCizgiler) n.push({ t: "line", katman: "ON_BUKUM", x1: s, y1: 0, x2: s, y2: a });
+    return n;
+  }
+  function d(e) {
+    const n = f(e),
+      t = o(n),
+      a = n.genislik,
+      s = n.uzunluk,
+      m = Math.max(Math.min(a, s) / 40, 3),
+      i = {
+        yuvarlak: "Yuvarlak boru (rulo)",
+        kare: "Kare/dikdortgen boru (abkant)",
+        cokgen: "Cokgen boru (abkant)",
+        konik: "Konik boru (rulo)",
+      }[n.tip];
+    return (
+      t.push({
+        t: "text",
+        katman: "YAZI",
+        x: 0,
+        y: -2.5 * m,
+        h: m,
+        metin: `${i} | Acilim ${a.toFixed(2)} x ${s.toFixed(2)} mm | Et ${n.et} | K ${n.k}`,
+      }),
+      (n.tip === "kare" || n.tip === "cokgen") &&
+        n.cizgiler.forEach((k, h) =>
+          t.push({
+            t: "text",
+            katman: "YAZI",
+            x: k.x + m * 0.4,
+            y: s + m * 0.5,
+            h: m * 0.7,
+            metin: `B${h + 1} ${k.aci.toFixed(0)} derece`,
+            aci: 90,
+          }),
+        ),
+      oa(
+        [
+          { ad: "KESIM", renk: 7 },
+          { ad: "BUKUM", renk: 1, cizgi: "DASHED" },
+          { ad: "BUKUM_REF", renk: 1, cizgi: "DASHED" },
+          { ad: "ON_BUKUM", renk: 3, cizgi: "DASHED" },
+          { ad: "YAZI", renk: 5 },
+        ],
+        t,
+      )
+    );
+  }
+  function I(e, n, t, a) {
+    const s = [{ x: 0, y: n + t, nx: 0, ny: 1 }],
+      m = [{ x: 0, y: n + a, nx: 0, ny: 1 }];
+    for (const i of e) {
+      const k = Math.max(3, Math.ceil((Math.abs(i.a1 - i.a0) / (Math.PI / 2)) * 10));
+      for (let h = 0; h <= k; h++) {
+        const r = i.a0 + ((i.a1 - i.a0) * h) / k,
+          l = Math.cos(r),
+          c = Math.sin(r);
+        (s.push({ x: i.cx + t * l, y: i.cy + t * c, nx: l, ny: c }),
+          m.push({ x: i.cx + a * l, y: i.cy + a * c, nx: l, ny: c }));
+      }
+    }
+    return { dis: s, ic: m };
+  }
+  function O(e, n, t) {
+    const a = [],
+      s = [];
+    for (let m = 0; m < t; m++) {
+      const i = Math.PI / 2 + (2 * Math.PI * m) / t,
+        k = Math.cos(i),
+        h = Math.sin(i);
+      (a.push({ x: e * k, y: e * h, nx: k, ny: h }), s.push({ x: n * k, y: n * h, nx: k, ny: h }));
+    }
+    return { dis: a, ic: s };
+  }
+  function v(e) {
+    const n = e.kesit,
+      t = e.boy3;
+    let a,
+      s,
+      m = 0,
+      i;
+    if (n.tur === "daire") ((a = s = O(n.ro, n.ri, 120)), (i = n.ro * 2));
+    else if (n.tur === "konik")
+      ((a = O(n.r0, n.r0 - n.et, 120)),
+        (s = O(n.r1, n.r1 - n.et, 120)),
+        (m = (n.r1 - n.r0) / t),
+        (i = n.r0 * 2));
+    else if (n.tur === "kare") {
+      const A = n.a / 2 - n.ro,
+        Y = n.b / 2 - n.ro,
+        C = Math.PI;
+      ((a = s =
+        I(
+          [
+            { cx: -A, cy: Y, a0: C / 2, a1: C },
+            { cx: -A, cy: -Y, a0: C, a1: 1.5 * C },
+            { cx: A, cy: -Y, a0: 1.5 * C, a1: 2 * C },
+            { cx: A, cy: Y, a0: 0, a1: C / 2 },
+          ],
+          Y,
+          n.ro,
+          n.ri,
+        )),
+        (i = Math.min(n.a, n.b)));
+    } else {
+      const A = n.n,
+        Y = (2 * Math.PI) / A,
+        C = n.af / 2 - n.ro,
+        Z = C / Math.cos(Math.PI / A),
+        ea = [];
+      for (let pa = 0; pa < A; pa++) {
+        const N = Math.PI / 2 + pa * Y,
+          ma = N + Y / 2;
+        ea.push({ cx: Z * Math.cos(ma), cy: Z * Math.sin(ma), a0: N, a1: N + Y });
+      }
+      ((a = s = I(ea, C, n.ro, n.ri)), (i = n.af));
+    }
+    const k = [],
+      h = [],
+      r = [],
+      l = [],
+      c = (A, Y, C, Z) => (k.push(A, Y, C), h.push(Z[0], Z[1], Z[2]), k.length / 3 - 1),
+      p = (A, Y, C) => {
+        const Z = Math.hypot(A, Y, C) || 1;
+        return [A / Z, Y / Z, C / Z];
+      },
+      x = a.dis.length,
+      b = (A, Y, C, Z) => {
+        const ea = [],
+          pa = [];
+        for (let N = 0; N < x; N++)
+          (ea.push(c(A[N].x, A[N].y, 0, p(C * A[N].nx, C * A[N].ny, -C * m))),
+            pa.push(c(Y[N].x, Y[N].y, t, p(C * Y[N].nx, C * Y[N].ny, -C * m))));
+        for (let N = 0; N < x; N++) {
+          const ma = (N + 1) % x;
+          (r.push(ea[N], ea[ma], pa[ma], ea[N], pa[ma], pa[N]), l.push(Z, Z));
+        }
+      };
+    (b(a.dis, s.dis, 1, 0), b(a.ic, s.ic, -1, 1));
+    for (const A of [
+      [a, 0, -1],
+      [s, t, 1],
+    ]) {
+      const Y = [],
+        C = [];
+      for (let Z = 0; Z < x; Z++)
+        (Y.push(c(A[0].dis[Z].x, A[0].dis[Z].y, A[1], [0, 0, A[2]])),
+          C.push(c(A[0].ic[Z].x, A[0].ic[Z].y, A[1], [0, 0, A[2]])));
+      for (let Z = 0; Z < x; Z++) {
+        const ea = (Z + 1) % x;
+        (r.push(Y[Z], Y[ea], C[ea], Y[Z], C[ea], C[Z]), l.push(2, 2));
+      }
+    }
+    let P = [1 / 0, 1 / 0, 1 / 0],
+      D = [-1 / 0, -1 / 0, -1 / 0];
+    for (let A = 0; A < k.length; A += 3)
+      for (let Y = 0; Y < 3; Y++)
+        (k[A + Y] < P[Y] && (P[Y] = k[A + Y]), k[A + Y] > D[Y] && (D[Y] = k[A + Y]));
+    const g = Math.max(0.5, i * 0.012),
+      U = Math.max(0.05, i * 0.0015),
+      R = a.dis[0],
+      X = s.dis[0],
+      j = p(R.nx, R.ny, -m),
+      _ = (A, Y, C) => c(A.x - A.ny * g * C + A.nx * U, A.y + A.nx * g * C + A.ny * U, Y, j),
+      T = [_(R, 0, -1), _(R, 0, 1), _(X, t, 1), _(X, t, -1)];
+    return (
+      r.push(T[0], T[1], T[2], T[0], T[2], T[3]),
+      l.push(3, 3),
+      { pos: k, nor: h, tri: r, tip: l, min: P, max: D, L: t }
+    );
+  }
+  function V(e) {
+    let n = e >>> 0;
+    return function () {
+      n = (n + 1831565813) >>> 0;
+      let t = n;
+      return (
+        (t = Math.imul(t ^ (t >>> 15), t | 1)),
+        (t ^= t + Math.imul(t ^ (t >>> 7), t | 61)),
+        ((t ^ (t >>> 14)) >>> 0) / 4294967296
+      );
+    };
+  }
+  function S(e, n, t, a, s) {
+    if (((a = a === void 0 ? 1500 : a), (e = +e), (n = +n), !(e > 0)))
+      throw new E("Ana profil boyu 0'dan b\xFCy\xFCk olmal\u0131.");
+    if (!(n >= 0)) throw new E("Testere pay\u0131 negatif olamaz.");
+    if (!t || !t.length) throw new E("En az bir par\xE7a girmelisiniz.");
+    const m = [];
+    for (const T of t) {
+      const A = +T.boy,
+        Y = +T.adet;
+      if (!(A > 0)) throw new E("Par\xE7a boylar\u0131 0'dan b\xFCy\xFCk olmal\u0131.");
+      if (!(Number.isInteger(Y) && Y >= 1))
+        throw new E("Par\xE7a adetleri 1 veya daha b\xFCy\xFCk tam say\u0131 olmal\u0131.");
+      if (A > e + 1e-9) throw new E(`${A} mm par\xE7a, ${e} mm ana boydan uzun; kesilemez.`);
+      if (m.length + Y > 5e3)
+        throw new E("Toplam par\xE7a adedi 5000 s\u0131n\u0131r\u0131n\u0131 a\u015F\u0131yor.");
+      for (let C = 0; C < Y; C++) m.push(A);
+    }
+    const i = (T, A, Y) => T + Y + A * n <= e + 1e-9;
+    function k(T) {
+      const A = [],
+        Y = [];
+      for (const C of T) {
+        let Z = !1;
+        for (let ea = 0; ea < A.length; ea++)
+          if (i(Y[ea], A[ea].length, C)) {
+            (A[ea].push(C), (Y[ea] += C), (Z = !0));
+            break;
+          }
+        Z || (A.push([C]), Y.push(C));
+      }
+      return A;
+    }
+    function h(T) {
+      const A = [],
+        Y = [];
+      for (const C of T) {
+        let Z = -1,
+          ea = 1 / 0;
+        for (let pa = 0; pa < A.length; pa++)
+          if (i(Y[pa], A[pa].length, C)) {
+            const N = e - (Y[pa] + C + A[pa].length * n);
+            N < ea && ((Z = pa), (ea = N));
+          }
+        Z >= 0 ? (A[Z].push(C), (Y[Z] += C)) : (A.push([C]), Y.push(C));
+      }
+      return A;
+    }
+    const r = (T) => T.reduce((A, Y) => A + Y, 0),
+      l = (T) => [T.length, -Math.max(...T.map((A) => e - (r(A) + (A.length - 1) * n)))],
+      c = (T, A) => T[0] < A[0] || (T[0] === A[0] && T[1] < A[1]),
+      p = m.slice().sort((T, A) => A - T);
+    let x = [k(p), h(p)].reduce((T, A) => (c(l(A), l(T)) ? A : T));
+    const b = Math.max(1, Math.ceil(m.reduce((T, A) => T + A + n, 0) / (e + n) - 1e-9)),
+      P = V(s || 1),
+      D = Date.now() + a;
+    for (; x.length > b && Date.now() < D;) {
+      const T = p.slice(),
+        A = Math.max(1, Math.floor(T.length / 5));
+      for (let C = 0; C < A; C++) {
+        const Z = Math.floor(P() * T.length),
+          ea = Math.min(T.length - 1, Math.max(0, Z + Math.floor(P() * 7) - 3)),
+          pa = T[Z];
+        ((T[Z] = T[ea]), (T[ea] = pa));
+      }
+      const Y = P() < 0.5 ? k(T) : h(T);
+      c(l(Y), l(x)) && (x = Y);
+    }
+    const g = x
+        .slice()
+        .sort((T, A) => r(A) - r(T) || A.length - T.length)
+        .map((T) => {
+          const A = r(T) + (T.length - 1) * n;
+          return { parcalar: T.slice().sort((Y, C) => C - Y), kullanilan: A, artik: Math.max(0, e - A) };
+        }),
+      U = new Map();
+    for (const T of g) {
+      const A = T.parcalar.join("|");
+      (U.has(A) || U.set(A, { adet: 0, parcalar: T.parcalar, kullanilan: T.kullanilan, artik: T.artik }),
+        U.get(A).adet++);
+    }
+    const R = e * g.length,
+      X = r(m),
+      j = R - X,
+      _ = [];
+    return (
+      g.length > b &&
+        _.push(
+          `Teorik alt s\u0131n\u0131r ${b} \xE7ubuk; bu plan ${g.length} \xE7ubuk kullan\u0131yor. Daha iyisi m\xFCmk\xFCn olabilir ama garanti edilemiyor.`,
+        ),
+      {
+        anaBoy: e,
+        kerf: n,
+        cubukSayisi: g.length,
+        altSinir: b,
+        toplamMalzeme: R,
+        parcaToplam: X,
+        fire: j,
+        firePct: R ? (100 * j) / R : 0,
+        cubuklar: g,
+        gruplar: Array.from(U.values()).sort((T, A) => A.adet - T.adet),
+        uyarilar: _,
+      }
+    );
+  }
+  function W(e) {
+    let n = 0;
+    for (let t = 0, a = e.length; t < a; t++) {
+      const s = e[t],
+        m = e[(t + 1) % a];
+      n += s[0] * m[1] - m[0] * s[1];
+    }
+    return n / 2;
+  }
+  function M(e) {
+    let n = 1 / 0,
+      t = 1 / 0,
+      a = -1 / 0,
+      s = -1 / 0;
+    for (const m of e)
+      (m[0] < n && (n = m[0]), m[0] > a && (a = m[0]), m[1] < t && (t = m[1]), m[1] > s && (s = m[1]));
+    return [n, t, a, s];
+  }
+  function ua(e, n, t) {
+    let a = !1;
+    for (let s = 0, m = e.length - 1; s < e.length; m = s++) {
+      const i = e[s][0],
+        k = e[s][1],
+        h = e[m][0],
+        r = e[m][1];
+      k > t != r > t && n < ((h - i) * (t - k)) / (r - k) + i && (a = !a);
+    }
+    return a;
+  }
+  function ga(e, n) {
+    if (e.length <= 80) return e;
+    let t = 0,
+      a = -1;
+    for (let r = 1; r < e.length; r++) {
+      const l = Math.hypot(e[r][0] - e[0][0], e[r][1] - e[0][1]);
+      l > a && ((a = l), (t = r));
+    }
+    const s = e.slice(0, t + 1),
+      m = e.slice(t).concat([e[0]]);
+    function i(r) {
+      const l = new Uint8Array(r.length);
+      ((l[0] = 1), (l[r.length - 1] = 1));
+      const c = [[0, r.length - 1]];
+      for (; c.length;) {
+        const [p, x] = c.pop();
+        let b = 0,
+          P = -1;
+        const D = r[p][0],
+          g = r[p][1],
+          U = r[x][0],
+          R = r[x][1],
+          X = U - D,
+          j = R - g,
+          _ = X * X + j * j;
+        for (let T = p + 1; T < x; T++) {
+          let A;
+          (_ === 0
+            ? (A = Math.hypot(r[T][0] - D, r[T][1] - g))
+            : (A = Math.abs(j * (r[T][0] - D) - X * (r[T][1] - g)) / Math.sqrt(_)),
+            A > b && ((b = A), (P = T)));
+        }
+        b > n && P > 0 && ((l[P] = 1), c.push([p, P], [P, x]));
+      }
+      return r.filter((p, x) => l[x]);
+    }
+    const k = i(s),
+      h = i(m);
+    return k.concat(h.slice(1, -1));
+  }
+  function Ia(e) {
+    const n = e.split(/\r\n|\r|\n/),
+      t = [];
+    let a = 0;
+    for (; a + 1 < n.length;) {
+      const s = n[a].trim();
+      if (!/^-?\d+$/.test(s)) {
+        a++;
+        continue;
+      }
+      (t.push([parseInt(s, 10), n[a + 1].trim()]), (a += 2));
+    }
+    return t;
+  }
+  function $a(e) {
+    if (/^AC10\d\d/.test(e))
+      throw new E(
+        'Bu bir DWG dosyas\u0131. AutoCAD/CAD program\u0131nda "DXF olarak kaydet" ile metin DXF \xFCretin.',
+      );
+    const n = Ia(e);
+    if (n.length < 4) throw new E("Bu dosya DXF gibi g\xF6r\xFCnm\xFCyor (i\xE7eri\u011Fi okunamad\u0131).");
+    const t = [];
+    let a = null;
+    for (const l of n) l[0] === 0 ? ((a = { tip: l[1], g: [] }), t.push(a)) : a && a.g.push(l);
+    let s = 0;
+    for (let l = 0; l < n.length - 1; l++)
+      n[l][0] === 9 && n[l][1] === "$INSUNITS" && n[l + 1][0] === 70 && (s = parseInt(n[l + 1][1], 10));
+    let m = null,
+      i = null;
+    const k = [],
+      h = {},
+      r = {};
+    for (const l of t) {
+      if (l.tip === "SECTION") {
+        const c = l.g.find((p) => p[0] === 2);
+        ((m = c ? c[1] : null), (i = null));
+        continue;
+      }
+      if (l.tip === "ENDSEC") {
+        ((m = null), (i = null));
+        continue;
+      }
+      if (l.tip === "EOF") break;
+      if (m === "ENTITIES") {
+        const c = l.g.find((p) => p[0] === 67);
+        (!c || parseInt(c[1], 10) !== 1) && k.push(l);
+      } else if (m === "TABLES") {
+        if (l.tip === "LAYER") {
+          const c = l.g.find((b) => b[0] === 2),
+            p = l.g.find((b) => b[0] === 70),
+            x = l.g.find((b) => b[0] === 62);
+          c &&
+            (r[c[1].toUpperCase()] = {
+              kapali: ((p ? parseInt(p[1], 10) : 0) & 1) === 1 || (x ? parseInt(x[1], 10) < 0 : !1),
+            });
+        }
+      } else if (m === "BLOCKS")
+        if (l.tip === "BLOCK") {
+          const c = l.g.find((b) => b[0] === 2),
+            p = l.g.find((b) => b[0] === 10),
+            x = l.g.find((b) => b[0] === 20);
+          ((i = {
+            ad: c ? c[1] : "",
+            bx: p ? parseFloat(p[1]) : 0,
+            by: x ? parseFloat(x[1]) : 0,
+            varliklar: [],
+          }),
+            (h[i.ad] = i));
+        } else l.tip === "ENDBLK" ? (i = null) : i && i.varliklar.push(l);
+    }
+    return { varliklar: k, bloklar: h, birim: s, katmanlar: r };
+  }
+  const na = (e, n, t) => {
+    const a = e.g.find((s) => s[0] === n);
+    return a ? parseFloat(a[1]) : t === void 0 ? 0 : t;
+  };
+  function Da(e, n) {
+    if (e <= aa) return 4;
+    const t = 2 * Math.acos(Math.max(0, 1 - aa / e));
+    return Math.max(2, Math.min(2e3, Math.ceil(Math.abs(n) / t)));
+  }
+  function Aa(e, n, t, a, s) {
+    const m = Da(t, s),
+      i = [];
+    for (let k = 0; k <= m; k++) {
+      const h = a + (s * k) / m;
+      i.push([e + t * Math.cos(h), n + t * Math.sin(h)]);
+    }
+    return i;
+  }
+  function da(e, n) {
+    const t = [],
+      a = e.length,
+      s = n ? a : a - 1;
+    for (let m = 0; m < s; m++) {
+      const i = e[m],
+        k = e[(m + 1) % a];
+      m === 0 && t.push([i.x, i.y]);
+      const h = i.b || 0,
+        r = Math.hypot(k.x - i.x, k.y - i.y);
+      if (Math.abs(h) > 1e-9 && r > 1e-9) {
+        const l = 4 * Math.atan(h),
+          c = r / (2 * Math.sin(Math.abs(l) / 2)),
+          p = (i.x + k.x) / 2,
+          x = (i.y + k.y) / 2,
+          b = (k.x - i.x) / r,
+          P = (k.y - i.y) / r,
+          D = c * Math.cos(Math.abs(l) / 2),
+          g = h > 0 ? 1 : -1,
+          U = p + -P * g * D,
+          R = x + b * g * D,
+          X = Math.atan2(i.y - R, i.x - U),
+          j = Aa(U, R, c, X, l);
+        for (let _ = 1; _ < j.length; _++) t.push(j[_]);
+        t[t.length - 1] = [k.x, k.y];
+      } else (n && m === a - 1) || t.push([k.x, k.y]);
+    }
+    return t;
+  }
+  function Na(e) {
+    const n = na(e, 71, 3),
+      t = e.g.filter((h) => h[0] === 40).map((h) => parseFloat(h[1])),
+      a = e.g.filter((h) => h[0] === 41).map((h) => parseFloat(h[1])),
+      s = [];
+    for (let h = 0; h < e.g.length; h++)
+      if (e.g[h][0] === 10) {
+        const r = parseFloat(e.g[h][1]);
+        let l = 0;
+        for (let c = h + 1; c < Math.min(h + 3, e.g.length); c++)
+          if (e.g[c][0] === 20) {
+            l = parseFloat(e.g[c][1]);
+            break;
+          }
+        s.push([r, l]);
+      }
+    const m = [];
+    for (let h = 0; h < e.g.length; h++)
+      if (e.g[h][0] === 11) {
+        const r = parseFloat(e.g[h][1]);
+        let l = 0;
+        for (let c = h + 1; c < Math.min(h + 3, e.g.length); c++)
+          if (e.g[c][0] === 21) {
+            l = parseFloat(e.g[c][1]);
+            break;
+          }
+        m.push([r, l]);
+      }
+    const i = s.length - 1,
+      k = n;
+    if (s.length > k && t.length === i + k + 2) {
+      const h = t[k],
+        r = t[i + 1];
+      if (r > h) {
+        const l = Math.max(24, Math.min(3e3, s.length * 16)),
+          c = [];
+        for (let p = 0; p <= l; p++) {
+          const x = Math.min(h + ((r - h) * p) / l, r - 1e-12 * (r - h));
+          let b = k;
+          for (; b < i && x >= t[b + 1];) b++;
+          const P = new Array(k + 1).fill(0);
+          P[0] = 1;
+          const D = [],
+            g = [];
+          for (let j = 1; j <= k; j++) {
+            ((D[j] = x - t[b + 1 - j]), (g[j] = t[b + j] - x));
+            let _ = 0;
+            for (let T = 0; T < j; T++) {
+              const A = g[T + 1] + D[j - T],
+                Y = A === 0 ? 0 : P[T] / A;
+              ((P[T] = _ + g[T + 1] * Y), (_ = D[j - T] * Y));
+            }
+            P[j] = _;
+          }
+          let U = 0,
+            R = 0,
+            X = 0;
+          for (let j = 0; j <= k; j++) {
+            const _ = b - k + j,
+              T = a.length === s.length ? a[_] : 1;
+            ((U += P[j] * T * s[_][0]), (R += P[j] * T * s[_][1]), (X += P[j] * T));
+          }
+          c.push(X ? [U / X, R / X] : [U, R]);
+        }
+        return c;
+      }
+    }
+    return m.length >= 2 ? m : s;
+  }
+  function Ha(e, n, t, a) {
+    const s = [];
+    for (let m = 0; m < e.length; m++) {
+      const i = e[m];
+      if (++a.n > ca)
+        throw new E(
+          `${ca} varl\u0131k s\u0131n\u0131r\u0131 a\u015F\u0131ld\u0131, dosya \xE7ok karma\u015F\u0131k.`,
+        );
+      const k = (i.g.find((l) => l[0] === 8) || [0, ""])[1].toUpperCase();
+      if (k === "DEFPOINTS") {
+        if (i.tip === "POLYLINE") for (; m + 1 < e.length && e[m + 1].tip !== "SEQEND";) m++;
+        continue;
+      }
+      const h = s.length,
+        r = na(i, 230, 1);
+      switch (i.tip) {
+        case "LINE":
+          s.push({
+            pts: [
+              [na(i, 10), na(i, 20)],
+              [na(i, 11), na(i, 21)],
+            ],
+            kapali: !1,
+          });
+          break;
+        case "CIRCLE": {
+          const l = na(i, 40);
+          if (l > 0) {
+            const c = Aa(na(i, 10), na(i, 20), l, 0, 2 * Math.PI);
+            (c.pop(), s.push({ pts: c, kapali: !0 }));
+          }
+          break;
+        }
+        case "ARC": {
+          const l = na(i, 40);
+          let c = (na(i, 50) * Math.PI) / 180,
+            p = (na(i, 51) * Math.PI) / 180;
+          for (; p <= c;) p += 2 * Math.PI;
+          l > 0 && s.push({ pts: Aa(na(i, 10), na(i, 20), l, c, p - c), kapali: !1 });
+          break;
+        }
+        case "ELLIPSE": {
+          const l = na(i, 10),
+            c = na(i, 20),
+            p = na(i, 11),
+            x = na(i, 21),
+            b = na(i, 40, 1);
+          let P = na(i, 41, 0),
+            D = na(i, 42, 2 * Math.PI);
+          for (; D <= P;) D += 2 * Math.PI;
+          const g = Math.abs(D - P - 2 * Math.PI) < 1e-6,
+            U = -x * b,
+            R = p * b,
+            X = Math.max(
+              24,
+              Math.min(1500, Math.ceil(((D - P) / (2 * Math.PI)) * Math.max(48, Math.hypot(p, x) * 0.8))),
+            ),
+            j = [];
+          for (let _ = 0; _ <= X; _++) {
+            const T = P + ((D - P) * _) / X;
+            j.push([l + p * Math.cos(T) + U * Math.sin(T), c + x * Math.cos(T) + R * Math.sin(T)]);
+          }
+          (g && j.pop(), s.push({ pts: j, kapali: g }));
+          break;
+        }
+        case "LWPOLYLINE": {
+          const l = [];
+          for (const p of i.g)
+            p[0] === 10
+              ? l.push({ x: parseFloat(p[1]), y: 0, b: 0 })
+              : p[0] === 20 && l.length
+                ? (l[l.length - 1].y = parseFloat(p[1]))
+                : p[0] === 42 && l.length && (l[l.length - 1].b = parseFloat(p[1]));
+          const c = (parseInt((i.g.find((p) => p[0] === 70) || [0, "0"])[1], 10) & 1) === 1;
+          l.length >= 2 && s.push({ pts: da(l, c), kapali: c });
+          break;
+        }
+        case "POLYLINE": {
+          const l = parseInt((i.g.find((p) => p[0] === 70) || [0, "0"])[1], 10),
+            c = [];
+          for (; m + 1 < e.length && e[m + 1].tip !== "SEQEND";) {
+            m++;
+            const p = e[m];
+            p.tip !== "VERTEX" ||
+              parseInt((p.g.find((b) => b[0] === 70) || [0, "0"])[1], 10) & 16 ||
+              c.push({ x: na(p, 10), y: na(p, 20), b: na(p, 42) });
+          }
+          (m + 1 < e.length && e[m + 1].tip === "SEQEND" && m++,
+            !(l & 80) && c.length >= 2 && s.push({ pts: da(c, (l & 1) === 1), kapali: (l & 1) === 1 }));
+          break;
+        }
+        case "SPLINE": {
+          const l = Na(i);
+          if (l.length >= 2) {
+            const c =
+              (parseInt((i.g.find((p) => p[0] === 70) || [0, "0"])[1], 10) & 1) === 1 ||
+              Math.hypot(l[0][0] - l[l.length - 1][0], l[0][1] - l[l.length - 1][1]) < q;
+            (c && Math.hypot(l[0][0] - l[l.length - 1][0], l[0][1] - l[l.length - 1][1]) < q && l.pop(),
+              s.push({ pts: l, kapali: c }));
+          }
+          break;
+        }
+        case "INSERT": {
+          if (t >= 6) break;
+          const l = n[(i.g.find((R) => R[0] === 2) || [0, ""])[1]];
+          if (!l) break;
+          const c = na(i, 41, 1),
+            p = na(i, 42, 1),
+            x = (na(i, 50, 0) * Math.PI) / 180,
+            b = na(i, 10),
+            P = na(i, 20),
+            D = Math.cos(x),
+            g = Math.sin(x),
+            U = Ha(l.varliklar, n, t + 1, a);
+          for (const R of U)
+            s.push({
+              kapali: R.kapali,
+              katman: R.katman === "0" ? k : R.katman,
+              pts: R.pts.map((X) => {
+                const j = (X[0] - l.bx) * c,
+                  _ = (X[1] - l.by) * p;
+                return [b + j * D - _ * g, P + j * g + _ * D];
+              }),
+            });
+          break;
+        }
+        default:
+          ia[i.tip] && a.yok && (a.yok[i.tip] = (a.yok[i.tip] || 0) + 1);
+          break;
+      }
+      for (let l = h; l < s.length; l++)
+        s[l].katman === void 0 &&
+          ((s[l].katman = k), r < 0 && (s[l].pts = s[l].pts.map((c) => [-c[0], c[1]])));
+    }
+    return s;
+  }
+  function Ka(e, n) {
+    const t = [],
+      a = [],
+      s = new Map();
+    function m(H, Q) {
+      const sa = Math.floor(H / n),
+        ya = Math.floor(Q / n);
+      for (let Sa = -1; Sa <= 1; Sa++)
+        for (let Fa = -1; Fa <= 1; Fa++) {
+          const Ya = s.get(sa + Sa + "," + (ya + Fa));
+          if (Ya) {
+            for (const Ra of Ya) if (Math.hypot(t[Ra] - H, a[Ra] - Q) <= n) return Ra;
+          }
+        }
+      const wa = t.length;
+      (t.push(H), a.push(Q));
+      const Ca = sa + "," + ya,
+        Pa = s.get(Ca);
+      return (Pa ? Pa.push(wa) : s.set(Ca, [wa]), wa);
+    }
+    let i = [];
+    const k = new Set(),
+      h = (H, Q, sa, ya) => {
+        if (sa === ya) return;
+        const wa = sa < ya ? sa + "_" + ya : ya + "_" + sa;
+        Q.has(wa) || (Q.add(wa), H.push([sa, ya]));
+      };
+    for (const H of e) {
+      const Q = H.pts.map((sa) => m(sa[0], sa[1]));
+      for (let sa = 0; sa + 1 < Q.length; sa++) h(i, k, Q[sa], Q[sa + 1]);
+      H.kapali && Q.length > 2 && h(i, k, Q[Q.length - 1], Q[0]);
+    }
+    if (i.length > 6e4)
+      throw new E(
+        "\xC7izim \xE7ok karma\u015F\u0131k (60.000'den fazla \xE7izgi par\xE7as\u0131). Gereksiz katmanlar\u0131 kapat\u0131n.",
+      );
+    const r = i.length;
+    if (r === 0) return { halkalar: [], acikUc: 0, acikNoktalar: [] };
+    let l = 1 / 0,
+      c = 1 / 0,
+      p = -1 / 0,
+      x = -1 / 0;
+    for (let H = 0; H < t.length; H++)
+      (t[H] < l && (l = t[H]), t[H] > p && (p = t[H]), a[H] < c && (c = a[H]), a[H] > x && (x = a[H]));
+    const b = Math.max(p - l, x - c, 1),
+      P = Math.max(b / Math.max(8, Math.sqrt(r) * 2), n * 4),
+      D = new Map();
+    for (let H = 0; H < r; H++) {
+      const Q = t[i[H][0]],
+        sa = a[i[H][0]],
+        ya = t[i[H][1]],
+        wa = a[i[H][1]],
+        Ca = Math.floor((Math.min(Q, ya) - n) / P),
+        Pa = Math.floor((Math.max(Q, ya) + n) / P),
+        Sa = Math.floor((Math.min(sa, wa) - n) / P),
+        Fa = Math.floor((Math.max(sa, wa) + n) / P);
+      for (let Ya = Ca; Ya <= Pa; Ya++)
+        for (let Ra = Sa; Ra <= Fa; Ra++) {
+          const Ga = Ya + "," + Ra,
+            Va = D.get(Ga);
+          Va ? Va.push(H) : D.set(Ga, [H]);
+        }
+    }
+    const g = new Array(r).fill(null),
+      U = (H, Q, sa) => {
+        (g[H] || (g[H] = [])).push([Q, sa]);
+      },
+      R = (H, Q, sa, ya) => {
+        const wa = i[sa],
+          Ca = t[wa[0]],
+          Pa = a[wa[0]],
+          Sa = t[wa[1]] - Ca,
+          Fa = a[wa[1]] - Pa,
+          Ya = Sa * Sa + Fa * Fa;
+        if (!Ya) return;
+        const Ra = ((H - Ca) * Sa + (Q - Pa) * Fa) / Ya,
+          Ga = Math.sqrt(Ya);
+        Ra * Ga <= n ||
+          (1 - Ra) * Ga <= n ||
+          Math.hypot(H - (Ca + Ra * Sa), Q - (Pa + Ra * Fa)) > n ||
+          U(sa, Ra, ya);
+      },
+      X = new Set();
+    for (const H of D.values())
+      for (let Q = 0; Q < H.length; Q++)
+        for (let sa = Q + 1; sa < H.length; sa++) {
+          const ya = H[Q],
+            wa = H[sa],
+            Ca = ya * r + wa;
+          if (X.has(Ca)) continue;
+          X.add(Ca);
+          const Pa = i[ya],
+            Sa = i[wa];
+          if (Pa[0] === Sa[0] || Pa[0] === Sa[1] || Pa[1] === Sa[0] || Pa[1] === Sa[1]) continue;
+          const Fa = t[Pa[0]],
+            Ya = a[Pa[0]],
+            Ra = t[Pa[1]],
+            Ga = a[Pa[1]],
+            Va = t[Sa[0]],
+            Za = a[Sa[0]],
+            Ja = t[Sa[1]],
+            va = a[Sa[1]];
+          if (
+            Math.max(Fa, Ra) + n < Math.min(Va, Ja) ||
+            Math.min(Fa, Ra) - n > Math.max(Va, Ja) ||
+            Math.max(Ya, Ga) + n < Math.min(Za, va) ||
+            Math.min(Ya, Ga) - n > Math.max(Za, va)
+          )
+            continue;
+          (R(Va, Za, ya, Sa[0]), R(Ja, va, ya, Sa[1]), R(Fa, Ya, wa, Pa[0]), R(Ra, Ga, wa, Pa[1]));
+          const qa = Ra - Fa,
+            at = Ga - Ya,
+            tt = Ja - Va,
+            nt = va - Za,
+            et = qa * nt - at * tt;
+          if (Math.abs(et) > 1e-12) {
+            const Qa = ((Va - Fa) * nt - (Za - Ya) * tt) / et,
+              it = ((Va - Fa) * at - (Za - Ya) * qa) / et,
+              st = Math.hypot(qa, at),
+              rt = Math.hypot(tt, nt);
+            if (Qa * st > n && (1 - Qa) * st > n && it * rt > n && (1 - it) * rt > n) {
+              const ot = m(Fa + Qa * qa, Ya + Qa * at);
+              (U(ya, Qa, ot), U(wa, it, ot));
+            }
+          }
+        }
+    const j = [],
+      _ = new Set();
+    for (let H = 0; H < r; H++) {
+      const Q = g[H];
+      if (!Q) {
+        h(j, _, i[H][0], i[H][1]);
+        continue;
+      }
+      Q.sort((ya, wa) => ya[0] - wa[0]);
+      let sa = i[H][0];
+      for (const ya of Q) (h(j, _, sa, ya[1]), (sa = ya[1]));
+      h(j, _, sa, i[H][1]);
+    }
+    const T = t.length,
+      A = Array.from({ length: T }, () => []);
+    for (const H of j) (A[H[0]].push(H[1]), A[H[1]].push(H[0]));
+    const Y = A.map((H) => H.length),
+      C = new Uint8Array(T).fill(1),
+      Z = [],
+      ea = [];
+    for (let H = 0; H < T; H++) Y[H] === 0 ? (C[H] = 0) : Y[H] === 1 && (ea.push(H), Z.push([t[H], a[H]]));
+    for (; ea.length;) {
+      const H = ea.pop();
+      if (C[H]) {
+        C[H] = 0;
+        for (const Q of A[H]) C[Q] && (Y[Q]--, Y[Q] === 1 ? ea.push(Q) : Y[Q] === 0 && (C[Q] = 0));
+      }
+    }
+    const pa = new Array(T).fill(null);
+    for (let H = 0; H < T; H++)
+      C[H] &&
+        ((A[H] = A[H].filter((Q) => C[Q])),
+        A[H].sort((Q, sa) => Math.atan2(a[Q] - a[H], t[Q] - t[H]) - Math.atan2(a[sa] - a[H], t[sa] - t[H])),
+        (pa[H] = new Map(A[H].map((Q, sa) => [Q, sa]))));
+    const N = new Set(),
+      ma = [],
+      Ba = 4 * j.length + 10;
+    for (let H = 0; H < T; H++)
+      if (C[H])
+        for (const Q of A[H]) {
+          if (N.has(H * T + Q)) continue;
+          const sa = [];
+          let ya = H,
+            wa = Q,
+            Ca = 0;
+          for (; !N.has(ya * T + wa) && Ca++ < Ba;) {
+            (N.add(ya * T + wa), sa.push([t[ya], a[ya]]));
+            const Pa = A[wa],
+              Sa = pa[wa].get(ya),
+              Fa = Pa[(Sa - 1 + Pa.length) % Pa.length];
+            ((ya = wa), (wa = Fa));
+          }
+          sa.length >= 3 && W(sa) > 0.05 && ma.push(sa);
+        }
+    return { halkalar: ma, acikUc: Z.length, acikNoktalar: Z };
+  }
+  function Ua(e) {
+    let n = null,
+      t = null;
+    for (const a of [0.05, 0.3, 1]) {
+      const s = Ka(e, a);
+      if (
+        ((s.tol = a),
+        t || (t = s),
+        (!n || s.acikUc < n.acikUc || (!n.halkalar.length && s.halkalar.length && s.acikUc <= n.acikUc)) &&
+          (n = s),
+        s.acikUc === 0 && s.halkalar.length)
+      )
+        break;
+    }
+    return ((n.ilkAcikUc = t.acikUc), n);
+  }
+  function ta(e) {
+    let n = e
+      .map((s) => {
+        let m = W(s);
+        return (m < 0 && ((s = s.slice().reverse()), (m = -m)), { p: ga(s, 0.08), alan: m });
+      })
+      .filter((s) => s.alan >= 1);
+    n.forEach((s) => {
+      s.kutu = M(s.p);
+    });
+    const t = [];
+    for (const s of n)
+      t.some(
+        (i) =>
+          Math.abs(i.alan - s.alan) < 0.001 * Math.max(1, s.alan) &&
+          Math.abs(i.kutu[0] - s.kutu[0]) < 0.1 &&
+          Math.abs(i.kutu[1] - s.kutu[1]) < 0.1 &&
+          Math.abs(i.kutu[2] - s.kutu[2]) < 0.1 &&
+          Math.abs(i.kutu[3] - s.kutu[3]) < 0.1,
+      ) || t.push(s);
+    n = t;
+    for (const s of n) {
+      const m = s.p[0],
+        i = s.p[1],
+        k = i[0] - m[0],
+        h = i[1] - m[1],
+        r = Math.hypot(k, h) || 1;
+      s.test = [(m[0] + i[0]) / 2 - (h / r) * 0.001, (m[1] + i[1]) / 2 + (k / r) * 0.001];
+    }
+    for (const s of n) {
+      s.kapsayan = [];
+      for (const m of n)
+        m === s ||
+          m.alan <= s.alan * (1 + 1e-9) + 1e-9 ||
+          m.kutu[0] - 1e-6 > s.kutu[0] ||
+          m.kutu[1] - 1e-6 > s.kutu[1] ||
+          m.kutu[2] + 1e-6 < s.kutu[2] ||
+          m.kutu[3] + 1e-6 < s.kutu[3] ||
+          (ua(m.p, s.test[0], s.test[1]) && s.kapsayan.push(m));
+      ((s.derinlik = s.kapsayan.length),
+        (s.ebeveyn = s.kapsayan.reduce((m, i) => (!m || i.alan < m.alan ? i : m), null)));
+    }
+    const a = [];
+    for (const s of n) {
+      if (s.derinlik % 2 !== 0) continue;
+      const m = n.filter((p) => p.derinlik % 2 === 1 && p.ebeveyn === s).map((p) => p.p),
+        [i, k] = s.kutu,
+        h = (p) => p.map((x) => [x[0] - i, x[1] - k]),
+        r = h(s.p),
+        l = m.map(h),
+        c = s.alan - m.reduce((p, x) => p + Math.abs(W(x)), 0);
+      a.push({ dis: r, delikler: l, alan: c, w: s.kutu[2] - i, h: s.kutu[3] - k });
+    }
+    return a;
+  }
+  const ra =
+      /(bend|b[uü]k[uü]m|bukum|fold|dim|[oö]l[cç][uü]|text|yaz[ıi]|^not|note|center|merkez|axis|eksen|hidden|gizli|hatch|tara|title|ba[sş]l[ıi]k|border|[cç]er[cç]eve|frame|anno|defpoints)/i,
+    ia = {
+      HATCH: 1,
+      SOLID: 1,
+      TRACE: 1,
+      MLINE: 1,
+      REGION: 1,
+      "3DSOLID": 1,
+      BODY: 1,
+      WIPEOUT: 1,
+      IMAGE: 1,
+      LEADER: 1,
+    };
+  function ka(e, n, t) {
+    if (((t = t || {}), typeof e != "string")) throw new E(`${n}: dosya okunamad\u0131.`);
+    if ((e.charCodeAt(0) === 65279 && (e = e.slice(1)), e.length > L))
+      throw new E(`${n}: dosya \xE7ok b\xFCy\xFCk (en fazla 8 MB).`);
+    if (e.startsWith("AutoCAD Binary DXF"))
+      throw new E(`${n}: ikili (binary) DXF desteklenmiyor, metin DXF olarak kaydedin.`);
+    const a = [];
+    let s;
+    try {
+      s = $a(e);
+    } catch (D) {
+      throw D.kullanici ? new E(`${n}: ${D.message}`) : D;
+    }
+    let m = 1;
+    s.birim === 0
+      ? a.push(`${n}: DXF'te birim tan\u0131ml\u0131 de\u011Fil, milimetre varsay\u0131ld\u0131.`)
+      : F[s.birim] === void 0
+        ? a.push(`${n}: birim kodu ${s.birim} desteklenmiyor, milimetre varsay\u0131ld\u0131.`)
+        : (m = F[s.birim]);
+    const i = { n: 0, yok: {} };
+    let k;
+    try {
+      k = Ha(s.varliklar, s.bloklar, 0, i);
+    } catch (D) {
+      throw D.kullanici ? new E(`${n}: ${D.message}`) : D;
+    }
+    if (!k.length) {
+      const D = Object.keys(i.yok)
+        .map((g) => `${g} \xD7 ${i.yok[g]}`)
+        .join(", ");
+      throw new E(
+        `${n}: DXF i\xE7inde \xE7izgi, yay, daire veya polyline bulunamad\u0131.` +
+          (D
+            ? ` Dosyada yaln\u0131zca desteklenmeyen varl\u0131klar var (${D}); konturu polyline/\xE7izgi olarak yeniden d\u0131\u015Fa aktar\u0131n.`
+            : " \xC7izim paper space (d\xFCzen) sekmesinde olabilir; model sekmesine ta\u015F\u0131y\u0131n."),
+      );
+    }
+    m !== 1 &&
+      (k = k.map((D) => ({
+        kapali: D.kapali,
+        katman: D.katman,
+        pts: D.pts.map((g) => [g[0] * m, g[1] * m]),
+      })));
+    for (const D of Object.keys(i.yok))
+      a.push(`${n}: ${D} \xD7 ${i.yok[D]} desteklenmedi\u011Fi i\xE7in yok say\u0131ld\u0131.`);
+    const h = {};
+    for (const D of k) h[D.katman] = (h[D.katman] || 0) + 1;
+    const r = Object.keys(h),
+      l = (D) => !!(s.katmanlar[D] && s.katmanlar[D].kapali);
+    let c;
+    t.katmanlar
+      ? (c = new Set(t.katmanlar.map((D) => String(D).toUpperCase())))
+      : ((c = new Set(r.filter((D) => !l(D) && !ra.test(D)))),
+        c.size || (c = new Set(r.filter((D) => !l(D)))),
+        c.size || (c = new Set(r)));
+    const p = r.map((D) => ({ ad: D, sayi: h[D], secili: c.has(D) })).sort((D, g) => g.sayi - D.sayi),
+      x = k.filter((D) => c.has(D.katman));
+    if (!x.length) throw new E(`${n}: se\xE7ili katmanlarda \xE7izim yok. En az bir katman se\xE7in.`);
+    let b;
+    try {
+      b = Ua(x);
+    } catch (D) {
+      throw D.kullanici ? new E(`${n}: ${D.message}`) : D;
+    }
+    if (!b.halkalar.length) {
+      let D = null;
+      const g = b.acikNoktalar.slice(0, 400);
+      for (let R = 0; R < g.length; R++)
+        for (let X = R + 1; X < g.length; X++) {
+          const j = Math.hypot(g[R][0] - g[X][0], g[R][1] - g[X][1]);
+          (D === null || j < D) && (D = j);
+        }
+      let U = `${n}: kapal\u0131 kontur bulunamad\u0131 (${x.length} \xE7izgi/yay okundu).`;
+      throw (
+        b.acikNoktalar.length
+          ? (U +=
+              ` ${b.acikNoktalar.length} a\xE7\u0131k u\xE7 var` +
+              (D !== null
+                ? `, birbirine en yak\u0131n iki u\xE7 aras\u0131nda ${D.toFixed(2)} mm bo\u015Fluk`
+                : "") +
+              ". Konturu kapat\u0131n veya birle\u015Ftirin (CAD'de JOIN / PEDIT).")
+          : (U += " \xC7izgilerin u\xE7 uca ba\u011Fl\u0131 ve kapal\u0131 oldu\u011Fundan emin olun."),
+        p.length > 1 && (U += " Kontur ba\u015Fka bir katmanda olabilir, katman se\xE7imini kontrol edin."),
+        new E(U)
+      );
+    }
+    (b.tol > 0.05 &&
+      b.acikUc < b.ilkAcikUc &&
+      a.push(
+        `${n}: \xE7izimdeki k\xFC\xE7\xFCk bo\u015Fluklar (en fazla ${b.tol} mm) otomatik kapat\u0131ld\u0131.`,
+      ),
+      b.acikUc > 0 &&
+        a.push(
+          `${n}: ${b.acikUc} bo\u015Fta \xE7izgi ucu yok say\u0131ld\u0131 (ta\u015Fan \xE7izgi veya eksik kontur olabilir; \xF6nizlemeyi kontrol edin).`,
+        ));
+    let P = ta(b.halkalar);
+    if (!P.length) throw new E(`${n}: ge\xE7erli par\xE7a konturu \xFCretilemedi.`);
+    return (
+      t.enBuyuk && P.length > 1 && (P.sort((D, g) => g.alan - D.alan), (P = [P[0]])),
+      { parcalar: P, uyarilar: a, katmanlar: p }
+    );
+  }
+  function xa(e, n) {
+    const t = (n * Math.PI) / 180,
+      a = Math.cos(t),
+      s = Math.sin(t),
+      m = (c) => c.map((p) => [p[0] * a - p[1] * s, p[0] * s + p[1] * a]),
+      i = [m(e.dis)].concat(e.delikler.map(m)),
+      k = M(i[0]),
+      h = k[0],
+      r = k[1],
+      l = i.map((c) => {
+        const p = c.length,
+          x = new Float64Array(2 * (p + 1));
+        let b = 1 / 0,
+          P = 1 / 0,
+          D = -1 / 0,
+          g = -1 / 0;
+        for (let U = 0; U <= p; U++) {
+          const R = c[U % p],
+            X = R[0] - h,
+            j = R[1] - r;
+          ((x[2 * U] = X),
+            (x[2 * U + 1] = j),
+            X < b && (b = X),
+            X > D && (D = X),
+            j < P && (P = j),
+            j > g && (g = j));
+        }
+        return { xy: x, n: p, x0: b, y0: P, x1: D, y1: g };
+      });
+    return { aci: n, w: k[2] - k[0], h: k[3] - k[1], rings: l };
+  }
+  function Ea(e, n, t, a, s, m) {
+    let i = !1;
+    for (let k = 0; k < n; k++) {
+      const h = e[2 * k] + s,
+        r = e[2 * k + 1] + m,
+        l = e[2 * k + 2] + s,
+        c = e[2 * k + 3] + m;
+      r > a != c > a && t < ((l - h) * (a - r)) / (c - r) + h && (i = !i);
+    }
+    return i;
+  }
+  function Oa(e, n, t, a, s) {
+    if (!Ea(e.rings[0].xy, e.rings[0].n, a, s, n, t)) return !1;
+    for (let m = 1; m < e.rings.length; m++) if (Ea(e.rings[m].xy, e.rings[m].n, a, s, n, t)) return !1;
+    return !0;
+  }
+  function ja(e, n, t, a, s, m) {
+    const i = s - t,
+      k = m - a,
+      h = i * i + k * k;
+    let r = h === 0 ? 0 : ((e - t) * i + (n - a) * k) / h;
+    r = r < 0 ? 0 : r > 1 ? 1 : r;
+    const l = t + r * i - e,
+      c = a + r * k - n;
+    return l * l + c * c;
+  }
+  function Xa(e, n, t, a, s, m, i, k) {
+    const h = t - e,
+      r = a - n,
+      l = i - s,
+      c = k - m,
+      p = h * c - r * l;
+    if (p !== 0) {
+      const x = ((s - e) * c - (m - n) * l) / p,
+        b = ((s - e) * r - (m - n) * h) / p;
+      if (x >= 0 && x <= 1 && b >= 0 && b <= 1) return 0;
+    }
+    return Math.min(ja(e, n, s, m, i, k), ja(t, a, s, m, i, k), ja(s, m, e, n, t, a), ja(i, k, e, n, t, a));
+  }
+  function _a(e, n, t, a, s, m, i) {
+    if (Math.max(s - (n + e.w), n - (s + a.w), m - (t + e.h), t - (m + a.h)) >= i) return !1;
+    const h = i * i;
+    for (const r of e.rings) {
+      const l = r.x0 + n - i,
+        c = r.y0 + t - i,
+        p = r.x1 + n + i,
+        x = r.y1 + t + i;
+      for (const b of a.rings) {
+        if (b.x1 + s < l || b.x0 + s > p || b.y1 + m < c || b.y0 + m > x) continue;
+        const P = r.xy,
+          D = b.xy;
+        for (let g = 0; g < r.n; g++) {
+          const U = P[2 * g] + n,
+            R = P[2 * g + 1] + t,
+            X = P[2 * g + 2] + n,
+            j = P[2 * g + 3] + t,
+            _ = (U < X ? U : X) - i,
+            T = (U < X ? X : U) + i,
+            A = (R < j ? R : j) - i,
+            Y = (R < j ? j : R) + i;
+          for (let C = 0; C < b.n; C++) {
+            const Z = D[2 * C] + s,
+              ea = D[2 * C + 1] + m,
+              pa = D[2 * C + 2] + s,
+              N = D[2 * C + 3] + m;
+            if (
+              !(
+                (Z > pa ? Z : pa) < _ ||
+                (Z < pa ? Z : pa) > T ||
+                (ea > N ? ea : N) < A ||
+                (ea < N ? ea : N) > Y
+              ) &&
+              Xa(U, R, X, j, Z, ea, pa, N) < h
+            )
+              return !0;
+          }
+        }
+      }
+    }
+    return !!(
+      Oa(a, s, m, e.rings[0].xy[0] + n, e.rings[0].xy[1] + t) ||
+      Oa(e, n, t, a.rings[0].xy[0] + s, a.rings[0].xy[1] + m)
+    );
+  }
+  class Wa {
+    constructor(n, t, a, s) {
+      ((this.tipIdx = n),
+        (this.g = t),
+        (this.kenar = a),
+        (this.s = s),
+        (this.yerlesik = []),
+        (this.alan = 0));
+    }
+    uygun(n, t, a) {
+      const s = this.kenar;
+      if (t < s - 1e-9 || a < s - 1e-9 || t + n.w > this.g.w - s + 1e-9 || a + n.h > this.g.h - s + 1e-9)
+        return !1;
+      for (const m of this.yerlesik) if (_a(n, t, a, m.P, m.x, m.y, this.s)) return !1;
+      return !0;
+    }
+    kaydir(n, t, a) {
+      const s = this.kenar;
+      for (const m of [16, 8, 4, 2, 1, 0.5, 0.25, 0.1])
+        for (let i = 0; i < 400; i++) {
+          let k = !1;
+          const h = Math.max(t - m, s);
+          h < t - 1e-9 && this.uygun(n, h, a) && ((t = h), (k = !0));
+          const r = Math.max(a - m, s);
+          if ((r < a - 1e-9 && this.uygun(n, t, r) && ((a = r), (k = !0)), !k)) break;
+        }
+      return [t, a];
+    }
+    adaylar(n) {
+      const t = this.kenar,
+        a = this.s,
+        s = [[t, t]];
+      for (const i of this.yerlesik) {
+        const k = i.x,
+          h = i.y,
+          r = i.x + i.P.w,
+          l = i.y + i.P.h;
+        s.push([r + a, h], [k, l + a], [r + a, l + a], [r + a, t], [t, l + a]);
+        for (let c = 1; c < i.P.rings.length; c++) {
+          const p = i.P.rings[c];
+          s.push([i.x + p.x0 + a, i.y + p.y0 + a]);
+        }
+      }
+      const m = s.filter(
+        (i) =>
+          i[0] >= t - 1e-9 &&
+          i[1] >= t - 1e-9 &&
+          i[0] + n.w <= this.g.w - t + 1e-9 &&
+          i[1] + n.h <= this.g.h - t + 1e-9,
+      );
+      return (m.sort((i, k) => i[0] + n.w - (k[0] + n.w) || i[1] - k[1]), m.slice(0, 500));
+    }
+    enIyi(n) {
+      let t = null;
+      for (const a of n.donmus)
+        if (!(a.w > this.g.w - 2 * this.kenar + 1e-9 || a.h > this.g.h - 2 * this.kenar + 1e-9)) {
+          for (const [s, m] of this.adaylar(a))
+            if (this.uygun(a, s, m)) {
+              const [i, k] = this.kaydir(a, s, m),
+                h = [i + a.w, k];
+              (!t ||
+                h[0] < t.anahtar[0] - 1e-9 ||
+                (Math.abs(h[0] - t.anahtar[0]) <= 1e-9 && h[1] < t.anahtar[1])) &&
+                (t = { anahtar: h, P: a, x: i, y: k });
+              break;
+            }
+        }
+      return t;
+    }
+    ekle(n, t, a, s) {
+      (this.yerlesik.push({ tip: n, P: t, x: a, y: s }), (this.alan += n.alan));
+    }
+  }
+  function u(e, n, t, a, s, m) {
+    const i = t.map((l) => l.adet),
+      k = [],
+      h = [];
+    let r = !1;
+    for (const l of e) {
+      if (Date.now() > m) {
+        ((r = !0), h.push(l));
+        continue;
+      }
+      const c = n[l];
+      let p = !1;
+      for (const x of k) {
+        const b = x.enIyi(c);
+        if (b) {
+          (x.ekle(c, b.P, b.x, b.y), (p = !0));
+          break;
+        }
+      }
+      if (!p)
+        for (let x = 0; x < t.length && !p; x++) {
+          if (i[x] <= 0) continue;
+          const b = new Wa(x, t[x], a, s),
+            P = b.enIyi(c);
+          P && (b.ekle(c, P.P, P.x, P.y), k.push(b), i[x]--, (p = !0));
+        }
+      p || h.push(l);
+    }
+    return { acik: k, yok: h, asim: r };
+  }
+  function y(e) {
+    const n = e.acik.reduce((a, s) => a + s.g.w * s.g.h, 0);
+    let t = 0;
+    if (e.acik.length) for (const a of e.acik[e.acik.length - 1].yerlesik) t = Math.max(t, a.x + a.P.w);
+    return [e.yok.length, n, t];
+  }
+  function z(e, n) {
+    for (let t = 0; t < 3; t++) {
+      if (e[t] < n[t] - 1e-9) return !0;
+      if (e[t] > n[t] + 1e-9) return !1;
+    }
+    return !1;
+  }
+  function w(e, n) {
+    const t = e.dosyalar || [],
+      a = e.plakalar || [],
+      s = Math.max(+e.bosluk || 0, 0.01),
+      m = +e.kenar || 0,
+      i = e.donus === void 0 ? 90 : +e.donus,
+      k = Math.min(Math.max(+e.sureMs || 8e3, 1e3), 3e4);
+    if (!t.length) throw new E("En az bir DXF dosyas\u0131 y\xFCklemelisiniz.");
+    if (t.length > 30) throw new E("En fazla 30 dosya y\xFCklenebilir.");
+    if (!a.length) throw new E("En az bir plaka (sac) bilgisi girmelisiniz.");
+    if (a.length > 5) throw new E("En fazla 5 farkl\u0131 plaka tipi girilebilir.");
+    for (const N of a) {
+      if (!(N.w > 0 && N.h > 0)) throw new E("Plaka \xF6l\xE7\xFCleri 0'dan b\xFCy\xFCk olmal\u0131.");
+      if (!(Number.isInteger(N.adet) && N.adet >= 1))
+        throw new E("Plaka adetleri 1 veya daha b\xFCy\xFCk tam say\u0131 olmal\u0131.");
+    }
+    if (m < 0 || e.bosluk < 0) throw new E("Bo\u015Fluk ve kenar pay\u0131 negatif olamaz.");
+    if (![0, 15, 30, 45, 90, 180].includes(i)) throw new E("D\xF6n\xFC\u015F ad\u0131m\u0131 ge\xE7ersiz.");
+    if (a.some((N) => m * 2 >= Math.min(N.w, N.h)))
+      throw new E("Kenar pay\u0131 plaka \xF6l\xE7\xFClerine g\xF6re \xE7ok b\xFCy\xFCk.");
+    const h = [],
+      r = [],
+      l = i === 0 ? [0] : Array.from({ length: Math.floor(360 / i) }, (N, ma) => ma * i);
+    let c = 0;
+    if (
+      (t.forEach((N, ma) => {
+        if (!(Number.isInteger(N.adet) && N.adet >= 1))
+          throw new E(`${N.ad}: adet 1 veya daha b\xFCy\xFCk tam say\u0131 olmal\u0131.`);
+        n && n({ tip: "ilerleme", mesaj: `${N.ad} okunuyor (${ma + 1}/${t.length})` });
+        const { parcalar: Ba, uyarilar: H } = ka(N.metin, N.ad, {
+          katmanlar: N.katmanlar,
+          enBuyuk: N.enBuyuk,
+        });
+        for (const Q of H) h.includes(Q) || h.push(Q);
+        Ba.forEach((Q, sa) => {
+          ((c += N.adet),
+            r.push({
+              ad: Ba.length === 1 ? N.ad : `${N.ad}#${sa + 1}`,
+              dosya: N.ad,
+              alan: Q.alan,
+              adet: N.adet,
+              part: Q,
+              donmus: l.map((ya) => xa(Q, ya)),
+            }));
+        });
+      }),
+      c > Ta)
+    )
+      throw new E(`Toplam par\xE7a adedi ${Ta} s\u0131n\u0131r\u0131n\u0131 a\u015F\u0131yor.`);
+    const p = [];
+    r.forEach((N, ma) => {
+      for (let Ba = 0; Ba < N.adet; Ba++) p.push(ma);
+    });
+    const x = (N) => Math.max(N.donmus[0].w, N.donmus[0].h),
+      b = [p.slice().sort((N, ma) => r[ma].alan - r[N].alan), p.slice().sort((N, ma) => x(r[ma]) - x(r[N]))],
+      P = V(e.tohum || 1),
+      D = Date.now(),
+      g = D + k;
+    let U = null,
+      R = !1,
+      X = 0;
+    for (;;) {
+      let N;
+      if (X < b.length) N = b[X];
+      else {
+        N = b[0].slice();
+        const sa = Math.max(1, Math.floor(N.length / 6));
+        for (let ya = 0; ya < sa; ya++) {
+          const wa = Math.floor(P() * N.length),
+            Ca = Math.min(N.length - 1, Math.max(0, wa + Math.floor(P() * 9) - 4)),
+            Pa = N[wa];
+          ((N[wa] = N[Ca]), (N[Ca] = Pa));
+        }
+      }
+      const ma = Date.now(),
+        Ba = u(N, r, a, m, s, X === 0 ? D + k * 3 : g),
+        H = y(Ba);
+      ((!U || (!Ba.asim && z(H, U.sk))) && ((U = { sonuc: Ba, sk: H }), (R = Ba.asim)),
+        X++,
+        n && n({ tip: "ilerleme", mesaj: `Yerle\u015Fim denemesi ${X}: ${Ba.acik.length} plaka` }));
+      const Q = Date.now() - ma;
+      if (Date.now() + Q > g || X >= 14 || (!U.sk[0] && U.sonuc.acik.length <= 1 && X >= b.length)) break;
+    }
+    const { acik: j, yok: _ } = U.sonuc;
+    R &&
+      h.push(
+        "S\xFCre s\u0131n\u0131r\u0131 a\u015F\u0131ld\u0131; yerle\u015Femeyen par\xE7alar s\xFCre y\xFCz\xFCnden kalm\u0131\u015F olabilir.",
+      );
+    const T = (N) =>
+        N.P.rings.map((ma) => {
+          const Ba = new Array(2 * ma.n);
+          for (let H = 0; H < ma.n; H++)
+            ((Ba[2 * H] = ma.xy[2 * H] + N.x), (Ba[2 * H + 1] = ma.xy[2 * H + 1] + N.y));
+          return Ba;
+        }),
+      A = j.map((N, ma) => {
+        let Ba = 0;
+        for (const H of N.yerlesik) Ba = Math.max(Ba, H.x + H.P.w);
+        return {
+          numara: ma + 1,
+          tip: N.tipIdx,
+          w: N.g.w,
+          h: N.g.h,
+          ad: N.g.ad || `${N.g.w}x${N.g.h}`,
+          parcaSayisi: N.yerlesik.length,
+          parcaAlani: N.alan,
+          doluluk: (100 * N.alan) / (N.g.w * N.g.h),
+          kullanilanX: Ba,
+          yerlesimler: N.yerlesik.map((H) => ({
+            ad: H.tip.ad,
+            aci: H.P.aci,
+            x: H.x,
+            y: H.y,
+            halkalar: T(H),
+          })),
+        };
+      }),
+      Y = a.map((N, ma) => ({
+        ad: N.ad || `${N.w}x${N.h}`,
+        w: N.w,
+        h: N.h,
+        eldeki: N.adet,
+        kullanilan: A.filter((Ba) => Ba.tip === ma).length,
+      })),
+      C = new Map();
+    for (const N of _) C.set(r[N].ad, (C.get(r[N].ad) || 0) + 1);
+    const Z = Array.from(C, ([N, ma]) => {
+      const Ba = r.find((Q) => Q.ad === N),
+        H = a.some((Q) => Ba.donmus.some((sa) => sa.w <= Q.w - 2 * m && sa.h <= Q.h - 2 * m));
+      return {
+        ad: N,
+        adet: ma,
+        neden: H ? "Plaka adedi yetmedi veya s\xFCre doldu." : "Par\xE7a plakaya s\u0131\u011Fm\u0131yor.",
+      };
+    });
+    Z.length && h.push("Baz\u0131 par\xE7alar yerle\u015Femedi.");
+    const ea = A.reduce((N, ma) => N + ma.parcaAlani, 0),
+      pa = A.reduce((N, ma) => N + ma.w * ma.h, 0);
+    return {
+      plakalar: A,
+      tipOzeti: Y,
+      yerlesemeyen: Z,
+      uyarilar: h,
+      toplamParcaAlani: ea,
+      toplamPlakaAlani: pa,
+      fire: pa ? 100 * (1 - ea / pa) : 0,
+      parcaOzeti: r.map((N) => ({
+        ad: N.ad,
+        istenen: N.adet,
+        delikSayisi: N.part.delikler.length,
+        w: N.part.w,
+        h: N.part.h,
+        alan: N.part.alan,
+      })),
+    };
+  }
+  function K(e) {
+    const n = [];
+    let t = 0;
+    for (const a of e.plakalar) {
+      n.push({
+        t: "poly",
+        katman: "PLAKA",
+        kapali: !0,
+        pts: [
+          [t, 0],
+          [t + a.w, 0],
+          [t + a.w, a.h],
+          [t, a.h],
+        ],
+      });
+      const s = Math.max(Math.min(a.w, a.h) / 60, 5);
+      n.push({
+        t: "text",
+        katman: "YAZI",
+        x: t,
+        y: a.h + s,
+        h: s,
+        metin: `Plaka ${a.numara} - ${a.ad} - doluluk %${a.doluluk.toFixed(1)}`,
+      });
+      for (const m of a.yerlesimler)
+        for (const i of m.halkalar) {
+          const k = [];
+          for (let h = 0; h < i.length; h += 2) k.push([i[h] + t, i[h + 1]]);
+          n.push({ t: "poly", katman: "KESIM", kapali: !0, pts: k });
+        }
+      t += a.w + 200;
+    }
+    return oa(
+      [
+        { ad: "PLAKA", renk: 8 },
+        { ad: "KESIM", renk: 7 },
+        { ad: "YAZI", renk: 5 },
+      ],
+      n,
+    );
+  }
+  const $ = {
+    GirdiHatasi: E,
+    ascii: J,
+    dxfYaz: oa,
+    zipYap: la,
+    crc32: G,
+    boruModel: f,
+    boruHesapla: f,
+    boruCizim: o,
+    boruMesh: v,
+    boruDxf: d,
+    profilOptimize: S,
+    dxfOku: ka,
+    nest: w,
+    nestDxf: K,
+    _iç: { cakisir: _a, parcaDondur: xa, segMin2: Xa, yuzleriBul: Ka, parcalaraAyir: ta, alanIsaretli: W },
+  };
+  typeof module != "undefined" && module.exports ? (module.exports = $) : (La.Cekirdek = $);
+})(typeof self != "undefined" ? self : this),
+  (function () {
+    "use strict";
+    const La = typeof module != "undefined" && module.exports ? require("./core.js") : self.Cekirdek,
+      E = La.GirdiHatasi,
+      aa = Math.PI,
+      q = 2 * aa,
+      ca = aa / 180,
+      L = {
+        sub: (u, y) => [u[0] - y[0], u[1] - y[1], u[2] - y[2]],
+        add: (u, y) => [u[0] + y[0], u[1] + y[1], u[2] + y[2]],
+        mul: (u, y) => [u[0] * y, u[1] * y, u[2] * y],
+        dot: (u, y) => u[0] * y[0] + u[1] * y[1] + u[2] * y[2],
+        cross: (u, y) => [u[1] * y[2] - u[2] * y[1], u[2] * y[0] - u[0] * y[2], u[0] * y[1] - u[1] * y[0]],
+        len: (u) => Math.hypot(u[0], u[1], u[2]),
+        mad: (u, y, z) => [u[0] + y[0] * z, u[1] + y[1] * z, u[2] + y[2] * z],
+      },
+      Ta = (u, y) => Math.hypot(u[0] - y[0], u[1] - y[1], u[2] - y[2]);
+    function F(u, y, z, w, K) {
+      const $ = Number(u[y]);
+      if (u[y] === "" || u[y] === void 0 || !isFinite($))
+        throw new E(z + " i\xE7in ge\xE7erli bir say\u0131 girin.");
+      if (w !== void 0 && $ < w) throw new E(z + " en az " + w + " olmal\u0131.");
+      if (K !== void 0 && $ > K) throw new E(z + " en fazla " + K + " olmal\u0131.");
+      return $;
+    }
+    function ha(u, y, z, w) {
+      const K = u / 2 + (y === "dis" ? -z / 2 : y === "ic" ? z / 2 : 0);
+      if (!(K > 0))
+        throw new E((w || "\xC7ap") + " sac kal\u0131nl\u0131\u011F\u0131na g\xF6re \xE7ok k\xFC\xE7\xFCk.");
+      return K;
+    }
+    const J = (u, y, z, w, K, $) => {
+      const e = [];
+      for (let n = 0; n < z; n++) {
+        const t = ($ || 0) + (q * n) / z;
+        e.push([(w || 0) + u * Math.cos(t), (K || 0) + u * Math.sin(t), y]);
+      }
+      return e;
+    };
+    function ba(u, y, z) {
+      const w = u.length,
+        K = z ? w : w - 1,
+        $ = [[0, 0]],
+        e = [[Ta(u[0], y[0]), 0]],
+        n = (t, a, s, m, i, k) => {
+          const h = a[0] - t[0],
+            r = a[1] - t[1],
+            l = Math.hypot(h, r);
+          if (l < 1e-9) {
+            let g = 0,
+              U = 1;
+            if (k) {
+              const R = Math.hypot(t[0] - k[0], t[1] - k[1]);
+              R > 1e-12 && ((g = (t[0] - k[0]) / R), (U = (t[1] - k[1]) / R));
+            }
+            return [t[0] + g * s, t[1] + U * s];
+          }
+          const c = (s * s - m * m + l * l) / (2 * l),
+            p = Math.sqrt(Math.max(0, s * s - c * c)),
+            x = h / l,
+            b = r / l;
+          let P = -b,
+            D = x;
+          return (
+            i && (i[0] - t[0]) * P + (i[1] - t[1]) * D > 0 && ((P = -P), (D = -D)),
+            [t[0] + x * c + P * p, t[1] + b * c + D * p]
+          );
+        };
+      for (let t = 0; t < K; t++) {
+        const a = (t + 1) % w;
+        (($[t + 1] = n(
+          $[t],
+          e[t],
+          Ta(u[a], u[t]),
+          Ta(u[a], y[t]),
+          t === 0 ? null : e[t - 1],
+          t === 0 ? null : $[t - 1],
+        )),
+          (e[t + 1] = n(e[t], $[t + 1], Ta(y[a], y[t]), Ta(y[a], u[a]), $[t], t === 0 ? null : e[t - 1])));
+      }
+      return { a: $, b: e, m: w, kapali: z };
+    }
+    function oa(u) {
+      const y = [],
+        z = (w) => {
+          const K = y[y.length - 1];
+          (!K || Math.hypot(K[0] - w[0], K[1] - w[1]) > 1e-9) && y.push(w);
+        };
+      u.a.forEach(z);
+      for (let w = u.b.length - 1; w >= 0; w--) z(u.b[w]);
+      return (
+        y.length > 1 &&
+          Math.hypot(y[0][0] - y[y.length - 1][0], y[0][1] - y[y.length - 1][1]) < 1e-9 &&
+          y.pop(),
+        y
+      );
+    }
+    const fa = (u) => {
+      let y = 0;
+      for (let z = 0; z < u.length; z++) {
+        const w = u[z],
+          K = u[(z + 1) % u.length];
+        y += w[0] * K[1] - K[0] * w[1];
+      }
+      return Math.abs(y) / 2;
+    };
+    function G(u, y, z, w) {
+      w = w || {};
+      const K = ($) => ($ || []).filter((e) => e >= 0 && e < z.a.length).map((e) => [z.a[e], z.b[e]]);
+      return { ad: u, adet: y, kesim: [oa(z)], bukum: K(w.bukum), ref: K(w.ref), alan: fa(oa(z)) };
+    }
+    const la = (u, y, z, w) => ({
+      ad: u,
+      adet: y,
+      kesim: [
+        [
+          [0, 0],
+          [z, 0],
+          [z, w],
+          [0, w],
+        ],
+      ],
+      bukum: [],
+      ref: [],
+      alan: z * w,
+    });
+    function Ma(u) {
+      const y = [];
+      u.kesim.forEach((i) => i.forEach((k) => y.push(k)));
+      const z = (i) => {
+          const k = Math.cos(i),
+            h = Math.sin(i),
+            r = (l) => [l[0] * k - l[1] * h, l[0] * h + l[1] * k];
+          return {
+            k: u.kesim.map((l) => l.map(r)),
+            b: u.bukum.map((l) => l.map(r)),
+            r: u.ref.map((l) => l.map(r)),
+          };
+        },
+        w = (i) => {
+          const k = Math.cos(i),
+            h = Math.sin(i);
+          let r = 1e18,
+            l = 1e18,
+            c = -1e18,
+            p = -1e18;
+          for (const x of y) {
+            const b = x[0] * k - x[1] * h,
+              P = x[0] * h + x[1] * k;
+            (b < r && (r = b), b > c && (c = b), P < l && (l = P), P > p && (p = P));
+          }
+          return (c - r) * (p - l);
+        };
+      let K = 0,
+        $ = w(0);
+      for (let i = 1; i < 180; i++) {
+        const k = i * ca,
+          h = w(k);
+        h < $ * 0.995 && (($ = h), (K = k));
+      }
+      const e = K ? z(K) : { k: u.kesim, b: u.bukum, r: u.ref };
+      let n = 1e18,
+        t = 1e18,
+        a = -1e18,
+        s = -1e18;
+      e.k.forEach((i) =>
+        i.forEach((k) => {
+          (k[0] < n && (n = k[0]), k[0] > a && (a = k[0]), k[1] < t && (t = k[1]), k[1] > s && (s = k[1]));
+        }),
+      );
+      const m = (i) => [i[0] - n, i[1] - t];
+      ((u.kesim = e.k.map((i) => i.map(m))),
+        (u.bukum = e.b.map((i) => i.map(m))),
+        (u.ref = e.r.map((i) => i.map(m))),
+        (u.w = a - n),
+        (u.h = s - t));
+    }
+    function za(u) {
+      u.forEach(Ma);
+      const y = Math.max(...u.map((i) => Math.max(i.w, i.h))),
+        z = Math.max(y / 38, 2.5),
+        w = z * 5,
+        K = u.reduce((i, k) => i + (k.w + w) * (k.h + w), 0),
+        $ = Math.max(Math.max(...u.map((i) => i.w)), Math.sqrt(K) * 1.7),
+        e = { kesim: [], bukum: [], ref: [], etiket: [] };
+      let n = 0,
+        t = 0,
+        a = 0,
+        s = 0,
+        m = 0;
+      return (
+        u.forEach((i) => {
+          n > 0 && n + i.w > $ && ((n = 0), (t += a + w + z * 2), (a = 0));
+          const k = (h) => [h[0] + n, h[1] + t];
+          (i.kesim.forEach((h) => e.kesim.push(h.map(k))),
+            i.bukum.forEach((h) => e.bukum.push(h.map(k))),
+            i.ref.forEach((h) => e.ref.push(h.map(k))),
+            e.etiket.push({ x: n, y: t + i.h + z * 0.8, h: z, t: i.ad + (i.adet > 1 ? " x " + i.adet : "") }),
+            (i.ox = n),
+            (i.oy = t),
+            (s = Math.max(s, n + i.w)),
+            (m = Math.max(m, t + i.h + z * 2.2)),
+            (n += i.w + w),
+            (a = Math.max(a, i.h + z * 2)));
+        }),
+        (e.w = s),
+        (e.h = m),
+        (e.th = z),
+        e
+      );
+    }
+    function B() {
+      return { P: [], N: [], T: [], K: [] };
+    }
+    function f(u) {
+      const y = L.len(u) || 1;
+      return [u[0] / y, u[1] / y, u[2] / y];
+    }
+    function o(u, y, z, w) {
+      return (u.P.push(y), u.N.push(z), u.K.push(w), u.P.length - 1);
+    }
+    function d(u, y, z, w, K) {
+      K = K || {};
+      const $ = y.length,
+        e = y.concat(z),
+        n = w ? $ : $ - 1,
+        t = [];
+      for (let r = 0; r < n; r++) {
+        const l = (r + 1) % $;
+        t.push([r, $ + r, l], [l, $ + r, $ + l]);
+      }
+      const a = t.map((r) => L.cross(L.sub(e[r[1]], e[r[0]]), L.sub(e[r[2]], e[r[0]])));
+      let s = K.merkez;
+      s ||
+        ((s = [0, 0, 0]),
+        e.forEach((r) => {
+          s = L.add(s, r);
+        }),
+        (s = L.mul(s, 1 / e.length)));
+      let m = 0;
+      t.forEach((r, l) => {
+        const c = L.mul(L.add(L.add(e[r[0]], e[r[1]]), e[r[2]]), 0.3333333333333333);
+        m += L.dot(a[l], L.sub(c, s));
+      });
+      const i = (m < 0 ? -1 : 1) * (K.ters ? -1 : 1),
+        k = K.tip === void 0 ? 0 : K.tip,
+        h = K.tipIc === void 0 ? 1 : K.tipIc;
+      if (K.duz)
+        t.forEach((r, l) => {
+          if (L.len(a[l]) < 1e-9) return;
+          const c = L.mul(f(a[l]), i),
+            p = L.mul(c, -1),
+            x = r.map((P) => o(u, e[P], c, k));
+          u.T.push(x[0], x[1], x[2]);
+          const b = r.map((P) => o(u, e[P], p, h));
+          u.T.push(b[0], b[1], b[2]);
+        });
+      else {
+        const r = e.map(() => [0, 0, 0]);
+        t.forEach((p, x) =>
+          p.forEach((b) => {
+            r[b] = L.add(r[b], a[x]);
+          }),
+        );
+        const l = e.map((p, x) => o(u, p, L.mul(f(r[x]), i), k)),
+          c = e.map((p, x) => o(u, p, L.mul(f(r[x]), -i), h));
+        t.forEach((p, x) => {
+          L.len(a[x]) < 1e-9 || (u.T.push(l[p[0]], l[p[1]], l[p[2]]), u.T.push(c[p[0]], c[p[1]], c[p[2]]));
+        });
+      }
+    }
+    function I(u) {
+      const y = u.P.length,
+        z = u.T.length / 3,
+        w = new Float32Array(y * 3),
+        K = new Float32Array(y * 3),
+        $ = new Uint32Array(u.T),
+        e = new Uint8Array(z),
+        n = [1e18, 1e18, 1e18],
+        t = [-1e18, -1e18, -1e18];
+      for (let a = 0; a < y; a++) {
+        const s = u.P[a],
+          m = f(u.N[a]),
+          i = [s[1], s[2], s[0]],
+          k = [m[1], m[2], m[0]];
+        for (let h = 0; h < 3; h++)
+          ((w[3 * a + h] = i[h]),
+            (K[3 * a + h] = k[h]),
+            i[h] < n[h] && (n[h] = i[h]),
+            i[h] > t[h] && (t[h] = i[h]));
+      }
+      for (let a = 0; a < z; a++) e[a] = u.K[$[3 * a]];
+      return { pos: w, nor: K, tri: $, tip: e, min: n, max: t, L: 0 };
+    }
+    function O(u, y, z) {
+      let w = !1;
+      for (let K = 0, $ = u.length - 1; K < u.length; $ = K++) {
+        const e = u[K],
+          n = u[$];
+        e[1] > z != n[1] > z && y < ((n[0] - e[0]) * (z - e[1])) / (n[1] - e[1]) + e[0] && (w = !w);
+      }
+      return w;
+    }
+    function v(u, y, z, w, K) {
+      const n = [];
+      for (let t = 0; t <= 90; t++) {
+        const a = z + ((w - z) * t) / 90;
+        n[t] = [];
+        for (let s = 0; s <= 96; s++) {
+          const m = -aa + (q * s) / 96,
+            i = [0, Math.sin(m), Math.cos(m)];
+          n[t][s] = [o(u, [a, y * i[1], y * i[2]], i, 0), o(u, [a, y * i[1], y * i[2]], L.mul(i, -1), 1)];
+        }
+      }
+      for (let t = 0; t < 90; t++)
+        for (let a = 0; a < 96; a++) {
+          if (K) {
+            const h = -aa + (q * (a + 0.5)) / 96,
+              r = z + ((w - z) * (t + 0.5)) / 90;
+            if (O(K, y * h, r)) continue;
+          }
+          const s = n[t][a],
+            m = n[t][a + 1],
+            i = n[t + 1][a],
+            k = n[t + 1][a + 1];
+          u.T.push(s[0], i[0], m[0], m[0], i[0], k[0], s[1], m[1], i[1], m[1], k[1], i[1]);
+        }
+    }
+    function V(u, y, z, w, K) {
+      const $ = za(y),
+        e = y.reduce((t, a) => t + a.alan * a.adet, 0),
+        n = w.slice();
+      return (
+        n.push(["Yerle\u015Fim kutusu", Math.round($.w) + " \xD7 " + Math.round($.h) + " mm"]),
+        n.push(["Toplam sac alan\u0131", (e / 1e6).toFixed(3) + " m\xB2"]),
+        {
+          ad: u,
+          cizim: $,
+          parcalar: y.map((t) => ({ ad: t.ad, adet: t.adet, w: t.w, h: t.h })),
+          bilgi: n,
+          uyarilar: K || [],
+          mesh: z ? I(z) : null,
+          alan: e,
+        }
+      );
+    }
+    const S = (u, y) => Number(u).toLocaleString("tr-TR", { maximumFractionDigits: y === void 0 ? 1 : y }),
+      W = [
+        ["dis", "D\u0131\u015F \xE7ap"],
+        ["orta", "Orta (n\xF6tr) \xE7ap"],
+        ["ic", "\u0130\xE7 \xE7ap"],
+      ],
+      M = (u, y, z, w, K, $, e) => ({ id: u, ad: y, birim: z, v: w, min: K, max: $, adim: e || "any" }),
+      ua = (u, y, z, w) => ({ id: u, ad: y, v: z, sec: w }),
+      ga = [
+        M("et", "Sac kal\u0131nl\u0131\u011F\u0131", "mm", 6, 0, 100),
+        ua("ref", "\xC7ap \xF6l\xE7\xFCs\xFC", "dis", W),
+      ];
+    function Ia(u) {
+      const y = F(u, "D1", "Alt \xE7ap", 1),
+        z = F(u, "D2", "\xDCst \xE7ap", 0),
+        w = F(u, "h", "Y\xFCkseklik", 0.1),
+        K = F(u, "ex", "Ofset"),
+        $ = F(u, "et", "Sac kal\u0131nl\u0131\u011F\u0131", 0),
+        e = ha(y, u.ref, $, "Alt \xE7ap"),
+        n = z > 0 ? ha(z, u.ref, $, "\xDCst \xE7ap") : 0,
+        t = 120,
+        a = [],
+        s = [];
+      for (let r = 0; r < t; r++) {
+        const l = (q * r) / t;
+        (a.push([e * Math.cos(l), e * Math.sin(l), 0]), s.push([K + n * Math.cos(l), n * Math.sin(l), w]));
+      }
+      const m = ba(a, s, !0),
+        i = B();
+      d(i, a, s, !0);
+      const k = [["Orta y\xFCzey yar\u0131\xE7aplar\u0131", S(e) + " / " + S(n) + " mm"]],
+        h = [];
+      if (Math.abs(K) < 1e-9 && Math.abs(e - n) > 1e-9) {
+        const r = Math.abs(e - n),
+          l = Math.sqrt(w * w + r * r),
+          c = (l * Math.max(e, n)) / r,
+          p = (l * Math.min(e, n)) / r,
+          x = (q * r) / l / ca;
+        k.push(
+          ["E\u011Fik y\xFCkseklik", S(l, 2) + " mm"],
+          ["A\xE7\u0131l\u0131m yaylar\u0131", "R " + S(c, 2) + " / R " + S(p, 2) + " mm"],
+          ["A\xE7\u0131l\u0131m a\xE7\u0131s\u0131", S(x, 2) + "\xB0"],
+        );
+      } else
+        Math.abs(K) > 1e-9 &&
+          k.push([
+            "E\u011Fik koni",
+            "\xDCst daire " + S(K) + " mm kaym\u0131\u015F; a\xE7\u0131l\u0131m \xFC\xE7genleme ile bulunur.",
+          ]);
+      return V("Koni", [G("Koni", 1, m, { ref: [t / 4, t / 2, (3 * t) / 4] })], i, k, h);
+    }
+    function $a(u) {
+      const y = F(u, "D", "\xC7ap", 1),
+        z = F(u, "h", "Boy", 0.1),
+        w = Math.round(F(u, "n", "Par\xE7a say\u0131s\u0131", 1, 8)),
+        K = F(u, "et", "Sac kal\u0131nl\u0131\u011F\u0131", 0),
+        $ = ha(y, u.ref, K),
+        e = (q * $) / w,
+        n = J($, 0, 120),
+        t = J($, z, 120),
+        a = B();
+      d(a, n, t, !0);
+      const s = la("Silindir" + (w > 1 ? " par\xE7as\u0131" : ""), w, e, z);
+      return (
+        (s.ref = [
+          [
+            [0, 0],
+            [e, z],
+          ],
+        ]),
+        V(
+          "Silindir",
+          [s],
+          a,
+          [
+            ["Orta y\xFCzey \xE7ap\u0131", S(2 * $, 2) + " mm"],
+            ["A\xE7\u0131l\u0131m", S(e, 2) + " \xD7 " + S(z, 2) + " mm"],
+            ["K\xF6\u015Fegen (kontrol)", S(Math.hypot(e, z), 2) + " mm"],
+          ],
+          [],
+        )
+      );
+    }
+    function na(u) {
+      const y = F(u, "D1", "Ana boru \xE7ap\u0131", 1),
+        z = F(u, "D2", "Bran\u015F \xE7ap\u0131", 1),
+        w = F(u, "al", "Bran\u015F a\xE7\u0131s\u0131", 15, 90),
+        K = F(u, "e", "Ofset"),
+        $ = F(u, "Lb", "Bran\u015F uzunlu\u011Fu", 1),
+        e = F(u, "Lm", "Ana boru boyu", 1),
+        n = F(u, "et", "Sac kal\u0131nl\u0131\u011F\u0131", 0),
+        t = ha(y, u.ref, n, "Ana boru \xE7ap\u0131"),
+        a = ha(z, u.ref, n, "Bran\u015F \xE7ap\u0131");
+      if (Math.abs(K) + a >= t)
+        throw new E(
+          "Bran\u015F ana boruya s\u0131\u011Fm\u0131yor: ofset + bran\u015F yar\u0131\xE7ap\u0131, ana boru yar\u0131\xE7ap\u0131ndan k\xFC\xE7\xFCk olmal\u0131.",
+        );
+      const s = w * ca,
+        m = Math.sin(s),
+        i = Math.cos(s),
+        k = 120,
+        h = [],
+        r = [],
+        l = [],
+        c = [];
+      for (let _ = 0; _ < k; _++) {
+        const T = (q * _) / k,
+          A = Math.cos(T),
+          Y = Math.sin(T),
+          C = K + a * A,
+          Z = t * t - C * C,
+          ea = Math.sqrt(Z),
+          pa = (ea - a * Y * i) / m,
+          N = pa * i - a * Y * m;
+        (h.push([N, C, ea]),
+          c.push(pa),
+          r.push([$ * i - a * Y * m, C, $ * m + a * Y * i]),
+          l.push([t * Math.atan2(C, ea), N]));
+      }
+      if ($ <= Math.max(...c) + 0.5)
+        throw new E(
+          "Bran\u015F uzunlu\u011Fu \xE7ok k\u0131sa: ana boru y\xFCzeyine ula\u015F\u0131yor. En az " +
+            S(Math.max(...c) + 1, 0) +
+            " mm olmal\u0131.",
+        );
+      let p = 0;
+      c.forEach((_, T) => {
+        _ > c[p] && (p = T);
+      });
+      const x = (_) => _.slice(p).concat(_.slice(0, p)),
+        b = ba(x(h), x(r), !0),
+        P = B();
+      d(P, h, r, !0);
+      const D = q * t,
+        g = [],
+        U = Math.max(...l.map((_) => Math.abs(_[1])));
+      if (U > e / 2 - 1)
+        throw new E(
+          "Ana boru boyu \xE7ok k\u0131sa: bran\u015F deli\u011Fi boru ucundan ta\u015F\u0131yor. Ana boru boyu en az " +
+            S(2 * U + 2, 0) +
+            " mm olmal\u0131.",
+        );
+      const R = l.map((_) => [D / 2 + _[0], e / 2 + _[1]]);
+      v(P, t, -e / 2, e / 2, l);
+      const X = la("Ana boru a\xE7\u0131l\u0131m\u0131 (delikli)", 1, D, e);
+      (X.kesim.push(R), (X.alan = D * e - fa(R)));
+      const j = [
+        ["Orta y\xFCzey \xE7aplar\u0131", S(2 * t, 2) + " / " + S(2 * a, 2) + " mm"],
+        ["Ana boru a\xE7\u0131l\u0131m\u0131", S(D, 2) + " \xD7 " + S(e, 2) + " mm"],
+        [
+          "Delik geni\u015Fli\u011Fi (\xE7evre y\xF6n\xFC)",
+          S(Math.max(...l.map((_) => _[0])) - Math.min(...l.map((_) => _[0])), 1) + " mm",
+        ],
+        ["Diki\u015F", "Bran\u015Fta en k\u0131sa \xE7izgi; ana boruda alt \xE7izgi"],
+      ];
+      return V("\xC7atal / T ba\u011Flant\u0131", [G("Bran\u015F", 1, b, { ref: [0, k / 2] }), X], P, j, g);
+    }
+    function Da(u, y, z, w, K) {
+      const $ = [],
+        e = [];
+      for (let n = 0; n < K; n++) {
+        const t = (q * n) / K,
+          a = u * Math.cos(t),
+          s = u * Math.sin(t);
+        ($.push([a, s, a * z]), e.push([a, s, y - a * w]));
+      }
+      return { A: $, B: e };
+    }
+    function Aa(u, y, z, w, K, $, e, n, t) {
+      const a = z / (2 * w),
+        s = Math.tan(a),
+        m = 96;
+      if (a > 80 * ca)
+        throw new E(
+          "Bu a\xE7\u0131 bu kadar az birle\u015Fimle yap\u0131lamaz (her g\xF6nye kesimi " +
+            S(a / ca, 0) +
+            "\xB0 olur, en \xE7ok 80\xB0 olabilir). Birle\u015Fim say\u0131s\u0131n\u0131 art\u0131r\u0131n.",
+        );
+      if (K < y - 1e-9)
+        throw new E(
+          "B\xFCk\xFCm yar\u0131\xE7ap\u0131 boru yar\u0131\xE7ap\u0131ndan k\xFC\xE7\xFCk olamaz (en az " +
+            S(y, 1) +
+            " mm).",
+        );
+      const i = [];
+      for (let g = 0; g <= w; g++) {
+        const U = g === 0,
+          R = g === w;
+        i.push({ tA: U ? 0 : s, tB: R ? 0 : s, c: (U ? $ : 0) + (R ? e : 0) + (U || R ? K * s : 2 * K * s) });
+      }
+      const k = B();
+      let h = [0, 0, 0],
+        r = [1, 0, 0],
+        l = [0, 0, 1];
+      const c = [],
+        p = Math.cos(2 * a),
+        x = Math.sin(2 * a);
+      i.forEach((g, U) => {
+        const { A: R, B: X } = Da(y, g.c, g.tA, g.tB, m),
+          j = g.c - y * (g.tA + g.tB);
+        if (j < -1e-9)
+          throw new E(
+            "Par\xE7a boyu negatif: b\xFCk\xFCm yar\u0131\xE7ap\u0131 \xE7ok k\xFC\xE7\xFCk veya a\xE7\u0131 \xE7ok b\xFCy\xFCk.",
+          );
+        ((g.ic = j), (g.dis = g.c + y * (g.tA + g.tB)), (g.d = ba(R, X, !0)));
+        const _ = (Y) => L.add(L.add(h, L.mul(r, Y[0])), L.add(L.mul([0, 1, 0], Y[1]), L.mul(l, Y[2])));
+        (d(k, R.map(_), X.map(_), !0), (h = L.add(h, L.mul(l, g.c))));
+        const T = L.add(L.mul(l, p), L.mul(r, x)),
+          A = L.sub(L.mul(r, p), L.mul(l, x));
+        ((l = T), (r = A));
+      });
+      const b = [],
+        P = (g) => [g.tA.toFixed(6), g.tB.toFixed(6), g.c.toFixed(3)].join("|");
+      i.forEach((g) => {
+        const U = b.find(
+          (R) =>
+            P(R.p) === P(g) ||
+            (Math.abs(R.p.tA - g.tB) < 1e-9 &&
+              Math.abs(R.p.tB - g.tA) < 1e-9 &&
+              Math.abs(R.p.c - g.c) < 0.001),
+        );
+        U ? U.adet++ : b.push({ p: g, adet: 1 });
+      });
+      const D = b.map((g, U) => G(u + " par\xE7as\u0131 " + (U + 1), g.adet, g.p.d, { ref: [0, m / 2] }));
+      return (
+        b.forEach((g, U) =>
+          n.push([
+            "Par\xE7a " + (U + 1) + " (" + g.adet + " adet)",
+            "i\xE7 " + S(g.p.ic, 1) + " \xB7 d\u0131\u015F " + S(g.p.dis, 1) + " mm",
+          ]),
+        ),
+        n.unshift([
+          "Birle\u015Fim a\xE7\u0131s\u0131",
+          S((2 * a) / ca, 2) + "\xB0 (her birle\u015Fimde d\xF6n\xFC\u015F)",
+        ]),
+        V(u, D, k, n, t)
+      );
+    }
+    function da(u) {
+      const y = F(u, "D", "\xC7ap", 1),
+        z = F(u, "th", "Dirsek a\xE7\u0131s\u0131", 5, 170),
+        w = Math.round(F(u, "j", "Birle\u015Fim say\u0131s\u0131", 1, 5)),
+        K = F(u, "L1", "1. kol", 0),
+        $ = F(u, "L2", "2. kol", 0),
+        e = F(u, "et", "Sac kal\u0131nl\u0131\u011F\u0131", 0),
+        n = ha(y, u.ref, e),
+        t = u.rt === "kisa" ? 2 * n : u.rt === "uzun" ? 3 * n : n;
+      return Aa(
+        "Dirsek",
+        n,
+        z * ca,
+        w,
+        t,
+        K,
+        $,
+        [
+          ["B\xFCk\xFCm yar\u0131\xE7ap\u0131 (eksen)", S(t, 1) + " mm"],
+          ["Kol uzunluklar\u0131", S(K, 0) + " / " + S($, 0) + " mm"],
+        ],
+        [],
+      );
+    }
+    function Na(u) {
+      const y = F(u, "D", "\xC7ap", 1),
+        z = F(u, "th", "B\xFCk\xFCm a\xE7\u0131s\u0131", 5, 180),
+        w = Math.round(F(u, "j", "Birle\u015Fim say\u0131s\u0131", 1, 11)),
+        K = F(u, "R", "B\xFCk\xFCm yar\u0131\xE7ap\u0131", 0.1),
+        $ = F(u, "L1", "1. kol", 0),
+        e = F(u, "L2", "2. kol", 0),
+        n = F(u, "et", "Sac kal\u0131nl\u0131\u011F\u0131", 0),
+        t = ha(y, u.ref, n),
+        a = [];
+      return (
+        w < 2 &&
+          z > 45 &&
+          a.push(
+            "Tek birle\u015Fimle yuvarlak bir b\xFCk\xFCm elde edilmez; birle\u015Fim say\u0131s\u0131n\u0131 art\u0131r\u0131n.",
+          ),
+        Aa(
+          "Segmanl\u0131 b\xFCk\xFCm",
+          t,
+          z * ca,
+          w,
+          K,
+          $,
+          e,
+          [
+            ["B\xFCk\xFCm yar\u0131\xE7ap\u0131 (eksen)", S(K, 1) + " mm"],
+            ["Par\xE7a say\u0131s\u0131", String(w + 1)],
+          ],
+          a,
+        )
+      );
+    }
+    function Ha(u) {
+      const y = F(u, "D1", "Ana boru \xE7ap\u0131", 1),
+        z = F(u, "D2", "Kol \xE7ap\u0131", 1),
+        w = F(u, "al", "Kol a\xE7\u0131s\u0131", 5, 80),
+        K = F(u, "L", "Kol uzunlu\u011Fu", 1),
+        $ = F(u, "Lm", "Ana boru boyu", 1),
+        e = F(u, "et", "Sac kal\u0131nl\u0131\u011F\u0131", 0),
+        n = ha(y, u.ref, e, "Ana boru \xE7ap\u0131"),
+        t = ha(z, u.ref, e, "Kol \xE7ap\u0131");
+      let a = Number(u.e);
+      if ((a > 0 || (a = Math.max(n - t, 0)), a + t > n + 1e-6))
+        throw new E(
+          "Kol, ana boruya s\u0131\u011Fm\u0131yor: ofset + kol yar\u0131\xE7ap\u0131, ana boru yar\u0131\xE7ap\u0131n\u0131 a\u015F\u0131yor.",
+        );
+      const s = w * ca,
+        m = Math.sin(s),
+        i = Math.cos(s),
+        k = 120,
+        h = B(),
+        r = {};
+      let l = null;
+      ([1, -1].forEach((b) => {
+        const P = [b * m, 0, i],
+          D = [0, 1, 0],
+          g = [b * i, 0, -m],
+          U = L.add([b * a, 0, 0], L.mul(P, K)),
+          R = [],
+          X = [],
+          j = [];
+        for (let _ = 0; _ < k; _++) {
+          const T = (q * _) / k,
+            A = L.add(U, L.add(L.mul(D, t * Math.cos(T)), L.mul(g, t * Math.sin(T)))),
+            Y = A[2] / i,
+            C = b * A[0] > 0 ? (b * A[0]) / m : 1 / 0,
+            Z = Math.min(Y, C);
+          if (!(Z > 0) || !isFinite(Z)) throw new E("Kol uzunlu\u011Fu \xE7ok k\u0131sa.");
+          (R.push(L.mad(A, P, -Z)), X.push(A), j.push(Z));
+        }
+        if ((d(h, R, X, !0, { merkez: [b * (a + (K * m) / 2), 0, (K * i) / 2] }), b === 1)) {
+          let _ = 0;
+          j.forEach((A, Y) => {
+            A < j[_] && (_ = Y);
+          });
+          const T = (A) => A.slice(_).concat(A.slice(0, _));
+          ((l = ba(T(R), T(X), !0)), (r.kisa = Math.min(...j)), (r.uzun = Math.max(...j)));
+        }
+      }),
+        d(h, J(n, -$, k), J(n, 0, k), !0));
+      const c = q * n,
+        p = la("Ana boru", 1, c, $),
+        x = [
+          "Kollar ana borunun u\xE7 d\xFCzlemine (Z = 0) ve birbirine orta d\xFCzlemde oturur. Ana boru ucu d\xFCz kesimdir; kol\u2013boru birle\u015Fimini kendi detay\u0131n\u0131za g\xF6re kontrol edin.",
+        ];
+      return V(
+        "Pantolon (Y) ba\u011Flant\u0131",
+        [G("Kol (biri ayna g\xF6r\xFCnt\xFCs\xFC)", 2, l, { ref: [0] }), p],
+        h,
+        [
+          ["Kol ofseti", S(a, 1) + " mm"],
+          ["Kol kenar uzunluklar\u0131", S(r.kisa, 1) + " \u2013 " + S(r.uzun, 1) + " mm"],
+          ["Ana boru a\xE7\u0131l\u0131m\u0131", S(c, 2) + " \xD7 " + S($, 2) + " mm"],
+        ],
+        x,
+      );
+    }
+    function Ka(u) {
+      const y = F(u, "D", "\xC7ap", 1),
+        z = F(u, "L", "K\u0131sa kenar boyu", 0),
+        w = F(u, "a1", "Alt kesim a\xE7\u0131s\u0131", -70, 70),
+        K = F(u, "a2", "\xDCst kesim a\xE7\u0131s\u0131", -70, 70),
+        $ = F(u, "et", "Sac kal\u0131nl\u0131\u011F\u0131", 0),
+        e = ha(y, u.ref, $),
+        n = Math.tan(w * ca),
+        t = Math.tan(K * ca),
+        a = 120,
+        s = z + e * (Math.abs(n) + Math.abs(t)),
+        { A: m, B: i } = Da(e, s, n, t, a),
+        k = B();
+      d(k, m, i, !0);
+      const h = ba(m, i, !0),
+        r = [G("E\u011Fik kesimli boru", 1, h, { ref: [0, a / 2] })],
+        l = (c, p) => {
+          const x = [];
+          for (let b = 0; b < a; b++) {
+            const P = (q * b) / a;
+            x.push([(e * Math.cos(P)) / Math.cos(Math.atan(c)), e * Math.sin(P)]);
+          }
+          return { ad: p, adet: 1, kesim: [x], bukum: [], ref: [], alan: fa(x) };
+        };
+      return (
+        Math.abs(w) > 1e-9 && r.push(l(n, "Levha deli\u011Fi (alt)")),
+        Math.abs(K) > 1e-9 && r.push(l(t, "Levha deli\u011Fi (\xFCst)")),
+        V(
+          "E\u011Fik kesimli boru",
+          r,
+          k,
+          [
+            ["Eksen boyu (en k\u0131sa kenar)", S(z, 1) + " mm"],
+            ["Eksen boyu (en uzun kenar)", S(z + 2 * e * (Math.abs(n) + Math.abs(t)), 1) + " mm"],
+            ["Delik elipsi", S((2 * e) / Math.cos(w * ca), 1) + " \xD7 " + S(2 * e, 1) + " mm (alt)"],
+          ],
+          [],
+        )
+      );
+    }
+    function Ua(u) {
+      const y = F(u, "a", "Taban geni\u015Fli\u011Fi", 1),
+        z = F(u, "b", "Taban y\xFCksekli\u011Fi", 1),
+        w = F(u, "D", "Daire \xE7ap\u0131", 1),
+        K = F(u, "h", "Y\xFCkseklik", 0.1),
+        $ = F(u, "ex", "Ofset X"),
+        e = F(u, "ey", "Ofset Y"),
+        n = F(u, "et", "Sac kal\u0131nl\u0131\u011F\u0131", 0),
+        t = ha(w, u.ref, n),
+        a = 96,
+        s = [];
+      for (let p = 0; p < a; p++) s.push((q * (p + 0.5)) / a);
+      const m = Math.atan2(z / 2, y / 2),
+        i = [m, aa - m, aa + m, q - m];
+      (i.forEach((p) => s.push(p)), s.sort((p, x) => p - x));
+      const k = [],
+        h = [],
+        r = [];
+      s.forEach((p, x) => {
+        const b = Math.cos(p),
+          P = Math.sin(p),
+          D = Math.min(
+            Math.abs(b) < 1e-12 ? 1e18 : y / 2 / Math.abs(b),
+            Math.abs(P) < 1e-12 ? 1e18 : z / 2 / Math.abs(P),
+          );
+        (k.push([D * b, D * P, 0]),
+          h.push([$ + t * b, e + t * P, K]),
+          i.some((g) => Math.abs(g - p) < 1e-12) && r.push(x));
+      });
+      const l = ba(k, h, !0),
+        c = B();
+      return (
+        d(c, k, h, !0),
+        V(
+          "Ge\xE7i\u015F par\xE7as\u0131",
+          [G("Ge\xE7i\u015F", 1, l, { ref: r })],
+          c,
+          [
+            ["Dikd\xF6rtgen", S(y, 1) + " \xD7 " + S(z, 1) + " mm"],
+            ["Daire (orta y\xFCzey)", "\xD8 " + S(2 * t, 1) + " mm"],
+            ["Y\xF6ntem", "K\xF6\u015Felerden yar\u0131\xE7apa \xFC\xE7genleme"],
+          ],
+          ["Ye\u015Fil \xE7izgiler dikd\xF6rtgenin k\xF6\u015Felerine denk gelen hatlard\u0131r."],
+        )
+      );
+    }
+    function ta(u, y, z, w) {
+      const K = y / 2,
+        $ = [];
+      if (u === "eliptik" || u === "yarimkure") {
+        const n = u === "yarimkure" ? K : K / 2;
+        for (let t = 0; t <= 80; t++) {
+          const a = ((aa / 2) * t) / 80;
+          $.push([K * Math.sin(a), n * (1 - Math.cos(a))]);
+        }
+      } else if (u === "kalota") {
+        if (w <= 0 || w > K)
+          throw new E("Kalota derinli\u011Fi 0 ile yar\u0131\xE7ap aras\u0131nda olmal\u0131.");
+        const n = (K * K + w * w) / (2 * w),
+          t = Math.asin(Math.min(1, K / n));
+        for (let a = 0; a <= 80; a++) {
+          const s = (t * a) / 80;
+          $.push([n * Math.sin(s), n * (1 - Math.cos(s))]);
+        }
+      } else {
+        const n = (u === "klopper" ? 1 : 0.8) * y,
+          t = (u === "klopper" ? 0.1 : 0.154) * y,
+          a = K - t,
+          s = Math.sqrt((n - t) * (n - t) - a * a),
+          m = n - s,
+          i = Math.asin(a / (n - t));
+        for (let k = 0; k <= 60; k++) {
+          const h = (i * k) / 60;
+          $.push([n * Math.sin(h), n * (1 - Math.cos(h))]);
+        }
+        for (let k = 1; k <= 40; k++) {
+          const h = i + ((aa / 2 - i) * k) / 40;
+          $.push([a + t * Math.sin(h), m - t * Math.cos(h)]);
+        }
+      }
+      const e = $[$.length - 1];
+      return (z > 0 && $.push([K, e[1] + z]), $);
+    }
+    function ra(u) {
+      const y = F(u, "D", "\xC7ap", 10),
+        z = F(u, "hf", "D\xFCz kenar", 0),
+        w = Math.round(F(u, "n", "Petal say\u0131s\u0131", 3, 36)),
+        K = F(u, "hk", "Kalota derinli\u011Fi", 0),
+        $ = F(u, "et", "Sac kal\u0131nl\u0131\u011F\u0131", 0),
+        e = 2 * ha(y, u.ref, $),
+        n = ta(u.tip, e, z, K),
+        t = [0],
+        a = n.map((g) => g[0]);
+      let s = 0;
+      for (let g = 1; g < n.length; g++) {
+        const U = Math.hypot(n[g][0] - n[g - 1][0], n[g][1] - n[g - 1][1]);
+        (t.push(t[g - 1] + U), (s += aa * (n[g][0] + n[g - 1][0]) * U));
+      }
+      const m = Math.sqrt((4 * s) / aa),
+        i = Math.sin(aa / w),
+        k = [],
+        h = [];
+      n.forEach((g, U) => {
+        (k.push([t[U], g[0] * i]), h.push([t[U], -g[0] * i]));
+      });
+      const r = {
+        ad: "Petal",
+        adet: w,
+        kesim: [k.concat(h.slice(1).reverse())],
+        bukum: [],
+        ref: [
+          [
+            [0, 0],
+            [t[t.length - 1], 0],
+          ],
+        ],
+        alan: 0,
+      };
+      r.alan = fa(r.kesim[0]);
+      const l = [];
+      for (let g = 0; g < 120; g++) {
+        const U = (q * g) / 120;
+        l.push([(m / 2) * Math.cos(U), (m / 2) * Math.sin(U)]);
+      }
+      const c = {
+          ad: "D\xFCz levha (alan e\u015Fde\u011Feri)",
+          adet: 1,
+          kesim: [l],
+          bukum: [],
+          ref: [],
+          alan: (aa * m * m) / 4,
+        },
+        p = n[n.length - 1][1],
+        x = B(),
+        b = n.map((g) => J(g[0], p - g[1], 96));
+      for (let g = 0; g + 1 < b.length; g++) d(x, b[g], b[g + 1], !0, { merkez: [0, 0, p / 2] });
+      const P = z > 0 ? n[n.length - 2][1] : p,
+        D = {
+          klopper: "Kl\xF6pper (R = D, r = 0,1 D)",
+          korb: "Korbbogen (R = 0,8 D, r = 0,154 D)",
+          eliptik: "Eliptik 2:1",
+          yarimkure: "Yar\u0131m k\xFCre",
+          kalota: "K\xFCresel kalota",
+        }[u.tip];
+      return V(
+        "Tank kapa\u011F\u0131",
+        [r, c],
+        x,
+        [
+          ["Kapak tipi", D],
+          ["Orta y\xFCzey \xE7ap\u0131", S(e, 1) + " mm"],
+          ["Bombe derinli\u011Fi", S(P, 1) + " mm"],
+          ["Meridyen boyu (petal uzunlu\u011Fu)", S(t[t.length - 1], 1) + " mm"],
+          ["Y\xFCzey alan\u0131", S(s / 1e6, 3) + " m\xB2"],
+          ["D\xFCz levha \xE7ap\u0131 (alan e\u015Fde\u011Feri)", S(m, 1) + " mm"],
+          ["Petal en geni\u015F", S(2 * Math.max(...a) * i, 1) + " mm"],
+        ],
+        [
+          "Petal ve d\xFCz levha ayr\u0131 y\xF6ntemlerdir: petal dilimleri kaynakla birle\u015Ftirilir, d\xFCz levha ise bask\u0131/\xE7ekme ile \u015Fekillenir. Bask\u0131da kal\u0131nl\u0131k incelmesi ve fire pay\u0131 ekleyin. Petal geni\u015Flikleri yakla\u015F\u0131kt\u0131r.",
+        ],
+      );
+    }
+    function ia(u) {
+      const y = F(u, "a", "Kanal geni\u015Fli\u011Fi (dirsek d\xFCzleminde)", 1),
+        z = F(u, "b", "Kanal y\xFCksekli\u011Fi", 1),
+        w = F(u, "th", "Dirsek a\xE7\u0131s\u0131", 0, 170),
+        K = F(u, "L1", "1. kol", 0),
+        $ = F(u, "L2", "2. kol", 0),
+        e = w * ca,
+        n = e / 2,
+        t = Math.tan(n),
+        a = Math.cos(n);
+      if (K < (y / 2) * t || $ < (y / 2) * t)
+        throw new E(
+          "Kol uzunluklar\u0131, i\xE7 k\xF6\u015Fe i\xE7in en az " + S((y / 2) * t, 1) + " mm olmal\u0131.",
+        );
+      const s = [0, 0, 1],
+        m = [1, 0, 0],
+        i = [Math.sin(e), 0, Math.cos(e)],
+        k = [Math.cos(e), 0, -Math.sin(e)],
+        h = [0, 0, 0],
+        r = L.mad(h, s, -K),
+        l = L.mad(h, i, $),
+        c = L.mul(L.add(m, k), y / 2 / (2 * a * a)),
+        p = L.sub(h, c),
+        x = L.add(h, c),
+        b = L.mad(r, m, -y / 2),
+        P = L.mad(r, m, y / 2),
+        D = L.mad(l, k, -y / 2),
+        g = L.mad(l, k, y / 2),
+        U = B(),
+        R = [0, z / 2, 0],
+        X = L.mul(L.add(r, l), 0.5);
+      ([1, -1].forEach((C) => {
+        const Z = (ea) => L.mad(ea, [0, 1, 0], (C * z) / 2);
+        (d(U, [Z(b), Z(P)], [Z(p), Z(x)], !1, { duz: !0, merkez: X }),
+          d(U, [Z(p), Z(x)], [Z(D), Z(g)], !1, { duz: !0, merkez: X }));
+      }),
+        [
+          [b, p, D],
+          [P, x, g],
+        ].forEach((C) => {
+          const Z = [
+              L.mad(C[0], [0, 1, 0], -z / 2),
+              L.mad(C[1], [0, 1, 0], -z / 2),
+              L.mad(C[2], [0, 1, 0], -z / 2),
+            ],
+            ea = Z.map((pa) => L.mad(pa, [0, 1, 0], z));
+          d(U, Z, ea, !1, { duz: !0, merkez: X });
+        }));
+      const j = (C) => [C[0], C[2]],
+        _ = {
+          ad: "Yan panel",
+          adet: 2,
+          kesim: [[j(b), j(p), j(D), j(g), j(x), j(P)]],
+          bukum: [],
+          ref: [[j(p), j(x)]],
+          alan: 0,
+        };
+      _.alan = fa(_.kesim[0]);
+      const T = [K + (y / 2) * t, $ + (y / 2) * t],
+        A = [K - (y / 2) * t, $ - (y / 2) * t],
+        Y = (C, Z) => {
+          const ea = Z[0] + Z[1];
+          return {
+            ad: C,
+            adet: 1,
+            kesim: [
+              [
+                [0, 0],
+                [ea, 0],
+                [ea, z],
+                [0, z],
+              ],
+            ],
+            bukum:
+              w > 0
+                ? [
+                    [
+                      [Z[0], 0],
+                      [Z[0], z],
+                    ],
+                  ]
+                : [],
+            ref: [],
+            alan: ea * z,
+          };
+        };
+      return V(
+        "Dikd\xF6rtgen kanal I (dirsek)",
+        [_, Y("D\u0131\u015F duvar (b\xFCk\xFCml\xFC)", T), Y("\u0130\xE7 duvar (b\xFCk\xFCml\xFC)", A)],
+        U,
+        [
+          ["D\u0131\u015F duvar boyu", S(T[0] + T[1], 1) + " mm"],
+          ["\u0130\xE7 duvar boyu", S(A[0] + A[1], 1) + " mm"],
+          ["G\xF6nye a\xE7\u0131s\u0131", S(w / 2, 1) + "\xB0"],
+          ["Yan panel", "2 adet, d\xFCz kesim; ye\u015Fil kesikli \xE7izgi g\xF6nye hatt\u0131d\u0131r"],
+        ],
+        [
+          "\xD6l\xE7\xFCler panel (kesim) \xF6l\xE7\xFCs\xFCd\xFCr; flan\u015F ve kenet paylar\u0131n\u0131 eklemeyi unutmay\u0131n.",
+        ],
+      );
+    }
+    function ka(u, y) {
+      const z = F(u, "a1", "Alt a\xE7\u0131kl\u0131k geni\u015Fli\u011Fi", 0.1),
+        w = F(u, "b1", "Alt a\xE7\u0131kl\u0131k y\xFCksekli\u011Fi", 0.1),
+        K = F(u, "a2", "\xDCst a\xE7\u0131kl\u0131k geni\u015Fli\u011Fi", 0),
+        $ = F(u, "b2", "\xDCst a\xE7\u0131kl\u0131k y\xFCksekli\u011Fi", 0),
+        e = F(u, "h", "Y\xFCkseklik", 0.1),
+        n = F(u, "ex", "Ofset X"),
+        t = F(u, "ey", "Ofset Y"),
+        a = y ? F(u, "rot", "D\xF6nd\xFCrme", -90, 90) * ca : 0,
+        s = Math.cos(a),
+        m = Math.sin(a),
+        i = (b, P, D) => [
+          [-b / 2, -P / 2],
+          [b / 2, -P / 2],
+          [b / 2, P / 2],
+          [-b / 2, P / 2],
+        ],
+        k = i(z, w).map((b) => [b[0], b[1], 0]),
+        h = i(K, $).map((b) => [n + b[0] * s - b[1] * m, t + b[0] * m + b[1] * s, e]),
+        r = B(),
+        l = [n / 2, t / 2, e / 2];
+      d(r, k, h, !0, { duz: !0, merkez: l });
+      const c = [];
+      y &&
+        Math.abs(a) > 1e-9 &&
+        c.push(
+          "Alt a\xE7\u0131kl\u0131k d\xF6nd\xFCr\xFCld\xFC\u011F\xFC i\xE7in y\xFCzeyler burulur; a\xE7\u0131l\u0131m \xFC\xE7genleme ile yakla\u015F\u0131k bulunur.",
+        );
+      const p = [];
+      if (u.uretim === "ayri")
+        for (let b = 0; b < 4; b++) {
+          const P = (b + 1) % 4,
+            D = ba([k[b], k[P]], [h[b], h[P]], !1);
+          p.push(G("Panel " + (b + 1), 1, D, {}));
+        }
+      else {
+        const b = ba(k, h, !0);
+        p.push(G(y ? "Savak (tek par\xE7a)" : "Ge\xE7i\u015F (tek par\xE7a)", 1, b, { bukum: [1, 2, 3] }));
+      }
+      const x = [0, 1, 2, 3]
+        .map((b) => S(Ta(k[b], k[(b + 1) % 4]), 1) + "/" + S(Ta(h[b], h[(b + 1) % 4]), 1))
+        .join(" \xB7 ");
+      return V(
+        y ? "Dikd\xF6rtgen savak" : "Dikd\xF6rtgen kanal II (ge\xE7i\u015F)",
+        p,
+        r,
+        [
+          ["Alt/\xFCst kenar \xE7iftleri", x + " mm"],
+          ["E\u011Fik y\xFCkseklikler", [0, 1, 2, 3].map((b) => S(Ta(k[b], h[b]), 1)).join(" \xB7 ") + " mm"],
+        ],
+        c,
+      );
+    }
+    function xa(u) {
+      const y = F(u, "D", "D\u0131\u015F \xE7ap", 1),
+        z = F(u, "d", "Mil \xE7ap\u0131", 0),
+        w = F(u, "p", "Ad\u0131m", 0.1),
+        K = F(u, "n", "Tur say\u0131s\u0131", 0.25, 30),
+        $ = Math.round(F(u, "k", "Tur ba\u015F\u0131na par\xE7a", 1, 8));
+      if (z >= y) throw new E("Mil \xE7ap\u0131 d\u0131\u015F \xE7aptan k\xFC\xE7\xFCk olmal\u0131.");
+      const e = y / 2,
+        n = z / 2,
+        t = e - n,
+        a = 1 / $,
+        s = Math.hypot(q * n * a, w * a),
+        m = Math.hypot(q * e * a, w * a);
+      if (m - s < 1e-9)
+        throw new E("Mil \xE7ap\u0131 ile d\u0131\u015F \xE7ap aras\u0131nda fark \xE7ok az.");
+      const i = (t * s) / (m - s),
+        k = i + t,
+        h = m / k,
+        r = 90,
+        l = [];
+      for (let g = 0; g <= r; g++) {
+        const U = (h * g) / r;
+        l.push([k * Math.cos(U), k * Math.sin(U)]);
+      }
+      for (let g = r; g >= 0; g--) {
+        const U = (h * g) / r;
+        l.push([i * Math.cos(U), i * Math.sin(U)]);
+      }
+      const c = [];
+      if (h > q)
+        throw new E(
+          "A\xE7\u0131l\u0131m a\xE7\u0131s\u0131 " +
+            S(h / ca, 0) +
+            `\xB0 \xE7\u0131k\u0131yor, 360\xB0'yi a\u015Fan par\xE7a d\xFCz sacda kendi \xFCzerine biner. "Tur ba\u015F\u0131na par\xE7a" de\u011Ferini art\u0131r\u0131n.`,
+        );
+      const p = {
+          ad: "Helezon kanad\u0131",
+          adet: Math.max(1, Math.round(K * $)),
+          kesim: [l],
+          bukum: [],
+          ref: [],
+          alan: fa(l),
+        },
+        x = B(),
+        b = Math.max(24, Math.round(48 * K)),
+        P = [],
+        D = [];
+      for (let g = 0; g <= b; g++) {
+        const U = (q * K * g) / b,
+          R = (w * K * g) / b;
+        (P.push([n * Math.cos(U), n * Math.sin(U), R]), D.push([e * Math.cos(U), e * Math.sin(U), R]));
+      }
+      return (
+        d(x, P, D, !1, { duz: !0, merkez: [0, 0, (w * K) / 2 + 1e5] }),
+        d(x, J(n, -w / 2, 64), J(n, w * K + w / 2, 64), !0),
+        V(
+          "Helezon",
+          [p],
+          x,
+          [
+            ["Kanat geni\u015Fli\u011Fi", S(t, 1) + " mm"],
+            ["\u0130\xE7 / d\u0131\u015F kenar boyu", S(s, 1) + " / " + S(m, 1) + " mm"],
+            ["A\xE7\u0131l\u0131m yar\u0131\xE7aplar\u0131", "R " + S(i, 1) + " / R " + S(k, 1) + " mm"],
+            ["A\xE7\u0131l\u0131m a\xE7\u0131s\u0131", S(h / ca, 1) + "\xB0"],
+            ["Toplam kanat say\u0131s\u0131", String(p.adet)],
+          ],
+          c.concat([
+            "Helis y\xFCzeyi tam a\xE7\u0131labilir de\u011Fildir; kanat \u015Fekillendirmede (basma/\xE7ekme) \xF6l\xE7\xFCler biraz de\u011Fi\u015Fir. \u0130lk par\xE7a ile deneme yap\u0131n.",
+          ]),
+        )
+      );
+    }
+    function Ea(u) {
+      const y = Math.round(F(u, "n", "Kenar say\u0131s\u0131", 3, 24)),
+        z = F(u, "a", "Taban kenar\u0131", 0.1),
+        w = F(u, "a2", "\xDCst kenar", 0),
+        K = F(u, "h", "Y\xFCkseklik", 0.1),
+        $ = z / (2 * Math.sin(aa / y)),
+        e = w / (2 * Math.sin(aa / y)),
+        n = [],
+        t = [];
+      for (let l = 0; l < y; l++) {
+        const c = (q * l) / y;
+        (n.push([$ * Math.cos(c), $ * Math.sin(c), 0]), t.push([e * Math.cos(c), e * Math.sin(c), K]));
+      }
+      const a = B();
+      d(a, n, t, !0, { duz: !0, merkez: [0, 0, K / 2] });
+      const s = ba(n, t, !0),
+        m = [];
+      for (let l = 1; l < y; l++) m.push(l);
+      const i = [
+          G(w > 0 ? "Yan y\xFCzeyler (kesik piramit/prizma)" : "Yan y\xFCzeyler (piramit)", 1, s, {
+            bukum: m,
+          }),
+        ],
+        k = (l, c) => {
+          const p = [];
+          for (let x = 0; x < y; x++) {
+            const b = (q * x) / y;
+            p.push([l * Math.cos(b), l * Math.sin(b)]);
+          }
+          return { ad: c, adet: 1, kesim: [p], bukum: [], ref: [], alan: fa(p) };
+        };
+      u.kapak === "evet" && (i.push(k($, "Taban")), w > 0 && i.push(k(e, "\xDCst kapak")));
+      const h = z / (2 * Math.tan(aa / y)),
+        r = w / (2 * Math.tan(aa / y));
+      return V(
+        "Prizma / piramit",
+        i,
+        a,
+        [
+          ["Yan y\xFCz e\u011Fik y\xFCksekli\u011Fi", S(Math.hypot(K, h - r), 2) + " mm"],
+          ["Yan y\xFCz say\u0131s\u0131", String(y)],
+          ["Taban\u0131n \xE7evre \xE7ap\u0131", S(2 * $, 1) + " mm"],
+        ],
+        w > z ? ["\xDCst kenar tabandan b\xFCy\xFCk: ters piramit olarak a\xE7\u0131l\u0131r."] : [],
+      );
+    }
+    function Oa(u) {
+      const y = u.arac;
+      if (y === "halka") {
+        const z = F(u, "Ro", "D\u0131\u015F yar\u0131\xE7ap", 0.1),
+          w = F(u, "Ri", "\u0130\xE7 yar\u0131\xE7ap", 0),
+          K = F(u, "an", "A\xE7\u0131", 1, 360),
+          $ = 90,
+          e = [],
+          n = [],
+          t = [];
+        for (let i = 0; i <= $; i++) {
+          const k = (K * ca * i) / $;
+          (e.push([z * Math.cos(k), z * Math.sin(k)]),
+            n.push([w * Math.cos(k), w * Math.sin(k), 0]),
+            t.push([z * Math.cos(k), z * Math.sin(k), 0]));
+        }
+        if (w >= z)
+          throw new E(
+            "\u0130\xE7 yar\u0131\xE7ap d\u0131\u015F yar\u0131\xE7aptan k\xFC\xE7\xFCk olmal\u0131.",
+          );
+        for (let i = $; i >= 0; i--) {
+          const k = (K * ca * i) / $;
+          e.push([w * Math.cos(k), w * Math.sin(k)]);
+        }
+        const a = B();
+        d(a, n, t, !1, { duz: !0, merkez: [0, 0, 1e5] });
+        let s = [e];
+        K >= 359.999
+          ? ((s = [e.slice(0, $ + 1).slice(0, $)]),
+            w > 0 &&
+              s.push(
+                e
+                  .slice($ + 1)
+                  .slice(1)
+                  .reverse(),
+              ))
+          : w === 0 && (s = [e.filter((i, k) => k <= $ || k === e.length - 1)]);
+        const m = {
+          ad: "Halka dilimi",
+          adet: 1,
+          kesim: s,
+          bukum: [],
+          ref: [],
+          alan: ((z * z - w * w) * K * ca) / 2,
+        };
+        return V(
+          "Halka dilimi",
+          [m],
+          a,
+          [
+            ["D\u0131\u015F / i\xE7 yay boyu", S(z * K * ca, 1) + " / " + S(w * K * ca, 1) + " mm"],
+            ["Kiri\u015F (d\u0131\u015F)", S(2 * z * Math.sin((Math.min(K, 180) * ca) / 2), 1) + " mm"],
+            ["Geni\u015Flik", S(z - w, 1) + " mm"],
+          ],
+          [],
+        );
+      }
+      if (y === "kure") {
+        const z = F(u, "D", "K\xFCre \xE7ap\u0131", 1),
+          w = Math.round(F(u, "n", "Petal say\u0131s\u0131", 3, 48)),
+          K = z / 2,
+          $ = u.kapsam === "tam",
+          e = $ ? aa * K : (aa * K) / 2,
+          n = 60,
+          t = [],
+          a = [];
+        for (let r = 0; r <= n; r++) {
+          const l = (e * r) / n,
+            c = (aa * K * Math.sin(l / K)) / w;
+          (t.push([l, c]), a.push([l, -c]));
+        }
+        const s = B(),
+          m = [],
+          i = $ ? aa : aa / 2;
+        for (let r = 0; r <= 40; r++) {
+          const l = (i * r) / 40;
+          m.push(J(K * Math.sin(l), K * Math.cos(l), 72));
+        }
+        for (let r = 0; r + 1 < m.length; r++) d(s, m[r], m[r + 1], !0, { merkez: [0, 0, 0] });
+        const k = t.concat(a.slice(1).reverse()),
+          h = {
+            ad: "K\xFCre petali",
+            adet: w,
+            kesim: [k],
+            bukum: [],
+            ref: [
+              [
+                [0, 0],
+                [e, 0],
+              ],
+            ],
+            alan: 0,
+          };
+        return (
+          (h.alan = fa(k)),
+          V(
+            "K\xFCre petali",
+            [h],
+            s,
+            [
+              ["Petal uzunlu\u011Fu", S(e, 1) + " mm"],
+              ["En geni\u015F yer", S((2 * aa * K) / w, 1) + " mm"],
+              ["Petal say\u0131s\u0131", String(w)],
+            ],
+            [
+              "Petal geni\u015Fli\u011Fi paralel dairenin yay boyuna g\xF6re al\u0131nm\u0131\u015Ft\u0131r; kenarlar kaynak pay\u0131 b\u0131rak\u0131larak kesilir.",
+            ],
+          )
+        );
+      }
+      if (y === "yay") {
+        const z = F(u, "c", "Kiri\u015F", 0.1),
+          w = F(u, "h", "Ok (yay y\xFCksekli\u011Fi)", 0.01),
+          K = ((z * z) / 4 + w * w) / (2 * w),
+          $ = Math.atan2(z / 2, K - w),
+          e = 2 * $,
+          n = 90,
+          t = [];
+        for (let s = 0; s <= n; s++) {
+          const m = -$ + (e * s) / n;
+          t.push([K * Math.sin(m), K * Math.cos(m) - (K - w)]);
+        }
+        const a = {
+          ad: "Yay par\xE7as\u0131",
+          adet: 1,
+          kesim: [t],
+          bukum: [],
+          ref: [],
+          alan: ((K * K) / 2) * (e - Math.sin(e)),
+        };
+        return V(
+          "Yay hesab\u0131",
+          [a],
+          null,
+          [
+            ["Yar\u0131\xE7ap", S(K, 2) + " mm"],
+            ["A\xE7\u0131", S(e / ca, 2) + "\xB0"],
+            ["Yay boyu", S(K * e, 2) + " mm"],
+            ["Kiri\u015F / ok", S(z, 2) + " / " + S(w, 2) + " mm"],
+          ],
+          [],
+        );
+      }
+      throw new E("Bilinmeyen ara\xE7.");
+    }
+    const ja = [
+      {
+        id: "koni",
+        ad: "Koni",
+        alt: "Kesik, sivri veya e\u011Fik koni",
+        f: Ia,
+        alan: [
+          M("D1", "Alt \xE7ap", "mm", 300, 1),
+          M("D2", "\xDCst \xE7ap (0 = sivri)", "mm", 100, 0),
+          M("h", "Y\xFCkseklik", "mm", 400, 0.1),
+          M("ex", "\xDCst dairenin kaymas\u0131 (e\u011Fik koni)", "mm", 0),
+        ].concat(ga),
+      },
+      {
+        id: "silindir",
+        ad: "Silindir",
+        alt: "Virole, par\xE7al\u0131 silindir",
+        f: $a,
+        alan: [
+          M("D", "\xC7ap", "mm", 500, 1),
+          M("h", "Boy", "mm", 1e3, 0.1),
+          M("n", "Ka\xE7 par\xE7adan yap\u0131lacak", "adet", 1, 1, 8, 1),
+        ].concat(ga),
+      },
+      {
+        id: "cat",
+        ad: "\xC7atal / T ba\u011Flant\u0131",
+        alt: "Bran\u015F, ana boruda delik a\xE7\u0131l\u0131m\u0131",
+        f: na,
+        alan: [
+          M("D1", "Ana boru \xE7ap\u0131", "mm", 400, 1),
+          M("D2", "Bran\u015F \xE7ap\u0131", "mm", 200, 1),
+          M("al", "Bran\u015F a\xE7\u0131s\u0131 (90 = T)", "\xB0", 90, 15, 90),
+          M("e", "Bran\u015F ofseti (eksen ka\xE7\u0131kl\u0131\u011F\u0131)", "mm", 0),
+          M("Lb", "Bran\u015F uzunlu\u011Fu (eksen boyunca)", "mm", 400, 1),
+          M("Lm", "Ana boru boyu", "mm", 900, 1),
+        ].concat(ga),
+      },
+      {
+        id: "dirsek",
+        ad: "Dirsek",
+        alt: "G\xF6nyeli (kaynakl\u0131) dirsek",
+        f: da,
+        alan: [
+          M("D", "\xC7ap", "mm", 200, 1),
+          M("th", "Dirsek a\xE7\u0131s\u0131", "\xB0", 90, 5, 170),
+          M("j", "Birle\u015Fim say\u0131s\u0131 (g\xF6nye)", "adet", 2, 1, 5, 1),
+          ua("rt", "Yar\u0131\xE7ap", "uzun", [
+            ["kisa", "K\u0131sa (R = 1 D)"],
+            ["uzun", "Uzun (R = 1,5 D)"],
+            ["keskin", "Keskin g\xF6nye (R = 0,5 D)"],
+          ]),
+          M("L1", "1. d\xFCz kol", "mm", 100, 0),
+          M("L2", "2. d\xFCz kol", "mm", 100, 0),
+        ].concat(ga),
+      },
+      {
+        id: "gecis",
+        ad: "Ge\xE7i\u015F par\xE7as\u0131",
+        alt: "Dikd\xF6rtgen \u2013 daire ge\xE7i\u015Fi",
+        f: Ua,
+        alan: [
+          M("a", "Taban geni\u015Fli\u011Fi", "mm", 400, 1),
+          M("b", "Taban y\xFCksekli\u011Fi", "mm", 300, 1),
+          M("D", "Daire \xE7ap\u0131", "mm", 250, 1),
+          M("h", "Y\xFCkseklik", "mm", 350, 0.1),
+          M("ex", "Daire ofseti X", "mm", 0),
+          M("ey", "Daire ofseti Y", "mm", 0),
+        ].concat(ga),
+      },
+      {
+        id: "seg",
+        ad: "Segmanl\u0131 b\xFCk\xFCm",
+        alt: "Yar\u0131\xE7apl\u0131, \xE7ok par\xE7al\u0131 b\xFCk\xFCm",
+        f: Na,
+        alan: [
+          M("D", "\xC7ap", "mm", 300, 1),
+          M("th", "B\xFCk\xFCm a\xE7\u0131s\u0131", "\xB0", 90, 5, 180),
+          M("R", "B\xFCk\xFCm yar\u0131\xE7ap\u0131 (eksen)", "mm", 450, 0.1),
+          M("j", "Birle\u015Fim say\u0131s\u0131", "adet", 4, 1, 11, 1),
+          M("L1", "1. d\xFCz kol", "mm", 0, 0),
+          M("L2", "2. d\xFCz kol", "mm", 0, 0),
+        ].concat(ga),
+      },
+      {
+        id: "pantolon",
+        ad: "Pantolon (Y) ba\u011Flant\u0131",
+        alt: "\u0130ki kola ayr\u0131lan ba\u011Flant\u0131",
+        f: Ha,
+        alan: [
+          M("D1", "Ana boru \xE7ap\u0131", "mm", 400, 1),
+          M("D2", "Kol \xE7ap\u0131", "mm", 220, 1),
+          M("al", "Kol a\xE7\u0131s\u0131 (eksenle)", "\xB0", 30, 5, 80),
+          M("L", "Kol uzunlu\u011Fu", "mm", 600, 1),
+          M("Lm", "Ana boru boyu", "mm", 500, 1),
+          M("e", "Kol ofseti (0 = otomatik)", "mm", 0, 0),
+        ].concat(ga),
+      },
+      {
+        id: "levha",
+        ad: "E\u011Fik kesimli boru",
+        alt: "Levhayla kesi\u015Fen boru, delik \u015Fablonu",
+        f: Ka,
+        alan: [
+          M("D", "Boru \xE7ap\u0131", "mm", 200, 1),
+          M("L", "K\u0131sa kenar boyu", "mm", 300, 0),
+          M("a1", "Alt kesim a\xE7\u0131s\u0131 (0 = dik)", "\xB0", 30, -70, 70),
+          M("a2", "\xDCst kesim a\xE7\u0131s\u0131", "\xB0", 0, -70, 70),
+        ].concat(ga),
+      },
+      {
+        id: "kapak",
+        ad: "Tank kapa\u011F\u0131",
+        alt: "Bombeli dip, petal ve d\xFCz levha",
+        f: ra,
+        alan: [
+          M("D", "Kapak \xE7ap\u0131", "mm", 1e3, 10),
+          ua("tip", "Kapak tipi", "klopper", [
+            ["klopper", "Kl\xF6pper (torisferik)"],
+            ["korb", "Korbbogen (torisferik)"],
+            ["eliptik", "Eliptik 2:1"],
+            ["yarimkure", "Yar\u0131m k\xFCre"],
+            ["kalota", "K\xFCresel kalota"],
+          ]),
+          M("hk", "Kalota derinli\u011Fi (yaln\u0131z kalotada)", "mm", 150, 0),
+          M("hf", "D\xFCz kenar y\xFCksekli\u011Fi", "mm", 40, 0),
+          M("n", "Petal say\u0131s\u0131", "adet", 8, 3, 36, 1),
+        ].concat(ga),
+      },
+      {
+        id: "kanal1",
+        ad: "Dikd\xF6rtgen kanal I",
+        alt: "G\xF6nyeli dirsek ve d\xFCz kanal",
+        f: ia,
+        alan: [
+          M("a", "Kanal geni\u015Fli\u011Fi (dirsek d\xFCzleminde)", "mm", 400, 1),
+          M("b", "Kanal y\xFCksekli\u011Fi", "mm", 300, 1),
+          M("th", "Dirsek a\xE7\u0131s\u0131 (0 = d\xFCz)", "\xB0", 90, 0, 170),
+          M("L1", "1. kol (eksen)", "mm", 500, 0),
+          M("L2", "2. kol (eksen)", "mm", 500, 0),
+        ],
+      },
+      {
+        id: "kanal2",
+        ad: "Dikd\xF6rtgen kanal II",
+        alt: "Daralma, geni\u015Fleme, eksantrik ge\xE7i\u015F",
+        f: (u) => ka(u, !1),
+        alan: [
+          M("a1", "Alt a\xE7\u0131kl\u0131k geni\u015Fli\u011Fi", "mm", 600, 0.1),
+          M("b1", "Alt a\xE7\u0131kl\u0131k y\xFCksekli\u011Fi", "mm", 400, 0.1),
+          M("a2", "\xDCst a\xE7\u0131kl\u0131k geni\u015Fli\u011Fi", "mm", 300, 0),
+          M("b2", "\xDCst a\xE7\u0131kl\u0131k y\xFCksekli\u011Fi", "mm", 200, 0),
+          M("h", "Y\xFCkseklik", "mm", 500, 0.1),
+          M("ex", "\xDCst a\xE7\u0131kl\u0131k ofseti X", "mm", 0),
+          M("ey", "\xDCst a\xE7\u0131kl\u0131k ofseti Y", "mm", 0),
+          ua("uretim", "\xDCretim", "tek", [
+            ["tek", "Tek par\xE7a (3 b\xFCk\xFCm)"],
+            ["ayri", "4 ayr\u0131 panel"],
+          ]),
+        ],
+      },
+      {
+        id: "helis",
+        ad: "Helezon",
+        alt: "Helis ve vidal\u0131 konvey\xF6r kanad\u0131",
+        f: xa,
+        alan: [
+          M("D", "D\u0131\u015F \xE7ap", "mm", 300, 1),
+          M("d", "Mil \xE7ap\u0131", "mm", 60, 0),
+          M("p", "Ad\u0131m", "mm", 250, 0.1),
+          M("n", "Tur say\u0131s\u0131", "tur", 4, 0.25, 30),
+          M("k", "Tur ba\u015F\u0131na par\xE7a", "adet", 1, 1, 8, 1),
+        ],
+      },
+      {
+        id: "prizma",
+        ad: "Prizma ve piramit",
+        alt: "\xC7okgen prizma, piramit, kesik piramit",
+        f: Ea,
+        alan: [
+          M("n", "Kenar say\u0131s\u0131", "adet", 6, 3, 24, 1),
+          M("a", "Taban kenar\u0131", "mm", 200, 0.1),
+          M("a2", "\xDCst kenar (0 = piramit)", "mm", 100, 0),
+          M("h", "Y\xFCkseklik", "mm", 300, 0.1),
+          ua("kapak", "Taban / \xFCst kapak", "hayir", [
+            ["hayir", "Ekleme"],
+            ["evet", "Ekle"],
+          ]),
+        ],
+      },
+      {
+        id: "savak",
+        ad: "Dikd\xF6rtgen savak",
+        alt: "Dikd\xF6rtgen \u015F\xFCt, kaymal\u0131 ve burulmal\u0131",
+        f: (u) => ka(u, !0),
+        alan: [
+          M("a1", "\xDCst a\xE7\u0131kl\u0131k geni\u015Fli\u011Fi", "mm", 500, 0.1),
+          M("b1", "\xDCst a\xE7\u0131kl\u0131k y\xFCksekli\u011Fi", "mm", 500, 0.1),
+          M("a2", "Alt a\xE7\u0131kl\u0131k geni\u015Fli\u011Fi", "mm", 300, 0),
+          M("b2", "Alt a\xE7\u0131kl\u0131k y\xFCksekli\u011Fi", "mm", 300, 0),
+          M("h", "Y\xFCkseklik", "mm", 600, 0.1),
+          M("ex", "Alt a\xE7\u0131kl\u0131k kaymas\u0131 X", "mm", 250),
+          M("ey", "Alt a\xE7\u0131kl\u0131k kaymas\u0131 Y", "mm", 0),
+          M("rot", "Alt a\xE7\u0131kl\u0131k d\xF6nmesi", "\xB0", 0, -90, 90),
+          ua("uretim", "\xDCretim", "ayri", [
+            ["tek", "Tek par\xE7a"],
+            ["ayri", "4 ayr\u0131 panel"],
+          ]),
+        ],
+      },
+      {
+        id: "diger",
+        ad: "Di\u011Fer \u015Fekiller ve ara\xE7lar",
+        alt: "Halka dilimi, k\xFCre petali, yay hesab\u0131",
+        f: Oa,
+        alan: [
+          ua("arac", "Ara\xE7", "halka", [
+            ["halka", "Halka dilimi"],
+            ["kure", "K\xFCre petali"],
+            ["yay", "Yay hesab\u0131 (kiri\u015F ve ok)"],
+          ]),
+          M("Ro", "Halka: d\u0131\u015F yar\u0131\xE7ap", "mm", 400, 0.1),
+          M("Ri", "Halka: i\xE7 yar\u0131\xE7ap", "mm", 250, 0),
+          M("an", "Halka: a\xE7\u0131", "\xB0", 120, 1, 360),
+          M("D", "K\xFCre: \xE7ap", "mm", 600, 1),
+          M("n", "K\xFCre: petal say\u0131s\u0131", "adet", 12, 3, 48, 1),
+          ua("kapsam", "K\xFCre: kapsam", "yarim", [
+            ["yarim", "Yar\u0131m k\xFCre"],
+            ["tam", "Tam k\xFCre"],
+          ]),
+          M("c", "Yay: kiri\u015F", "mm", 800, 0.1),
+          M("h", "Yay: ok (y\xFCkseklik)", "mm", 100, 0.01),
+        ],
+        grup: { halka: ["Ro", "Ri", "an"], kure: ["D", "n", "kapsam"], yay: ["c", "h"] },
+      },
+    ];
+    function Xa(u) {
+      const y = {};
+      return (
+        u.alan.forEach((z) => {
+          y[z.id] = z.v;
+        }),
+        y
+      );
+    }
+    function _a(u, y) {
+      const z = ja.find((w) => w.id === u);
+      if (!z) throw new E("Bilinmeyen \u015Fekil.");
+      return z.f(Object.assign(Xa(z), y || {}));
+    }
+    function Wa(u) {
+      const y = u.cizim,
+        z = [];
+      return (
+        y.kesim.forEach((w) => z.push({ t: "poly", katman: "KESIM", kapali: !0, pts: w })),
+        y.bukum.forEach((w) =>
+          z.push({ t: "line", katman: "BUKUM", x1: w[0][0], y1: w[0][1], x2: w[1][0], y2: w[1][1] }),
+        ),
+        y.ref.forEach((w) =>
+          z.push({ t: "line", katman: "REFERANS", x1: w[0][0], y1: w[0][1], x2: w[1][0], y2: w[1][1] }),
+        ),
+        y.etiket.forEach((w) => z.push({ t: "text", katman: "YAZI", x: w.x, y: w.y, h: w.h, metin: w.t })),
+        La.dxfYaz(
+          [
+            { ad: "KESIM", renk: 7 },
+            { ad: "BUKUM", renk: 1, cizgi: "DASHED" },
+            { ad: "REFERANS", renk: 3, cizgi: "DASHED" },
+            { ad: "YAZI", renk: 5 },
+          ],
+          z,
+        )
+      );
+    }
+    ((La.sekil = {
+      katalog: ja,
+      varsayilan: Xa,
+      hesapla: _a,
+      dxf: Wa,
+      _iç: { ac: ba, kontur: oa, alan2: fa, Ag: B, serit: d, bitir: I, V: L },
+    }),
+      typeof module != "undefined" && module.exports && (module.exports = La));
+  })(),
+  (function () {
+    "use strict";
+    const La = typeof module != "undefined" && module.exports ? require("./core.js") : self.Cekirdek,
+      E = La.GirdiHatasi,
+      aa = Math.PI,
+      q = (f) => (f * aa) / 180,
+      ca = (f) => (f * 180) / aa,
+      L = (f) => Math.tan(f) - f,
+      Ta = [0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 16, 20, 25, 32, 40, 50],
+      F = (f) => Ta.reduce((o, d) => (Math.abs(d - f) < Math.abs(o - f) ? d : o), Ta[0]),
+      ha = (f, o) => Number(Number(f).toFixed(o === void 0 ? 4 : o));
+    function J(f) {
+      const o = {
+        tip: f.tip === "helisel" ? "helisel" : "duz",
+        m: +f.m,
+        z: +f.z,
+        a: f.aci === void 0 || f.aci === "" || isNaN(f.aci) ? 20 : +f.aci,
+        beta: f.tip === "helisel" ? +f.beta : 0,
+        x: isNaN(f.x) || f.x === "" || f.x === void 0 ? 0 : +f.x,
+        ha: isNaN(f.ha) || f.ha === void 0 || f.ha === "" ? 1 : +f.ha,
+        c: isNaN(f.c) || f.c === void 0 || f.c === "" ? 0.25 : +f.c,
+        b: isNaN(f.b) ? 0 : +f.b,
+        delik: isNaN(f.delik) ? 0 : +f.delik,
+        z2: isNaN(f.z2) ? 0 : +f.z2,
+        x2: isNaN(f.x2) || f.x2 === void 0 ? 0 : +f.x2,
+        n1: isNaN(f.n1) ? 0 : +f.n1,
+      };
+      if (!(o.m > 0) || o.m > 100) throw new E("Mod\xFCl 0 ile 100 mm aras\u0131nda olmal\u0131.");
+      if (!Number.isInteger(o.z) || o.z < 5 || o.z > 500)
+        throw new E("Di\u015F say\u0131s\u0131 5 ile 500 aras\u0131nda tam say\u0131 olmal\u0131.");
+      if (!(o.a >= 10 && o.a <= 30))
+        throw new E(
+          "Bas\u0131n\xE7 a\xE7\u0131s\u0131 10\xB0 ile 30\xB0 aras\u0131nda olmal\u0131 (standart 20\xB0).",
+        );
+      if (o.tip === "helisel" && !(o.beta > 0 && o.beta <= 45))
+        throw new E("Helis a\xE7\u0131s\u0131 0\xB0 ile 45\xB0 aras\u0131nda olmal\u0131.");
+      if (!(o.x >= -1 && o.x <= 1.5))
+        throw new E("Profil kayd\u0131rma katsay\u0131s\u0131 -1 ile 1,5 aras\u0131nda olmal\u0131.");
+      if (!(o.ha > 0 && o.ha <= 1.5) || !(o.c >= 0 && o.c <= 0.5))
+        throw new E(
+          "Di\u015F ba\u015F\u0131 katsay\u0131s\u0131 0-1,5, bo\u015Fluk katsay\u0131s\u0131 0-0,5 aras\u0131nda olmal\u0131.",
+        );
+      if (o.z2 && (!Number.isInteger(o.z2) || o.z2 < 5 || o.z2 > 1e3))
+        throw new E(
+          "Kar\u015F\u0131 di\u015Fli di\u015F say\u0131s\u0131 5 ile 1000 aras\u0131nda tam say\u0131 olmal\u0131.",
+        );
+      return o;
+    }
+    function ba(f, o, d) {
+      const I = Math.cos(q(f.beta)),
+        O = f.m / I,
+        v = Math.atan(Math.tan(q(f.a)) / I),
+        V = O * o,
+        S = V * Math.cos(v),
+        W = V + 2 * f.m * (f.ha + d),
+        M = V - 2 * f.m * (f.ha + f.c - d),
+        ua = f.m * (aa / 2 + 2 * d * Math.tan(q(f.a))),
+        ga = ua / I,
+        Ia = S < W ? Math.acos(S / W) : 0,
+        $a = W * (ga / V + L(v) - L(Ia)),
+        na = (2 * f.ha * I) / Math.pow(Math.sin(v), 2);
+      return { mt: O, at: v, d: V, db: S, da: W, df: M, sn: ua, st: ga, sa: $a, zmin: na, aa: Ia };
+    }
+    function oa(f) {
+      const o = J(f),
+        d = [],
+        I = ba(o, o.z, o.x);
+      if (I.df <= 0)
+        throw new E(
+          "Di\u015F say\u0131s\u0131 bu mod\xFCl i\xE7in \xE7ok k\xFC\xE7\xFCk: di\u015F dibi \xE7ap\u0131 s\u0131f\u0131r veya negatif.",
+        );
+      if (I.sa <= 0)
+        throw new E(
+          "Di\u015F sivrilmi\u015F (u\xE7 kal\u0131nl\u0131\u011F\u0131 s\u0131f\u0131r\u0131n alt\u0131nda). Profil kayd\u0131rmay\u0131 azalt\u0131n veya di\u015F say\u0131s\u0131n\u0131 art\u0131r\u0131n.",
+        );
+      (o.z < I.zmin - 0.001 &&
+        o.x < (o.ha * (I.zmin - o.z)) / I.zmin - 1e-9 &&
+        d.push(
+          "Di\u015F say\u0131s\u0131 " +
+            ha(I.zmin, 1) +
+            " de\u011Ferinin alt\u0131nda; di\u015F dibinde oyulma (undercut) olu\u015Fabilir. Pozitif profil kayd\u0131rma (x \u2265 " +
+            ha((o.ha * (I.zmin - o.z)) / I.zmin, 2) +
+            ") kullan\u0131n.",
+        ),
+        I.sa < 0.2 * o.m &&
+          d.push(
+            "Di\u015F ucu kal\u0131nl\u0131\u011F\u0131 " +
+              ha(I.sa, 2) +
+              " mm (mod\xFCl\xFCn 0,2 kat\u0131ndan az); u\xE7 \xE7ok sivri, k\u0131r\u0131lgan olabilir.",
+          ),
+        o.b &&
+          o.b < 6 * o.m * 0.5 &&
+          d.push(
+            "Di\u015F geni\u015Fli\u011Fi \xE7ok dar g\xF6r\xFCn\xFCyor (genelde 6\u201312 \xD7 mod\xFCl).",
+          ),
+        o.delik &&
+          o.delik >= I.df - 2 * o.m &&
+          d.push("Delik \xE7ap\u0131 di\u015F dibine \xE7ok yak\u0131n; g\xF6bek zay\u0131f kal\u0131r."));
+      const O = {
+        tip: o.tip,
+        m: o.m,
+        z: o.z,
+        a: o.a,
+        beta: o.beta,
+        x: o.x,
+        mt: I.mt,
+        at: ca(I.at),
+        d: I.d,
+        db: I.db,
+        da: I.da,
+        df: I.df,
+        h: o.m * (2 * o.ha + o.c),
+        hb: o.m * (o.ha + o.x),
+        hd: o.m * (o.ha + o.c - o.x),
+        p: aa * o.m,
+        pt: aa * I.mt,
+        pb: aa * I.mt * Math.cos(I.at),
+        sn: I.sn,
+        st: I.st,
+        sa: I.sa,
+        zmin: I.zmin,
+        lead: o.beta ? (aa * I.d) / Math.tan(q(o.beta)) : 0,
+        gA: I,
+        g: o,
+        uyarilar: d,
+      };
+      if ((o.b && (O.b = o.b), o.z2)) {
+        const v = ba(o, o.z2, o.x2);
+        if (v.sa <= 0)
+          throw new E(
+            "Kar\u015F\u0131 di\u015Flide di\u015F sivrilmi\u015F. Profil kayd\u0131rmay\u0131 azalt\u0131n veya di\u015F say\u0131s\u0131n\u0131 art\u0131r\u0131n.",
+          );
+        const V = (I.d + v.d) / 2,
+          S = L(I.at) + ((2 * (o.x + o.x2)) / (o.z + o.z2)) * Math.tan(q(o.a));
+        let W = V,
+          M = I.at;
+        if (Math.abs(o.x + o.x2) > 1e-9) {
+          let Na = I.at;
+          for (let Ha = 0; Ha < 60; Ha++) {
+            const Ka = L(Na) - S;
+            Na -= Ka / Math.pow(Math.tan(Na), 2);
+          }
+          ((M = Na), (W = (V * Math.cos(I.at)) / Math.cos(Na)));
+        }
+        const ua = aa * I.mt * Math.cos(I.at),
+          ga = I.da / 2,
+          Ia = v.da / 2,
+          $a = I.db / 2,
+          na = v.db / 2,
+          Da =
+            (Math.sqrt(Math.max(ga * ga - $a * $a, 0)) +
+              Math.sqrt(Math.max(Ia * Ia - na * na, 0)) -
+              W * Math.sin(M)) /
+            ua,
+          Aa = o.z2 / o.z,
+          da = o.n1 ? o.n1 / Aa : 0;
+        ((O.cift = {
+          z2: o.z2,
+          d2: v.d,
+          da2: v.da,
+          df2: v.df,
+          db2: v.db,
+          a0: V,
+          aw: W,
+          i: Aa,
+          n2: da,
+          eps: Da,
+          x2: o.x2,
+          sa2: v.sa,
+        }),
+          Da < 1.2 &&
+            O.uyarilar.push(
+              "Kavrama oran\u0131 " +
+                ha(Da, 2) +
+                " (1,2 alt\u0131); di\u015Fliler sessiz ve d\xFCzg\xFCn \xE7al\u0131\u015Fmayabilir.",
+            ),
+          W - (v.da / 2 + I.df / 2) < 0.1 * o.m * o.c &&
+            O.uyarilar.push(
+              "Di\u015F ba\u015F\u0131 ile kar\u015F\u0131 di\u015F dibi aras\u0131ndaki bo\u015Fluk \xE7ok az.",
+            ),
+          o.c === 0 &&
+            O.uyarilar.push("Bo\u015Fluk katsay\u0131s\u0131 0; di\u015Fliler s\u0131k\u0131\u015Fabilir."));
+      }
+      return O;
+    }
+    function fa(f) {
+      const o = f.mod,
+        d = [],
+        I = [];
+      let O;
+      if (o === "dis") {
+        const S = +f.z,
+          W = +f.da,
+          M = f.tip === "helisel" ? +f.beta : 0;
+        if (!(S >= 5) || !Number.isInteger(S))
+          throw new E("Di\u015F say\u0131s\u0131 en az 5 olan tam say\u0131 olmal\u0131.");
+        if (!(W > 0)) throw new E("D\u0131\u015F \xE7ap 0'dan b\xFCy\xFCk olmal\u0131.");
+        if (f.tip === "helisel" && !(M > 0 && M <= 45))
+          throw new E("Helis a\xE7\u0131s\u0131 0\xB0 ile 45\xB0 aras\u0131nda olmal\u0131.");
+        ((O = W / (S / Math.cos(q(M)) + 2)),
+          d.push(["Hesap", "m = D\u0131\u015F \xE7ap / (z" + (M ? " / cos\u03B2" : "") + " + 2)"]));
+      } else if (o === "adim") {
+        const S = +f.p;
+        if (!(S > 0)) throw new E("Ad\u0131m 0'dan b\xFCy\xFCk olmal\u0131.");
+        ((O = S / aa), d.push(["Hesap", "m = Ad\u0131m / \u03C0"]));
+      } else if (o === "eksen") {
+        const S = +f.a,
+          W = +f.z,
+          M = +f.z2;
+        if (!(S > 0) || !(W >= 5) || !(M >= 5))
+          throw new E("Eksen mesafesi ve iki di\u015Flinin di\u015F say\u0131s\u0131n\u0131 girin.");
+        ((O = (2 * S) / (W + M)), d.push(["Hesap", "m = 2 \xD7 Eksen mesafesi / (z1 + z2)"]));
+      } else throw new E("Hesap t\xFCr\xFCn\xFC se\xE7in.");
+      const v = F(O),
+        V = (Math.abs(O - v) / v) * 100;
+      return (
+        V > 3 &&
+          I.push(
+            "Hesaplanan de\u011Fer standart mod\xFCllere tam uymuyor (sapma %" +
+              ha(V, 1) +
+              "). \xD6l\xE7\xFCm\xFC kontrol edin; di\u015Fli profil kayd\u0131rmal\u0131, in\xE7 (diametral pitch) ya da \xF6zel \xFCretim olabilir" +
+              (o === "dis"
+                ? " veya di\u015F say\u0131s\u0131 yanl\u0131\u015F say\u0131lm\u0131\u015F olabilir."
+                : "."),
+          ),
+        { m: O, standart: v, sapma: V, ayrinti: d, dpi: 25.4 / O, uyarilar: I }
+      );
+    }
+    function G(f, o) {
+      o = o || 10;
+      const d = oa(f),
+        I = d.g,
+        O = d.gA,
+        v = I.z,
+        V = O.db / 2,
+        S = O.da / 2,
+        W = O.df / 2,
+        M = Math.max(V, W),
+        ua = O.st / O.d,
+        ga = (Da) => ua + L(O.at) - L(Math.acos(Math.min(V / Da, 1))),
+        Ia = [],
+        $a = (Da, Aa) => [Da * Math.cos(Aa), Da * Math.sin(Aa)],
+        na = (2 * aa) / v;
+      if (ga(M) > na / 2 - 1e-6)
+        throw new E(
+          "Di\u015F bo\u015Flu\u011Fu kapan\u0131yor; profil \xE7izilemiyor. Profil kayd\u0131rmay\u0131 azalt\u0131n.",
+        );
+      for (let Da = 0; Da < v; Da++) {
+        const Aa = Da * na,
+          da = ga(M);
+        W < V && Ia.push($a(W, Aa - da));
+        for (let Ua = 0; Ua <= o; Ua++) {
+          const ta = M + ((S - M) * Ua) / o;
+          Ia.push($a(ta, Aa - ga(ta)));
+        }
+        const Na = ga(S);
+        for (let Ua = 1; Ua < 4; Ua++) Ia.push($a(S, Aa - Na + (2 * Na * Ua) / 4));
+        for (let Ua = o; Ua >= 0; Ua--) {
+          const ta = M + ((S - M) * Ua) / o;
+          Ia.push($a(ta, Aa + ga(ta)));
+        }
+        W < V && Ia.push($a(W, Aa + da));
+        const Ha = Aa + da,
+          Ka = Aa + na - da;
+        for (let Ua = 1; Ua < 4; Ua++) Ia.push($a(W, Ha + ((Ka - Ha) * Ua) / 4));
+      }
+      return { pts: Ia, r: d };
+    }
+    function la(f) {
+      const o = G(f),
+        d = o.r,
+        I = [];
+      (I.push({ t: "poly", katman: "KESIM", kapali: !0, pts: o.pts }),
+        d.g.delik > 0 &&
+          I.push({ t: "arc", katman: "KESIM", cx: 0, cy: 0, r: d.g.delik / 2, a0: 0, a1: 360 }),
+        I.push({ t: "arc", katman: "REFERANS", cx: 0, cy: 0, r: d.d / 2, a0: 0, a1: 360 }));
+      const O = Math.max(d.m * 0.9, 2);
+      return (
+        I.push({
+          t: "text",
+          katman: "YAZI",
+          x: -d.da / 2,
+          y: -d.da / 2 - O * 2.4,
+          h: O,
+          metin:
+            "Disli m" +
+            ha(d.m, 3) +
+            " z" +
+            d.z +
+            " a" +
+            d.a +
+            (d.beta ? " b" + d.beta : "") +
+            (d.x ? " x" + d.x : "") +
+            " | d " +
+            ha(d.d, 3) +
+            " da " +
+            ha(d.da, 3) +
+            " df " +
+            ha(d.df, 3),
+        }),
+        d.beta &&
+          I.push({
+            t: "text",
+            katman: "YAZI",
+            x: -d.da / 2,
+            y: -d.da / 2 - O * 4,
+            h: O * 0.8,
+            metin: "Enine kesit profili (helisel dislinin on yuz konturu)",
+          }),
+        La.dxfYaz(
+          [
+            { ad: "KESIM", renk: 7 },
+            { ad: "REFERANS", renk: 1, cizgi: "DASHED" },
+            { ad: "YAZI", renk: 5 },
+          ],
+          I,
+        )
+      );
+    }
+    function Ma(f) {
+      const o = (I, O) => (I === void 0 || I === "" || I === null || isNaN(I) ? O : +I),
+        d = {
+          tip: f.tip === "helisel" ? "helisel" : "duz",
+          m: o(f.m, 0),
+          a: o(f.aci, 20),
+          beta: f.tip === "helisel" ? o(f.beta, 0) : 0,
+          L: o(f.L, 0),
+          N: o(f.N, 0),
+          z: o(f.z, 0),
+          x: o(f.x, 0),
+          n1: o(f.n1, 0),
+          H: o(f.H, 0),
+          b: o(f.b, 0),
+        };
+      if (!(d.m > 0) || d.m > 50) throw new E("Mod\xFCl 0 ile 50 mm aras\u0131nda olmal\u0131.");
+      if (!(d.a >= 10 && d.a <= 30))
+        throw new E(
+          "Bas\u0131n\xE7 a\xE7\u0131s\u0131 10\xB0 ile 30\xB0 aras\u0131nda olmal\u0131 (standart 20\xB0).",
+        );
+      if (d.tip === "helisel" && !(d.beta > 0 && d.beta <= 45))
+        throw new E("Helis a\xE7\u0131s\u0131 0\xB0 ile 45\xB0 aras\u0131nda olmal\u0131.");
+      if (d.N && (!Number.isInteger(d.N) || d.N < 1 || d.N > 2e3))
+        throw new E("Di\u015F say\u0131s\u0131 1 ile 2000 aras\u0131nda tam say\u0131 olmal\u0131.");
+      if (d.L < 0 || d.L > 2e4) throw new E("Boy 0 ile 20.000 mm aras\u0131nda olmal\u0131.");
+      if (!d.N && !d.L) throw new E("Kremayer boyunu (mm) veya di\u015F say\u0131s\u0131n\u0131 girin.");
+      if (d.z && (!Number.isInteger(d.z) || d.z < 5 || d.z > 500))
+        throw new E("Pinyon di\u015F say\u0131s\u0131 5 ile 500 aras\u0131nda tam say\u0131 olmal\u0131.");
+      if (d.H < 0 || d.b < 0) throw new E("\xD6l\xE7\xFCler negatif olamaz.");
+      return d;
+    }
+    function za(f) {
+      const o = Ma(f),
+        d = o.m,
+        I = Math.cos(q(o.beta)),
+        O = Math.atan(Math.tan(q(o.a)) / I),
+        v = Math.tan(O),
+        V = (aa * d) / I,
+        S = aa * d,
+        W = d,
+        M = 1.25 * d,
+        ua = W + M,
+        ga = o.N || Math.floor(o.L / V + 1e-9),
+        Ia = ga * V,
+        $a = o.N ? 0 : o.L - Ia;
+      if (ga < 1) throw new E("Bu boyda en az bir di\u015F s\u0131\u011Fm\u0131yor; boyu art\u0131r\u0131n.");
+      const na = {
+        g: o,
+        m: d,
+        a: o.a,
+        at: ca(O),
+        beta: o.beta,
+        pt: V,
+        pn: S,
+        ha: W,
+        hf: M,
+        h: ua,
+        s: V / 2,
+        sa: V / 2 - 2 * W * v,
+        N: ga,
+        boy: Ia,
+        artik: $a,
+        kalinlik: o.H ? o.H + ua : 0,
+        uyarilar: [],
+      };
+      if (
+        (na.sa <= 0.05 * d &&
+          na.uyarilar.push(
+            "Di\u015F ucu \xE7ok sivri kald\u0131; bas\u0131n\xE7 a\xE7\u0131s\u0131n\u0131 azaltmay\u0131 d\xFC\u015F\xFCn\xFCn.",
+          ),
+        o.beta && (na.hatveGecis = null),
+        o.z)
+      ) {
+        const Da = (o.z * d) / I,
+          Aa = Da / 2 + o.x * d;
+        ((na.pinyon = {
+          z: o.z,
+          d: Da,
+          da: Da + 2 * (W + o.x) * d,
+          tur: aa * Da,
+          eksen: Aa,
+          sirt: o.H ? Aa + M + o.H : 0,
+          hiz: o.n1 ? (o.n1 * aa * Da) / 1e3 : 0,
+          n1: o.n1,
+          x: o.x,
+          dis: V,
+        }),
+          (na.pinyon.turSayisi = Ia / na.pinyon.tur),
+          o.z < 17 &&
+            !o.x &&
+            !o.beta &&
+            na.uyarilar.push(
+              "Pinyon " +
+                o.z +
+                " di\u015Fli: 17 di\u015Fin alt\u0131nda standart pinyonda di\u015F dibinde oyulma olabilir; profil kayd\u0131rma d\xFC\u015F\xFCn\xFCn.",
+            ));
+      }
+      return na;
+    }
+    function B(f) {
+      const o = za(f),
+        d = Math.min(o.N, 300),
+        I = o.pt,
+        O = Math.tan(q(o.at)),
+        v = o.g.H || 1.5 * o.m * 2,
+        V = -(o.hf + v),
+        S = [],
+        W = [
+          [0, V],
+          [0, -o.hf],
+        ];
+      for (let ua = 0; ua < d; ua++) {
+        const ga = ua * I + I / 2,
+          Ia = I / 4 + o.hf * O,
+          $a = I / 4 - o.ha * O;
+        W.push([ga - Ia, -o.hf], [ga - $a, o.ha], [ga + $a, o.ha], [ga + Ia, -o.hf]);
+      }
+      (W.push([d * I, -o.hf], [d * I, V]),
+        S.push({ t: "poly", katman: "KESIM", kapali: !0, pts: W.map((ua) => [ha(ua[0], 4), ha(ua[1], 4)]) }),
+        S.push({ t: "line", katman: "REFERANS", x1: 0, y1: 0, x2: d * I, y2: 0 }));
+      const M = Math.max(o.m * 0.9, 2);
+      return (
+        S.push({
+          t: "text",
+          katman: "YAZI",
+          x: 0,
+          y: V - M * 2,
+          h: M,
+          metin:
+            "Kremayer m" +
+            ha(o.m, 3) +
+            " a" +
+            o.a +
+            (o.beta ? " b" + o.beta : "") +
+            " | " +
+            d +
+            " dis | adim " +
+            ha(I, 3) +
+            " | boy " +
+            ha(d * I, 2),
+        }),
+        La.dxfYaz(
+          [
+            { ad: "KESIM", renk: 7 },
+            { ad: "REFERANS", renk: 1, cizgi: "DASHED" },
+            { ad: "YAZI", renk: 5 },
+          ],
+          S,
+        )
+      );
+    }
+    La.disli = { STANDART: Ta, hesapla: oa, modulBul: fa, profil: G, dxf: la, kremayer: za, kremayerDxf: B };
+  })(),
+  (function () {
+    "use strict";
+    const La = typeof module != "undefined" && module.exports ? require("./core.js") : self.Cekirdek,
+      E = La.GirdiHatasi,
+      aa = Math.PI,
+      q = [
+        ["celik", "\xC7elik", 7.85],
+        ["paslanmaz304", "Paslanmaz \xE7elik 304", 7.93],
+        ["paslanmaz316", "Paslanmaz \xE7elik 316", 7.98],
+        ["aluminyum", "Al\xFCminyum", 2.7],
+        ["bakir", "Bak\u0131r", 8.96],
+        ["pirinc", "Pirin\xE7", 8.5],
+        ["bronz", "Bronz", 8.8],
+        ["aluminyum6061", "Al\xFCminyum 6061 / 7075 (2,70\u20132,81)", 2.75],
+        ["titan", "Titanyum", 4.51],
+        ["cinko", "\xC7inko", 7.14],
+        ["dokum", "D\xF6kme demir", 7.2],
+        ["dokumsfero", "Sfero d\xF6k\xFCm (GGG)", 7.1],
+        ["paslanmaz430", "Paslanmaz \xE7elik 430", 7.7],
+        ["kursun", "Kur\u015Fun", 11.34],
+        ["nikel", "Nikel", 8.9],
+        ["kalay", "Kalay", 7.29],
+        ["magnezyum", "Magnezyum", 1.74],
+        ["tungsten", "Tungsten", 19.25],
+        ["altin", "Alt\u0131n", 19.32],
+        ["gumus", "G\xFCm\xFC\u015F", 10.49],
+        ["poliamid", "Poliamid (PA6, naylon)", 1.14],
+        ["pom", "POM (Delrin)", 1.41],
+        ["pe", "Polietilen (PE-HD)", 0.95],
+        ["pvc", "PVC", 1.4],
+        ["teflon", "Teflon (PTFE)", 2.2],
+        ["pleksi", "Pleksiglas (PMMA)", 1.18],
+        ["cam", "Cam", 2.5],
+        ["beton", "Beton", 2.4],
+        ["ahsap", "Ah\u015Fap (me\u015Fe ~0,75)", 0.75],
+        ["ozel", "\xD6zel (yo\u011Funlu\u011Fu kendim girece\u011Fim)", 0],
+      ],
+      ca = {
+        IPE: {
+          80: 6,
+          100: 8.1,
+          120: 10.4,
+          140: 12.9,
+          160: 15.8,
+          180: 18.8,
+          200: 22.4,
+          220: 26.2,
+          240: 30.7,
+          270: 36.1,
+          300: 42.2,
+          330: 49.1,
+          360: 57.1,
+          400: 66.3,
+          450: 77.6,
+          500: 90.7,
+          550: 106,
+          600: 122,
+        },
+        HEA: {
+          100: 16.7,
+          120: 19.9,
+          140: 24.7,
+          160: 30.4,
+          180: 35.5,
+          200: 42.3,
+          220: 50.5,
+          240: 60.3,
+          260: 68.2,
+          280: 76.4,
+          300: 88.3,
+        },
+        HEB: {
+          100: 20.4,
+          120: 26.7,
+          140: 33.7,
+          160: 42.6,
+          180: 51.2,
+          200: 61.3,
+          220: 71.5,
+          240: 83.2,
+          260: 93,
+          280: 103,
+          300: 117,
+        },
+        UPN: {
+          50: 5.59,
+          65: 7.09,
+          80: 8.64,
+          100: 10.6,
+          120: 13.4,
+          140: 16,
+          160: 18.8,
+          180: 22,
+          200: 25.3,
+          220: 29.4,
+          240: 33.2,
+          260: 37.9,
+          280: 41.8,
+          300: 46.2,
+        },
+      },
+      L = (B, f, o, d, I, O) => ({ id: B, ad: f, birim: o, v: d, min: I === void 0 ? 0 : I, harfsiz: !!O }),
+      Ta = [
+        L("dn", "Delik adedi (iste\u011Fe ba\u011Fl\u0131)", "adet", 0, 0, !0),
+        L("dd", "Delik \xE7ap\u0131", "mm", 0, 0, !0),
+      ],
+      F = (B, f, o) => {
+        const d = Number(B.dn) || 0,
+          I = Number(B.dd) || 0;
+        if (d < 0 || !Number.isInteger(d) || d > 1e4)
+          throw new E("Delik adedi 0 ile 10.000 aras\u0131nda tam say\u0131 olmal\u0131.");
+        if (!d) return { vh: 0, ek: [] };
+        if (!(I > 0)) throw new E("Delik \xE7ap\u0131n\u0131 girin.");
+        const O = ((d * aa) / 4) * I * I * f;
+        if (O >= o * f) throw new E("Deliklerin toplam alan\u0131 par\xE7adan b\xFCy\xFCk olamaz.");
+        return {
+          vh: O,
+          ek: [
+            ["Delikler", d + " adet \xD8" + I + " mm"],
+            ["Delik a\u011F\u0131rl\u0131\u011F\u0131 (\xE7\u0131kar\u0131ld\u0131)", null],
+          ],
+          n: d,
+          d: I,
+        };
+      },
+      ha = (B, f, o, d) => ({ id: B, ad: f, v: o, sec: d }),
+      J = (B, f, o, d, I) => {
+        const O = Number(B[f]);
+        if (B[f] === "" || B[f] === void 0 || !isFinite(O))
+          throw new E(o + " i\xE7in ge\xE7erli bir say\u0131 girin.");
+        if (O < (d === void 0 ? 0 : d) || (d === void 0 && O <= 0))
+          throw new E(o + " 0'dan b\xFCy\xFCk olmal\u0131.");
+        if (d !== void 0 && O < d) throw new E(o + " en az " + d + " olmal\u0131.");
+        if (I !== void 0 && O > I) throw new E(o + " en fazla " + I + " olmal\u0131.");
+        return O;
+      },
+      ba = (B, f, o, d, I, O, v) => {
+        const V = f * o,
+          S = (V * d) / 1e6,
+          W = S * I;
+        return {
+          ad: B,
+          kesit: f / 100,
+          hacim: V / 1e3,
+          kg: S,
+          top: W,
+          kgm: o > 0 ? (f * d) / 1e3 : 0,
+          adet: I,
+          yuz: O === void 0 ? null : (O * I) / 1e6,
+          ekstra: v || [],
+        };
+      },
+      oa = [
+        {
+          grup: "Levha ve sac",
+          id: "sac",
+          ad: "Sac / levha",
+          alan: [
+            L("en", "Geni\u015Flik", "mm", 1e3, 0.01),
+            L("bo", "Boy", "mm", 2e3, 0.01),
+            L("t", "Kal\u0131nl\u0131k", "mm", 3, 0.01),
+            ...Ta,
+          ],
+          hesap: (B) => {
+            const f = J(B, "en", "Geni\u015Flik"),
+              o = J(B, "bo", "Boy"),
+              d = J(B, "t", "Kal\u0131nl\u0131k"),
+              I = F(B, d, f * o);
+            return {
+              alan: f * d - I.vh / o,
+              boy: o,
+              yuz: 2 * f * o,
+              vh: I.vh,
+              ek: I.ek.concat([
+                ["Levha alan\u0131 (tek y\xFCz)", ((f * o) / 1e6).toFixed(3) + " m\xB2"],
+                ["m\xB2 a\u011F\u0131rl\u0131\u011F\u0131", null],
+              ]),
+            };
+          },
+        },
+        {
+          grup: "Levha ve sac",
+          id: "disk",
+          ad: "Daire / flan\u015F (delikli olabilir)",
+          alan: [
+            L("D", "D\u0131\u015F \xE7ap", "mm", 300, 0.01),
+            L("d", "Delik \xE7ap\u0131 (0 = yok)", "mm", 100, 0),
+            L("t", "Kal\u0131nl\u0131k", "mm", 10, 0.01),
+            L("dn", "C\u0131vata deli\u011Fi adedi (iste\u011Fe ba\u011Fl\u0131)", "adet", 0, 0, !0),
+            L("dd", "C\u0131vata deli\u011Fi \xE7ap\u0131", "mm", 0, 0, !0),
+          ],
+          hesap: (B) => {
+            const f = J(B, "D", "D\u0131\u015F \xE7ap"),
+              o = Number(B.d) || 0,
+              d = J(B, "t", "Kal\u0131nl\u0131k");
+            if (o < 0 || o >= f)
+              throw new E("Delik \xE7ap\u0131, d\u0131\u015F \xE7aptan k\xFC\xE7\xFCk olmal\u0131.");
+            const I = (aa / 4) * (f * f - o * o),
+              O = F(B, d, I);
+            return { alan: I - O.vh / d, boy: d, yuz: 2 * I + aa * (f + o) * d, vh: O.vh, ek: O.ek };
+          },
+        },
+        {
+          grup: "Boru",
+          id: "boru",
+          ad: "Yuvarlak boru",
+          alan: [
+            L("D", "D\u0131\u015F \xE7ap", "mm", 88.9, 0.01),
+            L("t", "Et kal\u0131nl\u0131\u011F\u0131", "mm", 3.2, 0.01),
+            L("bo", "Boy", "mm", 6e3, 0.01),
+          ],
+          hesap: (B) => {
+            const f = J(B, "D", "D\u0131\u015F \xE7ap"),
+              o = J(B, "t", "Et kal\u0131nl\u0131\u011F\u0131"),
+              d = J(B, "bo", "Boy");
+            if (2 * o >= f)
+              throw new E("Et kal\u0131nl\u0131\u011F\u0131 \xE7apa g\xF6re \xE7ok b\xFCy\xFCk.");
+            const I = f - 2 * o;
+            return {
+              alan: (aa / 4) * (f * f - I * I),
+              boy: d,
+              yuz: aa * f * d,
+              ek: [["\u0130\xE7 \xE7ap", I.toFixed(2) + " mm"]],
+            };
+          },
+        },
+        {
+          grup: "Boru",
+          id: "kutu",
+          ad: "Kare / dikd\xF6rtgen boru (profil)",
+          alan: [
+            L("a", "Geni\u015Flik", "mm", 60, 0.01),
+            L("b", "Y\xFCkseklik", "mm", 40, 0.01),
+            L("t", "Et kal\u0131nl\u0131\u011F\u0131", "mm", 3, 0.01),
+            L("bo", "Boy", "mm", 6e3, 0.01),
+          ],
+          hesap: (B) => {
+            const f = J(B, "a", "Geni\u015Flik"),
+              o = J(B, "b", "Y\xFCkseklik"),
+              d = J(B, "t", "Et kal\u0131nl\u0131\u011F\u0131"),
+              I = J(B, "bo", "Boy");
+            if (2 * d >= Math.min(f, o))
+              throw new E("Et kal\u0131nl\u0131\u011F\u0131 \xF6l\xE7\xFClere g\xF6re \xE7ok b\xFCy\xFCk.");
+            const O = d <= 6 ? 1.5 * d : d <= 10 ? 2 * d : 2.5 * d,
+              v = Math.max(O - d, 0);
+            return {
+              alan: 2 * d * (f + o - 2 * d) - (4 - aa) * (O * O - v * v),
+              boy: I,
+              yuz: 2 * (f + o) * I,
+              ek: [["K\xF6\u015Fe d\u0131\u015F rady\xFCs\xFC (EN 10219)", O.toFixed(2) + " mm"]],
+            };
+          },
+        },
+        {
+          grup: "Dolu malzeme",
+          id: "mil",
+          ad: "Yuvarlak dolu (mil)",
+          alan: [L("D", "\xC7ap", "mm", 30, 0.01), L("bo", "Boy", "mm", 1e3, 0.01)],
+          hesap: (B) => {
+            const f = J(B, "D", "\xC7ap"),
+              o = J(B, "bo", "Boy");
+            return { alan: (aa / 4) * f * f, boy: o, yuz: aa * f * o, ek: [] };
+          },
+        },
+        {
+          grup: "Dolu malzeme",
+          id: "karedolu",
+          ad: "Kare dolu",
+          alan: [L("a", "Kenar", "mm", 30, 0.01), L("bo", "Boy", "mm", 1e3, 0.01)],
+          hesap: (B) => {
+            const f = J(B, "a", "Kenar"),
+              o = J(B, "bo", "Boy");
+            return { alan: f * f, boy: o, yuz: 4 * f * o, ek: [] };
+          },
+        },
+        {
+          grup: "Dolu malzeme",
+          id: "lama",
+          ad: "Lama (yass\u0131 demir)",
+          alan: [
+            L("a", "Geni\u015Flik", "mm", 40, 0.01),
+            L("t", "Kal\u0131nl\u0131k", "mm", 5, 0.01),
+            L("bo", "Boy", "mm", 6e3, 0.01),
+            ...Ta,
+          ],
+          hesap: (B) => {
+            const f = J(B, "a", "Geni\u015Flik"),
+              o = J(B, "t", "Kal\u0131nl\u0131k"),
+              d = J(B, "bo", "Boy"),
+              I = F(B, o, f * d);
+            return { alan: f * o - I.vh / d, boy: d, yuz: 2 * (f + o) * d, vh: I.vh, ek: I.ek };
+          },
+        },
+        {
+          grup: "Dolu malzeme",
+          id: "alti",
+          ad: "Alt\u0131gen dolu",
+          alan: [
+            L("af", "Kar\u015F\u0131l\u0131kl\u0131 kenar mesafesi", "mm", 24, 0.01),
+            L("bo", "Boy", "mm", 1e3, 0.01),
+          ],
+          hesap: (B) => {
+            const f = J(B, "af", "Kar\u015F\u0131l\u0131kl\u0131 kenar"),
+              o = J(B, "bo", "Boy");
+            return { alan: (Math.sqrt(3) / 2) * f * f, boy: o, yuz: ((6 * f) / Math.sqrt(3)) * o, ek: [] };
+          },
+        },
+        {
+          grup: "Dolu malzeme",
+          id: "kure",
+          ad: "K\xFCre",
+          alan: [L("D", "\xC7ap", "mm", 100, 0.01)],
+          hesap: (B) => {
+            const f = J(B, "D", "\xC7ap");
+            return { alan: (aa / 6) * f * f, boy: f, yuz: aa * f * f, ek: [] };
+          },
+        },
+        {
+          grup: "Profil",
+          id: "kose",
+          ad: "K\xF6\u015Febent (L)",
+          alan: [
+            L("a", "Kol 1", "mm", 50, 0.01),
+            L("b", "Kol 2", "mm", 50, 0.01),
+            L("t", "Kal\u0131nl\u0131k", "mm", 5, 0.01),
+            L("bo", "Boy", "mm", 6e3, 0.01),
+          ],
+          hesap: (B) => {
+            const f = J(B, "a", "Kol 1"),
+              o = J(B, "b", "Kol 2"),
+              d = J(B, "t", "Kal\u0131nl\u0131k"),
+              I = J(B, "bo", "Boy");
+            if (d >= Math.min(f, o))
+              throw new E("Kal\u0131nl\u0131k kol \xF6l\xE7\xFClerinden k\xFC\xE7\xFCk olmal\u0131.");
+            return {
+              alan: d * (f + o - d),
+              boy: I,
+              yuz: 2 * (f + o) * I,
+              ek: [["Not", "K\xF6\u015Fe yuvarlakl\u0131klar\u0131 ihmal edildi"]],
+            };
+          },
+        },
+        {
+          grup: "Profil",
+          id: "ibeam",
+          ad: "I / H profil (\xF6l\xE7\xFCyle)",
+          alan: [
+            L("h", "Y\xFCkseklik", "mm", 200, 0.01),
+            L("b", "Ba\u015Fl\u0131k geni\u015Fli\u011Fi", "mm", 100, 0.01),
+            L("tw", "G\xF6vde kal\u0131nl\u0131\u011F\u0131", "mm", 5.6, 0.01),
+            L("tf", "Ba\u015Fl\u0131k kal\u0131nl\u0131\u011F\u0131", "mm", 8.5, 0.01),
+            L("bo", "Boy", "mm", 6e3, 0.01),
+          ],
+          hesap: (B) => {
+            const f = J(B, "h", "Y\xFCkseklik"),
+              o = J(B, "b", "Ba\u015Fl\u0131k geni\u015Fli\u011Fi"),
+              d = J(B, "tw", "G\xF6vde kal\u0131nl\u0131\u011F\u0131"),
+              I = J(B, "tf", "Ba\u015Fl\u0131k kal\u0131nl\u0131\u011F\u0131"),
+              O = J(B, "bo", "Boy");
+            if (2 * I >= f || d >= o)
+              throw new E("Kal\u0131nl\u0131klar \xF6l\xE7\xFClere g\xF6re \xE7ok b\xFCy\xFCk.");
+            return {
+              alan: 2 * o * I + (f - 2 * I) * d,
+              boy: O,
+              yuz: (4 * o + 2 * f - 2 * d) * O,
+              ek: [["Not", "K\xF6k yuvarlakl\u0131klar\u0131 ihmal edildi"]],
+            };
+          },
+        },
+        {
+          grup: "Profil",
+          id: "ukanal",
+          ad: "U profil (\xF6l\xE7\xFCyle)",
+          alan: [
+            L("h", "Y\xFCkseklik", "mm", 100, 0.01),
+            L("b", "Ba\u015Fl\u0131k geni\u015Fli\u011Fi", "mm", 50, 0.01),
+            L("tw", "G\xF6vde kal\u0131nl\u0131\u011F\u0131", "mm", 6, 0.01),
+            L("tf", "Ba\u015Fl\u0131k kal\u0131nl\u0131\u011F\u0131", "mm", 8.5, 0.01),
+            L("bo", "Boy", "mm", 6e3, 0.01),
+          ],
+          hesap: (B) => {
+            const f = J(B, "h", "Y\xFCkseklik"),
+              o = J(B, "b", "Ba\u015Fl\u0131k geni\u015Fli\u011Fi"),
+              d = J(B, "tw", "G\xF6vde kal\u0131nl\u0131\u011F\u0131"),
+              I = J(B, "tf", "Ba\u015Fl\u0131k kal\u0131nl\u0131\u011F\u0131"),
+              O = J(B, "bo", "Boy");
+            if (2 * I >= f || d >= o)
+              throw new E("Kal\u0131nl\u0131klar \xF6l\xE7\xFClere g\xF6re \xE7ok b\xFCy\xFCk.");
+            return {
+              alan: f * d + 2 * (o - d) * I,
+              boy: O,
+              yuz: (2 * o + 2 * f) * O,
+              ek: [["Not", "K\xF6k yuvarlakl\u0131klar\u0131 ihmal edildi"]],
+            };
+          },
+        },
+        {
+          grup: "Profil",
+          id: "tprofil",
+          ad: "T profil",
+          alan: [
+            L("h", "Y\xFCkseklik", "mm", 60, 0.01),
+            L("b", "Ba\u015Fl\u0131k geni\u015Fli\u011Fi", "mm", 60, 0.01),
+            L("tw", "G\xF6vde kal\u0131nl\u0131\u011F\u0131", "mm", 7, 0.01),
+            L("tf", "Ba\u015Fl\u0131k kal\u0131nl\u0131\u011F\u0131", "mm", 7, 0.01),
+            L("bo", "Boy", "mm", 6e3, 0.01),
+          ],
+          hesap: (B) => {
+            const f = J(B, "h", "Y\xFCkseklik"),
+              o = J(B, "b", "Ba\u015Fl\u0131k geni\u015Fli\u011Fi"),
+              d = J(B, "tw", "G\xF6vde kal\u0131nl\u0131\u011F\u0131"),
+              I = J(B, "tf", "Ba\u015Fl\u0131k kal\u0131nl\u0131\u011F\u0131"),
+              O = J(B, "bo", "Boy");
+            if (I >= f || d >= o)
+              throw new E("Kal\u0131nl\u0131klar \xF6l\xE7\xFClere g\xF6re \xE7ok b\xFCy\xFCk.");
+            return {
+              alan: o * I + (f - I) * d,
+              boy: O,
+              yuz: (2 * f + 2 * o) * O,
+              ek: [["Not", "K\xF6k yuvarlakl\u0131klar\u0131 ihmal edildi"]],
+            };
+          },
+        },
+        {
+          grup: "Standart profil (tablo)",
+          id: "std",
+          ad: "IPE \xB7 HEA \xB7 HEB \xB7 UPN",
+          alan: [
+            ha(
+              "seri",
+              "Seri",
+              "IPE",
+              Object.keys(ca).map((B) => [B, B]),
+            ),
+            ha("olcu", "\xD6l\xE7\xFC", "200", []),
+            L("bo", "Boy", "mm", 6e3, 0.01),
+          ],
+          hesap: (B) => {
+            const f = ca[B.seri];
+            if (!f) throw new E("Seri se\xE7in.");
+            const o = f[B.olcu];
+            if (!o) throw new E("Bu seride " + B.olcu + " \xF6l\xE7\xFCs\xFC yok.");
+            const d = J(B, "bo", "Boy");
+            return { kgmDogrudan: o, boy: d, ek: [["Katalog de\u011Feri", o + " kg/m (\xE7elik)"]] };
+          },
+        },
+      ];
+    function fa(B, f) {
+      const o = oa.find((W) => W.id === B);
+      if (!o) throw new E("Bilinmeyen \u015Fekil.");
+      let d;
+      const I = q.find((W) => W[0] === f.mal);
+      if (!I) throw new E("Malzeme se\xE7in.");
+      if (((d = I[0] === "ozel" ? Number(f.rho) : I[2]), !(d > 0)))
+        throw new E("Yo\u011Funluk 0'dan b\xFCy\xFCk olmal\u0131.");
+      const O = Math.round(Number(f.adet) || 1);
+      if (O < 1 || O > 1e5) throw new E("Adet 1 ile 100.000 aras\u0131nda olmal\u0131.");
+      const v = o.hesap(f);
+      let V;
+      if (v.kgmDogrudan) {
+        const W = (v.kgmDogrudan * d) / 7.85,
+          M = (W * v.boy) / 1e3;
+        ((V = {
+          ad: o.ad,
+          kesit: ((((W / d) * 1e3) / 100) * 1e3) / 1e3,
+          hacim: (M / d) * 1e3,
+          kg: M,
+          top: M * O,
+          kgm: W,
+          adet: O,
+          yuz: null,
+          ekstra: v.ek,
+        }),
+          (V.kesit = (W / d) * 10));
+      } else V = ba(o.ad, v.alan, v.boy, d, O, v.yuz, v.ek);
+      ((V.rho = d), (V.malAd = I[1]), (B === "disk" || B === "kure") && (V.kgm = 0));
+      const S = Number(f.fiyat);
+      return (
+        S > 0 && (V.maliyet = V.top * S),
+        (V.ekstra = V.ekstra.map((W) =>
+          W[1] === null
+            ? W[0] === "m\xB2 a\u011F\u0131rl\u0131\u011F\u0131"
+              ? [
+                  W[0],
+                  ((V.kg + ((v.vh || 0) * d) / 1e6) / ((Number(f.en) * Number(f.bo)) / 1e6)).toFixed(2) +
+                    " kg/m\xB2" +
+                    (v.vh ? " (deliksiz)" : ""),
+                ]
+              : [W[0], ((v.vh * d) / 1e6).toFixed(3) + " kg / par\xE7a"]
+            : W,
+        )),
+        V
+      );
+    }
+    const G = {
+        sac: ["en", "bo", "t"],
+        disk: ["D", "d", "t"],
+        boru: ["D", "t", "bo"],
+        kutu: ["a", "b", "t", "bo"],
+        mil: ["D", "bo"],
+        karedolu: ["a", "bo"],
+        lama: ["a", "t", "bo"],
+        alti: ["af", "bo"],
+        kure: ["D"],
+        kose: ["a", "b", "t", "bo"],
+        ibeam: ["h", "b", "tw", "tf", "bo"],
+        ukanal: ["h", "b", "tw", "tf", "bo"],
+        tprofil: ["h", "b", "tw", "tf", "bo"],
+        std: ["bo"],
+      },
+      la = {
+        ink: "var(--ink)",
+        fill: "var(--accent-soft)",
+        acc: "var(--accent)",
+        pan: "var(--panel)",
+        mut: "var(--mut)",
+      },
+      Ma = { ink: "#0b0f17", fill: "#dfe8ff", acc: "#1638d4", pan: "#ffffff", mut: "#5a6b8c" };
+    function za(B, f) {
+      f = f || {};
+      const o = f.pal || la,
+        d = !!f.mini,
+        I = f.seri || "IPE",
+        O = (ta, ra, ia) =>
+          `style="fill:${ta};stroke:${ra};stroke-width:${ia === void 0 ? 2 : ia};stroke-linejoin:round"`,
+        v = (ta, ra) => `<path d="${ta}" ${O(o.fill, o.ink)} ${ra || ""}/>`,
+        V = (ta, ra, ia, ka, xa, Ea) =>
+          `<rect x="${ta}" y="${ra}" width="${ia}" height="${ka}"${xa ? ` rx="${xa}"` : ""} ${O(Ea || o.fill, o.ink)}/>`,
+        S = (ta, ra, ia, ka) => `<circle cx="${ta}" cy="${ra}" r="${ia}" ${O(ka || o.fill, o.ink)}/>`,
+        W = (ta, ra, ia, ka, xa, Ea, Oa) =>
+          `<line x1="${ta}" y1="${ra}" x2="${ia}" y2="${ka}" style="stroke:${xa};stroke-width:${Ea};${Oa ? "stroke-dasharray:" + Oa : ""}"/>`,
+        M = (ta, ra, ia, ka) => (d ? "" : W(ta, ra, ia, ka, o.mut, 0.8)),
+        ua = Math.min(Math.max(Math.round(f.delik || 0), 0), 48),
+        ga = (ta, ra) => Math.max(1.6, Math.min(5, ra / Math.sqrt(Math.max(ta, 1)))),
+        Ia = (ta, ra, ia, ka) => {
+          if (!ua) return "";
+          const xa = Math.max(1, Math.round(Math.sqrt((ua * ia) / ka))),
+            Ea = Math.ceil(ua / xa);
+          let Oa = "";
+          for (let ja = 0; ja < ua; ja++) {
+            const Xa = ja % xa,
+              _a = Math.floor(ja / xa),
+              Wa = ta + (xa === 1 ? ia / 2 : (Xa * ia) / (xa - 1)),
+              u = ra + (Ea === 1 ? ka / 2 : (_a * ka) / (Ea - 1));
+            Oa += S(Wa, u, Math.min(5, ia / xa / 3, ka / Ea / 3), o.pan);
+          }
+          return Oa;
+        },
+        $a = (ta, ra, ia) => {
+          if (!ua) return "";
+          let ka = "";
+          const xa = Math.min(5, (ia * Math.PI) / ua / 2.4);
+          for (let Ea = 0; Ea < ua; Ea++) {
+            const Oa = -Math.PI / 2 + (2 * Math.PI * Ea) / ua;
+            ka += S(ta + ia * Math.cos(Oa), ra + ia * Math.sin(Oa), Math.max(1.6, xa), o.pan);
+          }
+          return ka;
+        },
+        na = (ta, ra, ia) => {
+          if (!ua) return "";
+          let ka = "";
+          const xa = Math.max(1.6, Math.min(5, ia / ua / 2.6));
+          for (let Ea = 0; Ea < ua; Ea++) ka += S(ta + (ia * (Ea + 0.5)) / ua, ra, xa, o.pan);
+          return ka;
+        },
+        Da = (ta, ra, ia) =>
+          `<circle cx="${ta}" cy="${ra}" r="9" style="fill:${o.acc}"/><text x="${ta}" y="${ra + 4}" text-anchor="middle" style="fill:#fff;font:700 11px Arial,sans-serif">${ia}</text>`,
+        Aa = (ta, ra, ia) =>
+          ia ? W(ta, ra - 4, ta, ra + 4, o.acc, 1.6) : W(ta - 4, ra, ta + 4, ra, o.acc, 1.6),
+        da = (ta, ra, ia, ka, xa, Ea) =>
+          d
+            ? ""
+            : W(ta, ia, ra, ia, o.acc, 1.6) +
+              Aa(ta, ia, 1) +
+              Aa(ra, ia, 1) +
+              (xa !== void 0
+                ? W((ta + ra) / 2, ia, xa, Ea, o.acc, 1) + Da(xa, Ea, ka)
+                : Da((ta + ra) / 2, ia, ka)),
+        Na = (ta, ra, ia, ka, xa, Ea) =>
+          d
+            ? ""
+            : W(ia, ta, ia, ra, o.acc, 1.6) +
+              Aa(ia, ta, 0) +
+              Aa(ia, ra, 0) +
+              (xa !== void 0
+                ? W(ia, (ta + ra) / 2, xa, Ea, o.acc, 1) + Da(xa, Ea, ka)
+                : Da(ia, (ta + ra) / 2, ka)),
+        Ha = (ta, ra, ia, ka, xa, Ea) =>
+          V(ta, ra, ia, ka, 0) +
+          (Ea || "") +
+          M(ta, ra + ka, ta, ra + ka + 18) +
+          M(ta + ia, ra + ka, ta + ia, ra + ka + 18) +
+          da(ta, ta + ia, ra + ka + 16, xa);
+      let Ka = "";
+      switch (B) {
+        case "sac":
+          Ka =
+            V(40, 25, 120, 80) +
+            Ia(50, 35, 100, 60) +
+            M(40, 105, 40, 126) +
+            M(160, 105, 160, 126) +
+            da(40, 160, 122, "A") +
+            M(36, 25, 18, 25) +
+            M(36, 105, 18, 105) +
+            Na(25, 105, 22, "B") +
+            V(190, 25, 12, 80) +
+            M(190, 25, 190, 12) +
+            M(202, 25, 202, 12) +
+            da(190, 202, 16, "C", 196, 5);
+          break;
+        case "disk":
+          Ka =
+            S(95, 80, 60) +
+            (f.merkez === !1 ? "" : S(95, 80, 24, o.pan)) +
+            $a(95, 80, f.merkez === !1 ? 38 : 42) +
+            M(35, 80, 35, 150) +
+            M(155, 80, 155, 150) +
+            da(35, 155, 146, "A") +
+            (f.merkez === !1 ? "" : da(71, 119, 80, "B")) +
+            V(195, 30, 14, 100) +
+            M(195, 30, 195, 18) +
+            M(209, 30, 209, 18) +
+            da(195, 209, 22, "C", 202, 8);
+          break;
+        case "boru":
+          Ka =
+            S(75, 80, 55) +
+            S(75, 80, 40, o.pan) +
+            M(20, 80, 20, 150) +
+            M(130, 80, 130, 150) +
+            da(20, 130, 146, "A") +
+            da(115, 130, 80, "B", 122, 12) +
+            V(150, 55, 80, 50) +
+            W(150, 62, 230, 62, o.ink, 1, "4 3") +
+            W(150, 98, 230, 98, o.ink, 1, "4 3") +
+            M(150, 105, 150, 128) +
+            M(230, 105, 230, 128) +
+            da(150, 230, 124, "C");
+          break;
+        case "kutu":
+          Ka =
+            V(25, 38, 100, 80, 9) +
+            V(37, 50, 76, 56, 4, o.pan) +
+            M(25, 118, 25, 138) +
+            M(125, 118, 125, 138) +
+            da(25, 125, 134, "A") +
+            M(21, 38, 8, 38) +
+            M(21, 118, 8, 118) +
+            Na(38, 118, 12, "B") +
+            da(25, 37, 28, "C", 31, 12) +
+            V(150, 58, 80, 40) +
+            M(150, 98, 150, 122) +
+            M(230, 98, 230, 122) +
+            da(150, 230, 118, "D");
+          break;
+        case "mil":
+          Ka =
+            S(75, 80, 48) +
+            M(27, 80, 27, 142) +
+            M(123, 80, 123, 142) +
+            da(27, 123, 138, "A") +
+            Ha(150, 62, 80, 36, "B");
+          break;
+        case "karedolu":
+          Ka =
+            V(35, 38, 80, 80) +
+            M(35, 118, 35, 140) +
+            M(115, 118, 115, 140) +
+            da(35, 115, 136, "A") +
+            Ha(150, 62, 80, 36, "B");
+          break;
+        case "lama":
+          Ka =
+            V(25, 65, 100, 30) +
+            na(25, 80, 100) +
+            M(25, 95, 25, 120) +
+            M(125, 95, 125, 120) +
+            da(25, 125, 116, "A") +
+            M(125, 65, 146, 65) +
+            M(125, 95, 146, 95) +
+            Na(65, 95, 142, "B", 154, 80) +
+            Ha(170, 65, 65, 30, "C");
+          break;
+        case "alti":
+          Ka =
+            v("M127 80L101 125H49L23 80L49 35H101Z") +
+            M(101, 35, 146, 35) +
+            M(101, 125, 146, 125) +
+            Na(35, 125, 142, "A") +
+            Ha(165, 62, 70, 36, "B");
+          break;
+        case "kure":
+          Ka =
+            S(120, 80, 55) +
+            '<path d="M85 55A42 42 0 0 1 120 38" style="fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;opacity:.7"/>' +
+            M(65, 80, 65, 146) +
+            M(175, 80, 175, 146) +
+            da(65, 175, 142, "A");
+          break;
+        case "kose":
+          Ka =
+            v("M25 30H39V116H115V130H25Z") +
+            M(21, 30, 10, 30) +
+            M(21, 130, 10, 130) +
+            Na(30, 130, 14, "A") +
+            M(25, 130, 25, 150) +
+            M(115, 130, 115, 150) +
+            da(25, 115, 146, "B") +
+            M(25, 26, 25, 12) +
+            M(39, 26, 39, 12) +
+            da(25, 39, 16, "C", 32, 4) +
+            Ha(150, 70, 85, 30, "D");
+          break;
+        case "ibeam":
+          Ka =
+            v("M30 25H120V37H81V123H120V135H30V123H69V37H30Z") +
+            M(26, 25, 12, 25) +
+            M(26, 135, 12, 135) +
+            Na(25, 135, 16, "A") +
+            M(30, 135, 30, 152) +
+            M(120, 135, 120, 152) +
+            da(30, 120, 148, "B") +
+            da(69, 81, 80, "C", 100, 80) +
+            M(120, 25, 136, 25) +
+            M(120, 37, 136, 37) +
+            Na(25, 37, 132, "D", 148, 31) +
+            Ha(168, 70, 67, 30, "E");
+          break;
+        case "ukanal":
+          Ka =
+            v("M30 30H110V42H42V118H110V130H30Z") +
+            M(26, 30, 12, 30) +
+            M(26, 130, 12, 130) +
+            Na(30, 130, 16, "A") +
+            M(30, 130, 30, 150) +
+            M(110, 130, 110, 150) +
+            da(30, 110, 146, "B") +
+            da(30, 42, 80, "C", 70, 80) +
+            M(110, 30, 130, 30) +
+            M(110, 42, 130, 42) +
+            Na(30, 42, 126, "D", 142, 36) +
+            Ha(168, 70, 67, 30, "E");
+          break;
+        case "tprofil":
+          Ka =
+            v("M30 30H120V42H81V130H69V42H30Z") +
+            M(26, 30, 12, 30) +
+            M(26, 130, 12, 130) +
+            Na(30, 130, 16, "A") +
+            M(30, 26, 30, 12) +
+            M(120, 26, 120, 12) +
+            da(30, 120, 14, "B", 75, 6) +
+            da(69, 81, 100, "C", 105, 100) +
+            M(120, 30, 136, 30) +
+            M(120, 42, 136, 42) +
+            Na(30, 42, 132, "D", 148, 36) +
+            Ha(168, 70, 67, 30, "E");
+          break;
+        case "std":
+          Ka =
+            v(
+              I === "UPN"
+                ? "M30 30H110V42H42V118H110V130H30Z"
+                : "M30 25H120V37H81V123H120V135H30V123H69V37H30Z",
+            ) +
+            (d
+              ? ""
+              : `<text x="75" y="156" text-anchor="middle" style="fill:${o.ink};font:700 12px Arial,sans-serif">${I} ${f.olcu || ""}</text>`) +
+            Ha(150, 70, 85, 30, "A");
+          break;
+        default:
+          Ka = "";
+      }
+      return `<svg class="cz${d ? " mini" : ""}" viewBox="${d ? "0 -6 240 172" : "0 -14 240 186"}" role="img" aria-label="${d ? "" : "\xD6l\xE7\xFCl\xFC \xE7izim"}" xmlns="http://www.w3.org/2000/svg">${Ka}</svg>`;
+    }
+    ((La.agirlik = { MALZEME: q, STANDART: ca, SEKIL: oa, hesapla: fa, cizim: za, HARF: G, PAL_RESIM: Ma }),
+      typeof module != "undefined" && module.exports && (module.exports = La));
+  })(),
+  (function () {
+    "use strict";
+    const La = typeof module != "undefined" && module.exports ? require("./core.js") : self.Cekirdek,
+      E = (G, la) => Number(G.toFixed(la === void 0 ? 3 : la)),
+      aa = [
+        [1.6, 0.35, 1.25, 3.2, 1.8],
+        [2, 0.4, 1.6, 4, 2.4],
+        [2.5, 0.45, 2.05, 5, 2.9],
+        [3, 0.5, 2.5, 5.5, 3.4],
+        [4, 0.7, 3.3, 7, 4.5],
+        [5, 0.8, 4.2, 8, 5.5],
+        [6, 1, 5, 10, 6.6],
+        [8, 1.25, 6.8, 13, 9],
+        [10, 1.5, 8.5, 16, 11],
+        [12, 1.75, 10.2, 18, 13.5],
+        [14, 2, 12, 21, 15.5],
+        [16, 2, 14, 24, 17.5],
+        [18, 2.5, 15.5, 27, 20],
+        [20, 2.5, 17.5, 30, 22],
+        [22, 2.5, 19.5, 34, 24],
+        [24, 3, 21, 36, 26],
+        [27, 3, 24, 41, 30],
+        [30, 3.5, 26.5, 46, 33],
+        [33, 3.5, 29.5, 50, 36],
+        [36, 4, 32, 55, 39],
+        [39, 4, 35, 60, 42],
+        [42, 4.5, 37.5, 65, 45],
+        [48, 5, 43, 75, 52],
+      ],
+      q = [
+        [8, 1],
+        [10, 1.25],
+        [10, 1],
+        [12, 1.5],
+        [12, 1.25],
+        [14, 1.5],
+        [16, 1.5],
+        [18, 1.5],
+        [20, 1.5],
+        [22, 1.5],
+        [24, 2],
+        [27, 2],
+        [30, 2],
+        [33, 2],
+        [36, 3],
+        [39, 3],
+        [42, 3],
+        [48, 3],
+      ];
+    function ca(G, la, Ma) {
+      const za = aa.find((f) => f[0] === G),
+        B = {
+          d: G,
+          P: la,
+          ad: "M" + G + (Ma ? "x" + la : ""),
+          d2: E(G - 0.6495 * la),
+          d3: E(G - 1.2269 * la),
+          D1: E(G - 1.0825 * la),
+          ince: !!Ma,
+        };
+      return (
+        (B.alan = E((Math.PI / 4) * Math.pow((B.d2 + B.d3) / 2, 2), 1)),
+        (B.matkap = Ma ? E(G - la, 2) : za ? za[2] : E(G - la, 2)),
+        (B.anahtar = za ? za[3] : null),
+        (B.gecis = za ? za[4] : null),
+        B
+      );
+    }
+    const L = aa.map((G) => ca(G[0], G[1], !1)),
+      Ta = q.map((G) => ca(G[0], G[1], !0)),
+      F = (G, la, Ma) => ({
+        ad: G,
+        inc: la,
+        tpi: Ma,
+        d: E(la * 25.4, 2),
+        P: E(25.4 / Ma, 3),
+        cek: E(la * 25.4 - (1.2806 * 25.4) / Ma, 2),
+      }),
+      ha = [
+        ["1/8", 1 / 8, 40],
+        ["3/16", 3 / 16, 24],
+        ["1/4", 1 / 4, 20],
+        ["5/16", 5 / 16, 18],
+        ["3/8", 3 / 8, 16],
+        ["7/16", 7 / 16, 14],
+        ["1/2", 1 / 2, 12],
+        ["9/16", 9 / 16, 12],
+        ["5/8", 5 / 8, 11],
+        ["3/4", 3 / 4, 10],
+        ["7/8", 7 / 8, 9],
+        ["1", 1, 8],
+        ["1 1/8", 9 / 8, 7],
+        ["1 1/4", 5 / 4, 7],
+        ["1 1/2", 3 / 2, 6],
+        ["1 3/4", 7 / 4, 5],
+        ["2", 2, 4.5],
+      ].map((G) => F(G[0], G[1], G[2])),
+      J = [
+        ["3/16", 3 / 16, 32],
+        ["1/4", 1 / 4, 26],
+        ["5/16", 5 / 16, 22],
+        ["3/8", 3 / 8, 20],
+        ["7/16", 7 / 16, 18],
+        ["1/2", 1 / 2, 16],
+        ["9/16", 9 / 16, 16],
+        ["5/8", 5 / 8, 14],
+        ["3/4", 3 / 4, 12],
+        ["7/8", 7 / 8, 11],
+        ["1", 1, 10],
+        ["1 1/8", 9 / 8, 9],
+        ["1 1/4", 5 / 4, 9],
+      ].map((G) => F(G[0], G[1], G[2])),
+      ba = [
+        ["1/8", 9.728, 28, 8.8],
+        ["1/4", 13.157, 19, 11.8],
+        ["3/8", 16.662, 19, 15.25],
+        ["1/2", 20.955, 14, 19],
+        ["5/8", 22.911, 14, null],
+        ["3/4", 26.441, 14, 24.5],
+        ["1", 33.249, 11, 30.5],
+        ["1 1/4", 41.91, 11, null],
+        ["1 1/2", 47.803, 11, null],
+        ["2", 59.614, 11, null],
+      ].map((G) => ({
+        ad: "G " + G[0],
+        d: G[1],
+        tpi: G[2],
+        P: E(25.4 / G[2], 3),
+        cek: E(G[1] - (1.28 * 25.4) / G[2], 2),
+        matkap: G[3],
+      })),
+      oa = [
+        [6, 8, 2, 2, 1.2, 1],
+        [8, 10, 3, 3, 1.8, 1.4],
+        [10, 12, 4, 4, 2.5, 1.8],
+        [12, 17, 5, 5, 3, 2.3],
+        [17, 22, 6, 6, 3.5, 2.8],
+        [22, 30, 8, 7, 4, 3.3],
+        [30, 38, 10, 8, 5, 3.3],
+        [38, 44, 12, 8, 5, 3.3],
+        [44, 50, 14, 9, 5.5, 3.8],
+        [50, 58, 16, 10, 6, 4.3],
+        [58, 65, 18, 11, 7, 4.4],
+        [65, 75, 20, 12, 7.5, 4.9],
+        [75, 85, 22, 14, 9, 5.4],
+        [85, 95, 25, 14, 9, 5.4],
+        [95, 110, 28, 16, 10, 6.4],
+        [110, 130, 32, 18, 11, 7.4],
+      ].map((G) => ({ dmin: G[0], dmax: G[1], b: G[2], h: G[3], t1: G[4], t2: G[5] }));
+    function fa(G) {
+      if (!(G > 6 && G <= 130))
+        throw new La.GirdiHatasi("Mil \xE7ap\u0131 6 mm'den b\xFCy\xFCk, 130 mm'ye kadar olmal\u0131.");
+      const la = oa.find((Ma) => G > Ma.dmin && G <= Ma.dmax);
+      return Object.assign({ d: G, milOlcu: E(G - la.t1, 2), poyraOlcu: E(G + la.t2, 2) }, la);
+    }
+    La.vida = { METRIK: L, METRIK_INCE: Ta, BSW: ha, BSF: J, BSP: ba, KAMA: oa, kamaBul: fa };
+  })(),
+  (function () {
+    "use strict";
+    const La = typeof module != "undefined" && module.exports ? require("./core.js") : self.Cekirdek,
+      E = La.GirdiHatasi,
+      aa = Math.PI,
+      q = (oa, fa, G, la) => {
+        if (typeof oa != "number" || !isFinite(oa)) throw new E(fa + " say\u0131 olmal\u0131.");
+        if (oa < G || oa > la) throw new E(fa + " " + G + " ile " + la + " aras\u0131nda olmal\u0131.");
+        return oa;
+      },
+      ca = [
+        ["celik", "Yumu\u015Fak \xE7elik (St37, S235)", 30, 180],
+        ["c45", "Orta karbonlu \xE7elik (C45)", 22, 140],
+        ["alasim", "Ala\u015F\u0131ml\u0131 / \u0131slah \xE7eli\u011Fi", 15, 100],
+        ["paslanmaz", "Paslanmaz \xE7elik", 12, 80],
+        ["dokum", "D\xF6kme demir", 20, 110],
+        ["aluminyum", "Al\xFCminyum", 100, 300],
+        ["pirinc", "Pirin\xE7 / bronz", 60, 200],
+        ["plastik", "Plastik (PA, POM)", 80, 200],
+      ];
+    function L(oa) {
+      const fa = oa.islem,
+        G = q(oa.D, "\xC7ap", 0.1, 2e3),
+        la = q(oa.vc, "Kesme h\u0131z\u0131", 1, 2e3);
+      if (!["torna", "freze", "matkap"].includes(fa)) throw new E("\u0130\u015Flem se\xE7in.");
+      const Ma = (1e3 * la) / (aa * G),
+        za = { n: Ma, vc: la, D: G, islem: fa };
+      if (fa === "freze") {
+        const f = q(oa.z, "Di\u015F say\u0131s\u0131", 1, 100),
+          o = q(oa.f, "Di\u015F ba\u015F\u0131na ilerleme", 0.001, 5);
+        ((za.vf = o * f * Ma), (za.f = o), (za.z = f));
+      } else {
+        const f = q(oa.f, "Devir ba\u015F\u0131na ilerleme", 0.001, 5);
+        ((za.vf = f * Ma), (za.f = f));
+      }
+      const B = [];
+      return (
+        Ma > 2e4 &&
+          B.push(
+            "Hesaplanan devir \xE7ok y\xFCksek; tezg\xE2h\u0131n en y\xFCksek devrini a\u015F\u0131yorsa tezg\xE2h s\u0131n\u0131r\u0131nda \xE7al\u0131\u015F\u0131n.",
+          ),
+        fa === "matkap" &&
+          G > 40 &&
+          B.push(
+            "B\xFCy\xFCk \xE7apl\u0131 matkapta devri azalt\u0131n ve kademeli (\xF6nc\xFCl delik) \xE7al\u0131\u015F\u0131n.",
+          ),
+        (za.uyarilar = B),
+        za
+      );
+    }
+    function Ta(oa) {
+      const fa = q(oa.uzunluk, "Kesim uzunlu\u011Fu", 0, 1e8),
+        G = q(oa.hiz, "Kesim h\u0131z\u0131", 1, 1e6),
+        la = Math.round(q(oa.delik, "Delme say\u0131s\u0131", 0, 1e6)),
+        Ma = q(oa.delme, "Delme s\xFCresi", 0, 600),
+        za = q(oa.ucret, "Saatlik makine \xFCcreti", 0, 1e7),
+        B = Math.round(q(oa.adet, "Adet", 1, 1e6)),
+        f = q(oa.hazirlik, "Haz\u0131rl\u0131k \xFCcreti", 0, 1e8),
+        o = q(oa.kg, "Par\xE7a a\u011F\u0131rl\u0131\u011F\u0131", 0, 1e6),
+        d = q(oa.kgFiyat, "Malzeme fiyat\u0131", 0, 1e6),
+        I = q(oa.fire, "Fire", 0, 90),
+        O = q(oa.kar, "K\xE2r", 0, 500),
+        v = (fa / G) * 60 + la * Ma,
+        V = (v / 3600) * za,
+        S = (o * d) / (1 - I / 100),
+        W = V + S + f / B,
+        M = W * (1 + O / 100);
+      return {
+        sn: v,
+        makine: V,
+        malz: S,
+        hazirBirim: f / B,
+        birimMaliyet: W,
+        birim: M,
+        toplam: M * B,
+        adet: B,
+        saat: (v * B) / 3600,
+      };
+    }
+    const F = {
+      sinif: ["8.8", "10.9", "12.9"],
+      d: [
+        ["M4", 2.9, 4.2, 5],
+        ["M5", 5.5, 8.1, 9.5],
+        ["M6", 9.6, 14, 16.5],
+        ["M8", 23, 34, 40],
+        ["M10", 46, 67, 79],
+        ["M12", 79, 115, 135],
+        ["M14", 126, 184, 215],
+        ["M16", 195, 285, 335],
+        ["M18", 280, 400, 470],
+        ["M20", 390, 560, 660],
+        ["M22", 530, 760, 890],
+        ["M24", 670, 960, 1120],
+        ["M27", 990, 1400, 1650],
+        ["M30", 1340, 1910, 2240],
+      ],
+      surtunme: [
+        ["kuru", "Kuru / ya\u011Fs\u0131z (\u2248 \xD71,25)", 1.25],
+        ["normal", "Normal, hafif ya\u011Fl\u0131 (referans)", 1],
+        ["yagli", "Ya\u011Fl\u0131 / gresli (\u2248 \xD70,75)", 0.75],
+      ],
+    };
+    function ha(oa, fa, G) {
+      const la = F.d.find((f) => f[0] === oa),
+        Ma = F.sinif.indexOf(fa),
+        za = F.surtunme.find((f) => f[0] === G);
+      if (!la || Ma < 0 || !za)
+        throw new E("C\u0131vata, s\u0131n\u0131f ve ya\u011Flama durumunu se\xE7in.");
+      const B = la[1 + Ma] * za[2];
+      return { nm: B, kgfm: B / 9.80665, lbfft: B / 1.355818, ad: oa, sinif: fa };
+    }
+    const J = {
+      uzunluk: {
+        ad: "Uzunluk",
+        b: [
+          ["mm", 1],
+          ["cm", 10],
+          ["m", 1e3],
+          ["in\xE7 (in)", 25.4],
+          ["ft", 304.8],
+          ["mil (thou)", 0.0254],
+        ],
+      },
+      kutle: {
+        ad: "K\xFCtle",
+        b: [
+          ["g", 1],
+          ["kg", 1e3],
+          ["ton", 1e6],
+          ["lb", 453.59237],
+          ["oz", 28.349523],
+        ],
+      },
+      basinc: {
+        ad: "Bas\u0131n\xE7",
+        b: [
+          ["bar", 1e5],
+          ["MPa", 1e6],
+          ["kPa", 1e3],
+          ["psi", 6894.757293],
+          ["kgf/cm\xB2", 98066.5],
+          ["atm", 101325],
+        ],
+      },
+      tork: {
+        ad: "Tork",
+        b: [
+          ["N\xB7m", 1],
+          ["kgf\xB7m", 9.80665],
+          ["lbf\xB7ft", 1.3558179],
+          ["lbf\xB7in", 0.1129848],
+        ],
+      },
+      alan: {
+        ad: "Alan",
+        b: [
+          ["mm\xB2", 1],
+          ["cm\xB2", 100],
+          ["m\xB2", 1e6],
+          ["in\xB2", 645.16],
+          ["ft\xB2", 92903.04],
+        ],
+      },
+      kuvvet: {
+        ad: "Kuvvet",
+        b: [
+          ["N", 1],
+          ["kN", 1e3],
+          ["kgf", 9.80665],
+          ["lbf", 4.4482216],
+          ["ton-kuvvet", 9806.65],
+        ],
+      },
+      hiz: {
+        ad: "H\u0131z",
+        b: [
+          ["m/dk", 1],
+          ["mm/dk", 0.001],
+          ["m/sn", 60],
+          ["ft/dk (SFM)", 0.3048],
+        ],
+      },
+      yogunluk: {
+        ad: "Yo\u011Funluk",
+        b: [
+          ["g/cm\xB3", 1],
+          ["kg/m\xB3", 0.001],
+          ["lb/in\xB3", 27.679905],
+        ],
+      },
+    };
+    function ba(oa, fa, G, la) {
+      const Ma = J[oa];
+      if (!Ma) throw new E("Birim t\xFCr\xFCn\xFC se\xE7in.");
+      const za = Ma.b.find((f) => f[0] === G),
+        B = Ma.b.find((f) => f[0] === la);
+      if (!za || !B) throw new E("Birimleri se\xE7in.");
+      return (q(fa, "De\u011Fer", -1e15, 1e15), (fa * za[1]) / B[1]);
+    }
+    ((La.atolye = { VC: ca, devir: L, kesim: Ta, TORK: F, tork: ha, BIRIM: J, cevir: ba }),
+      typeof module != "undefined" && module.exports && (module.exports = La));
+  })());
